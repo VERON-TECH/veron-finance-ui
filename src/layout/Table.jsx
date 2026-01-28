@@ -1,0 +1,152 @@
+
+import { DataTable } from 'primereact/datatable';
+import { Column } from 'primereact/column';
+import "primereact/resources/themes/lara-light-blue/theme.css"
+import { useMemo, useRef } from 'react';
+import { Tooltip } from 'primereact/tooltip';
+import 'primeicons/primeicons.css';
+import { AnimatePresence, motion } from 'framer-motion';
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { Button } from 'primereact/button';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faFolderOpen } from '@fortawesome/free-solid-svg-icons';
+import Modal from './Modal';
+import { useDispatch } from 'react-redux';
+import { modalActions } from '../store/modalSlice';
+import EditUser from '../components/user/EditUser';
+import EditBeneficiary from '../components/beneficiary/EditBeneficiary';
+import EditProject from '../components/projet/EditProject';
+import GetFinancement from '../components/finance/GetFinancement';
+
+
+
+
+
+export default function Table({ data, headers, emptyMessage, sheet, titleRef, size }) {
+
+
+
+  const dt = useRef(null);
+  const exportColumns = headers.map((col) => ({ title: col.header, dataKey: col.field }));
+  const dialog1 = useRef();
+  const dispatch = useDispatch()
+
+
+
+
+
+  const exportCSV = (selectionOnly) => {
+    dt.current.exportCSV({ selectionOnly });
+  };
+
+  const exportExcel = () => {
+    import('xlsx').then((xlsx) => {
+      const worksheet = xlsx.utils.json_to_sheet(data);
+      const workbook = { Sheets: { data: worksheet }, SheetNames: ['data'] };
+      const excelBuffer = xlsx.write(workbook, {
+        bookType: 'xlsx',
+        type: 'array'
+      });
+
+      saveAsExcelFile(excelBuffer, sheet);
+    });
+  };
+
+  const saveAsExcelFile = (buffer, fileName) => {
+    let EXCEL_TYPE = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8';
+    let EXCEL_EXTENSION = '.xlsx';
+    const data = new Blob([buffer], {
+      type: EXCEL_TYPE
+    });
+
+    saveAs(data, fileName + '_export_' + new Date().getTime() + EXCEL_EXTENSION);
+  };
+
+  function handleClick(value) {
+    dispatch(modalActions.updateValue(value))
+    dialog1.current.open();
+  }
+
+
+  const icons = useMemo(() => {
+    return [{
+      header: "Action",
+      title: titleRef,
+      field: data?.map(d => d.id) || [] // Préparer les IDs sans muter un objet
+    }];
+  }, [data]);
+
+
+
+  return <div className="card">
+
+    <Tooltip target=".export-buttons>button" position="bottom" />
+    <DataTable ref={dt}
+      value={data}
+      resizableColumns
+      scrollHeight="400px"
+      columnResizeMode="expand"
+      filterDisplay="row"
+      emptyMessage={emptyMessage}
+      size="small"
+      stripedRows
+      paginator
+      rows={5}
+      rowsPerPageOptions={[5, 10, 25, 50]}
+      tableStyle={{ minWidth: '50rem', fontSize: '0.70em' }}
+      pt={{
+        root: { className: 'bg-sky-950 text-white' },
+        header: { className: 'bg-sky-900 text-white' },
+        bodyRow: { className: 'hover:bg-sky-800 text-white' },
+        paginator: { className: 'bg-sky-900 text-white' }
+      }}
+    >
+
+      {headers.map(header => (
+        <Column key={header.key} field={header.field} header={header.header} sortable></Column>
+      ))}
+
+      {icons[0].field.length > 0 && icons[0].title === titleRef &&
+        icons.map(icon => (
+          <Column
+            key={icon.header}
+            field={icon.field}
+            header={icon.header}
+            sortable
+            body={(rowData) => (
+              <button onClick={() => handleClick(rowData.id)}>
+                <FontAwesomeIcon icon={faFolderOpen} />
+              </button>
+            )}
+          />))}
+
+    </DataTable>
+    <div className="flex items-center justify-end gap-2">
+      <Button type="button" icon="pi pi-file" rounded onClick={() => exportCSV(false)} data-pr-tooltip="CSV" />
+      <Button type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportExcel} data-pr-tooltip="XLS" />
+    </div>
+
+    <AnimatePresence>
+      <Modal ref={dialog1} title={titleRef} size={size}>
+        {titleRef === "Mise à jour informations de l'utilisateur" &&
+          <EditUser />
+        }
+        {titleRef === "Mise à jour informations du bénéficiaire" &&
+          <EditBeneficiary />
+        }
+        {titleRef === "Mise à jour informations d'un segment" &&
+          <EditProject />
+        }
+
+        {titleRef === "Informations sur un financement" &&
+          <GetFinancement />
+        }
+
+
+
+
+      </Modal>
+    </AnimatePresence>
+  </div>
+}

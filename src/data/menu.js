@@ -11,9 +11,12 @@ export const features = [
 ]
 
 export const subFeactures = [
-  { key: 5, menu: "Entreprise", identifier: "administration", url: "enterprise", role: ["ROLE_ADMIN"] },
-  { key: 5, menu: "Agences", identifier: "administration", url: "agency", role: ["ROLE_ADMIN"] },
+  { key: 0, menu: "Entreprise", identifier: "administration", url: "enterprise", role: ["ROLE_ADMIN"] },
+  { key: 1, menu: "Agences", identifier: "administration", url: "agency", role: ["ROLE_ADMIN"] },
 ]
+
+
+
 
 
 

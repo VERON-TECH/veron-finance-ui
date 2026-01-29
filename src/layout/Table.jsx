@@ -14,10 +14,8 @@ import { faFolderOpen } from '@fortawesome/free-solid-svg-icons';
 import Modal from './Modal';
 import { useDispatch } from 'react-redux';
 import { modalActions } from '../store/modalSlice';
-import EditUser from '../components/user/EditUser';
-import EditBeneficiary from '../components/beneficiary/EditBeneficiary';
-import EditProject from '../components/projet/EditProject';
-import GetFinancement from '../components/finance/GetFinancement';
+import UpdateEnterprise from '../components/enterprise/UpdateEnteprise';
+import UpdateAgency from '../components/agency/UpdateAgency';
 
 
 
@@ -129,22 +127,12 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
 
     <AnimatePresence>
       <Modal ref={dialog1} title={titleRef} size={size}>
-        {titleRef === "Mise à jour informations de l'utilisateur" &&
-          <EditUser />
+        {titleRef === "Mise à jour informations de l'entreprise" &&
+          <UpdateEnterprise />
         }
-        {titleRef === "Mise à jour informations du bénéficiaire" &&
-          <EditBeneficiary />
+        {titleRef === "Mise à jour informations de l'agence" &&
+          <UpdateAgency />
         }
-        {titleRef === "Mise à jour informations d'un segment" &&
-          <EditProject />
-        }
-
-        {titleRef === "Informations sur un financement" &&
-          <GetFinancement />
-        }
-
-
-
 
       </Modal>
     </AnimatePresence>

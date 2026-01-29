@@ -22,7 +22,7 @@ export async function login(data) {
   if (response.status === 403) {
     return ["Vous n'êtes pas autorisé à effectuer cette opération"];
   }
-  if (response === 404) {
+  if (response.status === 404) {
     return ["Impossible de recupérer les données"];
   }
 
@@ -57,7 +57,7 @@ export async function connected(username) {
   if (response.status === 403) {
     return ["Vous n'êtes pas autorisé à effectuer cette opération"];
   }
-  if (response === 404) {
+  if (response.status === 404) {
     return ["Impossible de recupérer les données"];
   }
 
@@ -90,7 +90,7 @@ export async function getUser(username) {
   if (response.status === 403) {
     return ["Vous n'êtes pas autorisé à effectuer cette opération"];
   }
-  if (response === 404) {
+  if (response.status === 404) {
     return ["Impossible de recupérer les données"];
   }
 
@@ -120,7 +120,7 @@ export async function getAuthoritiByUsername(username) {
   if (response.status === 403) {
     return ["Vous n'êtes pas autorisé à effectuer cette opération"];
   }
-  if (response === 404) {
+  if (response.status === 404) {
     return ["Impossible de recupérer les données"];
   }
 
@@ -155,7 +155,7 @@ export async function logout(username) {
   if (response.status === 403) {
     return ["Vous n'êtes pas autorisé à effectuer cette opération"];
   }
-  if (response === 404) {
+  if (response.status === 404) {
     return ["Impossible de recupérer les données"];
   }
 
@@ -186,7 +186,7 @@ export async function editPassword(username, userEditPasswordDto) {
   if (response.status === 403) {
     return ["Vous n'êtes pas autorisé à effectuer cette opération"];
   }
-  if (response === 404) {
+  if (response.status === 404) {
     return ["Impossible de recupérer les données"];
   }
 
@@ -199,4 +199,268 @@ export async function editPassword(username, userEditPasswordDto) {
     return data;
   }
 }
+
+
+
+export async function getAllEnterprises() {
+  const url = `${BASE_URL}enterprise/ad/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+
+export async function createEnterprise(enterpriseDto) {
+  const url = `${BASE_URL}enterprise/ad/create/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(enterpriseDto)
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+export async function updateEnterprise({ slug, enterpriseDto }) {
+  const url = `${BASE_URL}enterprise/ad/update/${slug}/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(enterpriseDto)
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+
+export async function getEnterpriseById({ id, signal }) {
+  const url = `${BASE_URL}enterprise/ad/get/${id}/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    signal
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+
+export async function getAllAgencies() {
+  const url = `${BASE_URL}agency/ad-ac/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+
+export async function getAgencyById({ id, signal }) {
+  const url = `${BASE_URL}agency/ad-ac/get/${id}/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    signal
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+
+export async function createAgency(agencyDto) {
+  const url = `${BASE_URL}agency/ad/create/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(agencyDto)
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+export async function updateAgency({ slug, agencyDto }) {
+  const url = `${BASE_URL}agency/ad/update/${slug}/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(agencyDto)
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
 

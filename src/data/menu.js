@@ -1,18 +1,18 @@
 export const features = [
   { key: 0, menu: "Administration", role: ["ROLE_ADMIN"], path: "" },
-  { key: 1, menu: "Finance", role: ["ROLE_ADMIN", "ROLE_AGENT"], path: "projects" },
-  { key: 2, menu: "Stock", role: ["ROLE_ADMIN", "ROLE_SUPERADMIN", "ROLE_AGENT"], path: "human" },
-  { key: 3, menu: "Ressource humaine", role: ["ROLE_SUPERADMIN"], path: "data" },
-
+  { key: 1, menu: "Finances", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"], path: "financial" },
+  { key: 2, menu: "Ressources Humaines", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"], path: "human" },
+  { key: 3, menu: "Dashboard", role: ["ROLE_ADMIN"], path: "reporting" },
+  { key: 4, menu: "Caisses", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSIER"], path: "cash" },
+  { key: 5, menu: "Ventes", role: ["ROLE_CAISSIER"], path: "sale" },
+  { key: 6, menu: "Magasins", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"], path: "store" },
+  { key: 7, menu: "Autres réglages", role: ["ROLE_ADMIN"], path: "setting" },
+  { key: 8, menu: "Base de données", role: ["ROLE_ADMIN"], path: "data" },
 ]
 
 export const subFeactures = [
-  { key: 0, menu: "Utilisateurs", identifier: "users", url: "users", role: ["ROLE_SUPERADMIN", "ROLE_ADMIN"] },
-  { key: 1, menu: "Importations", identifier: "bdd", url: "import", role: ["ROLE_SUPERADMIN"] },
-  { key: 2, menu: "Bénéficiaire", identifier: "beneficiary", url: "beneficiary", role: ["ROLE_ADMIN", "ROLE_AGENT"] },
-  { key: 3, menu: "Segments", identifier: "project", url: "project", role: ["ROLE_ADMIN", "ROLE_AGENT"] },
-  { key: 4, menu: "Financements", identifier: "project", url: "finance", role: ["ROLE_ADMIN", "ROLE_AGENT"] },
-  { key: 5, menu: "Mot de passe", identifier: "users", url: "password", role: ["ROLE_SUPERADMIN", "ROLE_AGENT", "ROLE_ADMIN"] },
+  { key: 5, menu: "Entreprise", identifier: "administration", url: "enterprise", role: ["ROLE_ADMIN"] },
+  { key: 5, menu: "Agences", identifier: "administration", url: "agency", role: ["ROLE_ADMIN"] },
 ]
 
 

@@ -1,7 +1,7 @@
 import { NavLink } from "react-router";
 import Logo from "../../layout/Logo";
 import { features } from "../../data/menu.js";
-import { faDashboard, faProjectDiagram, faUserGroup, faUserLarge } from "@fortawesome/free-solid-svg-icons";
+import { faArchive, faDashboard, faHome, faMoneyBill, faProjectDiagram, faStore, faToolbox, faUserGroup, faUserLarge, faWallet } from "@fortawesome/free-solid-svg-icons";
 import { faDatabase } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
@@ -33,11 +33,15 @@ export default function Nav() {
             end
             onClick={() => handleClick(feature.menu)}
           >
-            {feature.menu === "Segments" && <FontAwesomeIcon icon={faProjectDiagram} className="me-2" />}
-            {feature.menu === "Bénéficiaires" && <FontAwesomeIcon icon={faUserLarge} className="me-2" />}
-            {feature.menu === "Utilisateurs" && <FontAwesomeIcon icon={faUserGroup} className="me-2" />}
-            {feature.menu === "Base de données" && <FontAwesomeIcon icon={faDatabase} className="me-2" />}
+            {feature.menu === "Administration" && <FontAwesomeIcon icon={faHome} className="me-2" />}
+            {feature.menu === "Finances" && <FontAwesomeIcon icon={faMoneyBill} className="me-2" />}
+            {feature.menu === "Ressources Humaines" && <FontAwesomeIcon icon={faUserGroup} className="me-2" />}
+            {feature.menu === "Moyens Généraux" && <FontAwesomeIcon icon={faArchive} className="me-2" />}
             {feature.menu === "Dashboard" && <FontAwesomeIcon icon={faDashboard} className="me-2" />}
+            {feature.menu === "Caisses" && <FontAwesomeIcon icon={faWallet} className="me-2" />}
+            {feature.menu === "Magasins" && <FontAwesomeIcon icon={faStore} className="me-2" />}
+            {feature.menu === "Autres réglages" && <FontAwesomeIcon icon={faToolbox} className="me-2" />}
+            {feature.menu === "Base de données" && <FontAwesomeIcon icon={faDatabase} className="me-2" />}
             {feature.menu}
           </NavLink>
 

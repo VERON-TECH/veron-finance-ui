@@ -11,6 +11,8 @@ const HomePage = lazy(() => import("../pages/Home/Home.jsx"));
 const HomeIndexPage = lazy(() => import("../pages/Home/HomeIndex.jsx"));
 const EnterprisePage = lazy(() => import("../pages/enterprise/Enterprise.jsx"));
 const AgencyPage = lazy(() => import("../pages/agency/Agency.jsx"));
+const BankAccountPage = lazy(() => import("../pages/financial/BankAccount.jsx"));
+const FinancialPage = lazy(() => import("../pages/financial/Financial.jsx"));
 
 
 export const router = createBrowserRouter([
@@ -21,6 +23,8 @@ export const router = createBrowserRouter([
       { index: true, element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><HomeIndexPage /></Suspense> },
       { path: "enterprise", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><EnterprisePage /></Suspense> },
       { path: "agency", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><AgencyPage /></Suspense> },
+      { path: "financial", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><FinancialPage /></Suspense> },
+      { path: "bank-account", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><BankAccountPage /></Suspense> },
 
 
     ]

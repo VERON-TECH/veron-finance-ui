@@ -13,6 +13,10 @@ export const features = [
 export const subFeactures = [
   { key: 0, menu: "Entreprise", identifier: "administration", url: "enterprise", role: ["ROLE_ADMIN"] },
   { key: 1, menu: "Agences", identifier: "administration", url: "agency", role: ["ROLE_ADMIN"] },
+  { key: 2, menu: "Coffre-forts", identifier: "financial", url: "safe", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+  { key: 3, menu: "Caisses", identifier: "financial", url: "cash", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+  { key: 4, menu: "Banques", identifier: "financial", url: "bank-account", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+  { key: 5, menu: "Mobile Money", identifier: "financial", url: "mobile-money", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
 ]
 
 

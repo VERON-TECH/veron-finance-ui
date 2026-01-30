@@ -11,10 +11,10 @@ export default function HomeIndexPage() {
 
 
   useEffect(() => {
-
     if (user.role.includes("ROLE_ADMIN")) {
       dispatch(identifierMenuActions.updateMenu({ menu: "administration" }))
     }
+
 
 
 

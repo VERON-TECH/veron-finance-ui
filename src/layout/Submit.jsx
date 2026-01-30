@@ -1,7 +1,7 @@
 import { useFormStatus } from "react-dom"
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAdd, faAngleDoubleDown, faCircleCheck, faCirclePlus, faCoins, faFileCircleCheck, faFloppyDisk, faFolderOpen, faGraduationCap, faListCheck, faPrint, faSpinner, faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import { faAdd, faAngleDoubleDown, faBank, faCircleCheck, faCirclePlus, faCoins, faFileCircleCheck, faFloppyDisk, faFolderOpen, faGraduationCap, faListCheck, faPrint, faSpinner, faSquarePhone, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { faWindowRestore } from "@fortawesome/free-regular-svg-icons";
 
 
@@ -23,6 +23,8 @@ export default function Submit({ children, disabled = false, ...props }) {
       {children === "Réinitialiser" ? <FontAwesomeIcon icon={faWindowRestore} className="me-2" /> : undefined}
       {children === "Créer un élève" ? <FontAwesomeIcon icon={faUserGroup} className="me-2" /> : undefined}
       {children === "Imprimer" ? <FontAwesomeIcon icon={faPrint} className="me-2" /> : undefined}
+      {children === "Banques" && < FontAwesomeIcon icon={faBank} className="me-2" />}
+      {children === "Opérateurs" && < FontAwesomeIcon icon={faSquarePhone} className="me-2" />}
       {children.includes("Reste à payer") ? <FontAwesomeIcon icon={faCoins} className="me-2" /> : undefined}
       {children.includes("Liste des bénéficiaires") || children.includes("Liste des segments") ? <FontAwesomeIcon icon={faListCheck} className="me-2" /> : undefined}
       {children.includes("Ajouter un bénéficiaire") ? <FontAwesomeIcon icon={faAdd} className="me-2" /> : undefined}

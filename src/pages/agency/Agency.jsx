@@ -23,7 +23,7 @@ export default function AgencyPage() {
 
 
     const { data } = useQuery({
-        queryKey: ["agency"],
+        queryKey: ["agencies"],
         queryFn: getAllAgencies,
         enabled: user.role.includes("ROLE_ADMIN")
     })
@@ -36,7 +36,7 @@ export default function AgencyPage() {
     }
 
     useEffect(() => {
-        dispatch(identifierMenuActions.updateMenu({ menu: "agency" }))
+        dispatch(identifierMenuActions.updateMenu({ menu: "administration" }))
     }, [menu, dispatch])
 
     return <>

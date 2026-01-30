@@ -13,6 +13,9 @@ const EnterprisePage = lazy(() => import("../pages/enterprise/Enterprise.jsx"));
 const AgencyPage = lazy(() => import("../pages/agency/Agency.jsx"));
 const BankAccountPage = lazy(() => import("../pages/financial/BankAccount.jsx"));
 const FinancialPage = lazy(() => import("../pages/financial/Financial.jsx"));
+const SafePage = lazy(() => import("../pages/financial/Safe.jsx"));
+const CashPage = lazy(() => import("../pages/financial/Cash.jsx"));
+const MobileMoneyPage = lazy(() => import("../pages/financial/MobileMoney.jsx"));
 
 
 export const router = createBrowserRouter([
@@ -25,6 +28,9 @@ export const router = createBrowserRouter([
       { path: "agency", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><AgencyPage /></Suspense> },
       { path: "financial", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><FinancialPage /></Suspense> },
       { path: "bank-account", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><BankAccountPage /></Suspense> },
+      { path: "safe", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SafePage /></Suspense> },
+      { path: "cash", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><CashPage /></Suspense> },
+      { path: "mobile-money", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><MobileMoneyPage /></Suspense> },
 
 
     ]

@@ -17,6 +17,7 @@ export const subFeactures = [
   { key: 3, menu: "Caisses", identifier: "financial", url: "cash", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
   { key: 4, menu: "Banques", identifier: "financial", url: "bank-account", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
   { key: 5, menu: "Mobile Money", identifier: "financial", url: "mobile-money", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+
 ]
 
 

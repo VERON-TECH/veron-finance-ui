@@ -16,6 +16,12 @@ import { useDispatch } from 'react-redux';
 import { modalActions } from '../store/modalSlice';
 import UpdateEnterprise from '../components/enterprise/UpdateEnteprise';
 import UpdateAgency from '../components/agency/UpdateAgency';
+import UpdateSafe from '../components/safe/UpdateSafe';
+import UpdateCash from '../components/cash/UpdateCash';
+import UpdateBankAccount from '../components/bankAccount/UpdateBankAccount';
+import UpdateBank from '../components/bankAccount/UpdateBank';
+import UpdateMobileMoney from '../components/mobile_money/UpdateMobileMoney';
+import UpdateOperator from '../components/mobile_money/UpdateOperator';
 
 
 
@@ -133,6 +139,39 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
         {titleRef === "Mise à jour informations de l'agence" &&
           <UpdateAgency />
         }
+
+        {titleRef === "Mise à jour informations du coffre-fort" &&
+          <UpdateSafe />
+        }
+
+        {titleRef === "Mise à jour informations de la caisse" &&
+          <UpdateCash />
+        }
+
+        {titleRef === "Mise à jour informations d'un compte bancaire" &&
+          <UpdateBankAccount />
+        }
+
+        {titleRef === "Mise à jour informations d'une banque" &&
+          <UpdateBank />
+        }
+
+        {titleRef === "Mise à jour informations d'un compte mobile money" &&
+          <UpdateMobileMoney />
+        }
+
+        {titleRef === "Mise à jour informations d'un opérateur" &&
+          <UpdateOperator />
+        }
+
+
+
+
+
+
+
+
+
 
       </Modal>
     </AnimatePresence>

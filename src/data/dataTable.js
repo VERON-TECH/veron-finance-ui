@@ -82,3 +82,186 @@ export const agencies = {
     ]
 
 }
+
+
+export const safes = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Nom", field: "name" },
+        { key: 4, header: "Solde", field: "balance" },
+        { key: 5, header: "Créée le", field: "dateCreated" },
+        { key: 6, header: "Par", field: "userCreated" },
+        { key: 7, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 8, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Nom",
+        "Solde",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+
+export const cashes = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Nom", field: "name" },
+        { key: 4, header: "Type", field: "type" },
+        { key: 5, header: "Personnel", field: "personal" },
+        { key: 6, header: "Coffre-fort", field: "safe" },
+        { key: 7, header: "Solde", field: "balance" },
+        { key: 8, header: "Créée le", field: "dateCreated" },
+        { key: 9, header: "Par", field: "userCreated" },
+        { key: 10, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 11, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Nom",
+        "Type",
+        "Personnel",
+        "Coffre-fort",
+        "Solde",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+
+export const bankAccounts = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Banque", field: "bank" },
+        { key: 3, header: "R.I.B.", field: "rib" },
+        { key: 4, header: "Solde", field: "balance" },
+        { key: 5, header: "Emprunt", field: "borrowMoney" },
+        { key: 6, header: "Prêt", field: "loanMoney" },
+        { key: 7, header: "Agences", field: "agencies" },
+        { key: 8, header: "Créée le", field: "dateCreated" },
+        { key: 9, header: "Par", field: "userCreated" },
+        { key: 10, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 11, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Banque",
+        "R.I.B.",
+        "Solde",
+        "Emprunt",
+        "Prêt",
+        "Agences",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+export const banks = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Nom", field: "name" },
+        { key: 2, header: "Créée le", field: "dateCreated" },
+        { key: 3, header: "Par", field: "userCreated" },
+        { key: 4, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 5, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Nom",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+
+export const mobileMonies = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Pays", field: "country" },
+        { key: 3, header: "Opérateur", field: "operator" },
+        { key: 4, header: "Tél.", field: "phone" },
+        { key: 5, header: "Solde", field: "balance" },
+        { key: 6, header: "Agences", field: "agencies" },
+        { key: 7, header: "Créée le", field: "dateCreated" },
+        { key: 8, header: "Par", field: "userCreated" },
+        { key: 9, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 10, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Pays",
+        "Opérateur",
+        "Tél.",
+        "Solde",
+        "Agences",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+export const operators = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Nom", field: "name" },
+        { key: 2, header: "Créée le", field: "dateCreated" },
+        { key: 3, header: "Par", field: "userCreated" },
+        { key: 4, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 5, header: "Par", field: "userUpdated" },
+    ],
+
+    global: [
+        "Nom",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}

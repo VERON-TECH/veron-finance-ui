@@ -2,7 +2,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useRef } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getBankById, getOperatorById, updateBank, updateOperator } from "../../utils/http";
+import { getOperatorById, queryClient, updateOperator } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
@@ -31,7 +31,7 @@ export default function UpdateOperator() {
 
         if (!isNotEmpty(name)) {
             animate(inputName.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("veuillez renseigner le nom de la banque.")
+            errors.push("veuillez renseigner le nom de l'opérateur.")
         }
 
 
@@ -89,10 +89,9 @@ export default function UpdateOperator() {
 
     return <>
 
-        <form action={formAction} className="rounded-lg text-sky-50 p-4" ref={scope}>
+        <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
                 <Input label="Nom*" type="text" defaultValue={data?.name} name="name" placeholder="Nom de l'opérateur" className="border border-sky-950" onBlur={(event) => handleBlur("name", event.target.value)} ref={inputName} />
-
             </div>
 
             <Submit>

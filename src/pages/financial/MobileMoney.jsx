@@ -1,23 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllBankAccount, getAllCashes, getAllMobileMoney } from "../../utils/http";
+import { getAllMobileMoney } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
 import { useEffect, useRef } from "react";
 import Submit from "../../layout/Submit.jsx"
 import Table from "../../layout/Table.jsx"
 import Modal from "../../layout/Modal.jsx";
 import { identifierMenuActions } from "../../store/identifierSlice.js"
-import CreateCash from "../../components/cash/CreateCash.jsx";
-import { bankAccounts, cashes, mobileMonies } from "../../data/dataTable.js";
-import CreateBankAccount from "../../components/bankAccount/CreateBankAccount.jsx";
-import CreateBank from "../../components/bankAccount/CreateBank.jsx";
+import { mobileMonies } from "../../data/dataTable.js";
 import CreateMobileMoney from "../../components/mobile_money/CreateMobileMoney.jsx";
 import Operator from "../../components/mobile_money/Operator.jsx";
 
 
 
 
-export default function BMobileMoneyPage() {
+export default function MobileMoneyPage() {
     const user = JSON.parse(localStorage.getItem("user"));
     const errorNotification = useSelector(state => state.note.error);
     const relaunch = useSelector(state => state.note.relaunch);
@@ -57,8 +54,8 @@ export default function BMobileMoneyPage() {
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("operator")}>Opérateurs</Submit> : undefined}
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("account")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={mobileMonies.header} emptyMessage="Aucun compte mobile money trouvé." globalFilterFields={bankAccounts.global} sheet="Compte bancaire" titleRef="Mise à jour informations d'un compte mobile money" size="lg:h-5/11 lg:w-4/15" />
-        <Modal ref={dialog} size="lg:h-3/11 lg:w-4/15" title="Créer une compte mobile money">
+        <Table data={data} headers={mobileMonies.header} emptyMessage="Aucun compte mobile money trouvé." globalFilterFields={mobileMonies.global} sheet="Compte mobile money" titleRef="Mise à jour informations d'un compte mobile money" size="lg:h-7/13 lg:w-4/15" />
+        <Modal ref={dialog} size="lg:h-5/11 lg:w-4/15" title="Créer une compte mobile money">
             <CreateMobileMoney />
         </Modal>
         <Modal ref={dialog1} size="lg:h-6/11 lg:w-12/15 overflow-auto" title="Opérateurs">

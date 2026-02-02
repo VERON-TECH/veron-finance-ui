@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useRef } from "react";
 import { useDispatch } from "react-redux";
-import { createEnterprise } from "../../utils/http";
+import { createEnterprise, queryClient } from "../../utils/http";
 import Select from "../../layout/Select.jsx"
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
@@ -216,7 +216,7 @@ export default function CreateEnterprise() {
 
     return <>
 
-        <form action={formAction} className="rounded-lg text-sky-50 p-4" ref={scope}>
+        <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
 
             <div className="flex justify-between gap-2">
                 <Select label="Pays *" id="country" name="country" selectedTitle="Sélectionner un pays" data={countries} ref={selectCountry} />

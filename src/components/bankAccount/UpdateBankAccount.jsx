@@ -2,14 +2,19 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getBankAccountById, getBankById, getEnterpriseById, updateBankAccount } from "../../utils/http";
+import { getBankAccountById, getBankById, getEnterpriseById, queryClient, updateBankAccount } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
 import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
+import CreateBank from "./CreateBank.jsx";
+import Modal from "../../layout/Modal.jsx";
+import AuthorizationBankAgency from "./AuthorizationBankAgency.jsx";
+import { dataTableActions } from "../../store/dataTableSlice.js";
 
 export default function UpdateBankAccount() {
+    const dialog = useRef();
     const inputEnterprise = useRef();
     const inputBank = useRef();
     const inputRib = useRef();
@@ -131,20 +136,33 @@ export default function UpdateBankAccount() {
         }
     }
 
+
+
+    function handleClick() {
+        dispatch(dataTableActions.getRib({ rib: data?.rib }))
+        dialog.current.open()
+    }
+
     return <>
 
-        <form action={formAction} className="rounded-lg text-sky-50 p-4" ref={scope}>
+        <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
                 <Input label="Banque *" type="text" defaultValue={data?.bank} name="bank" placeholder="Nom de la banque" className="border border-sky-950" onBlur={(event) => handleBlur("bank", event.target.value)} ref={inputBank} readOnly />
                 <Input label="Entreprise *" type="text" defaultValue={data?.enterprise} name="enterprise" placeholder="Nom de l'entreprise" className="border border-sky-950" onBlur={(event) => handleBlur("enterprise", event.target.value)} ref={inputEnterprise} readOnly />
                 <Input label="R.I.B. *" type="text" defaultValue={data?.rib} name="rib" placeholder="Nº du compte bancaire" className="border border-sky-950" onBlur={(event) => handleBlur("rib", event.target.value)} ref={inputRib} />
             </div>
 
-            <Submit>
+            {user.role.includes("ROLE_ADMIN") && <Submit>
                 Enregistrer
-            </Submit>
+            </Submit>}
         </form>
+        {user.role.includes("ROLE_ADMIN") && <Submit onClick={handleClick} className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
+            Agences autorisées
+        </Submit>}
 
+        <Modal ref={dialog} size="lg:h-6/11 lg:w-12/15 overflow-auto" title="Agences autorisés">
+            <AuthorizationBankAgency />
+        </Modal>
 
     </>
 

@@ -2,22 +2,24 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { createBankAccount, getAllBanks, getAllEnterprises } from "../../utils/http";
+import { createMobileMoney, getAllEnterprises, getAllOperators, queryClient } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
 import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
 import Select from "../../layout/Select.jsx";
+import { countries } from "../../data/info.js";
 
 export default function CreateMobileMoney() {
     const selectEnterprise = useRef();
-    const selectBank = useRef();
-    const inputRib = useRef();
+    const selectOperator = useRef();
+    const selectCountry = useRef();
+    const inputPhone = useRef();
     const dispatch = useDispatch();
     const [scope, animate] = useAnimate();
     const [data, setData] = useState({
-        banks: [],
+        operators: [],
         enterprises: []
     })
 
@@ -27,10 +29,10 @@ export default function CreateMobileMoney() {
             tb1: []
         }
         async function get() {
-            const allBanks = await getAllBanks()
+            const allOperators = await getAllOperators()
             const allEnterprises = await getAllEnterprises()
-            allBanks.forEach(b => {
-                tbEl.tb.push({ id: b.id, name: b.name, value: b.slug })
+            allOperators.forEach(o => {
+                tbEl.tb.push({ id: o.id, name: o.name, value: o.slug })
             })
             allEnterprises.forEach(e => {
                 tbEl.tb1.push({ id: e.id, name: e.name, value: e.slug })
@@ -38,7 +40,7 @@ export default function CreateMobileMoney() {
             setData(prev => {
                 return {
                     ...prev,
-                    banks: tbEl.tb,
+                    operators: tbEl.tb,
                     enterprises: tbEl.tb1
                 }
             })
@@ -49,22 +51,28 @@ export default function CreateMobileMoney() {
     async function handleSubmit(prevState, formData) {
         const allData = Object.fromEntries(formData.entries())
         let errors = [];
-        const rib = formData.get("rib")
-        const bank = formData.get("bank")
+        const country = formData.get("country")
+        const operator = formData.get("operator")
         const enterprise = formData.get("enterprise")
+        const phone = formData.get("phone")
 
-        if (!isNotEmpty(rib)) {
-            animate(inputRib.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("veuillez renseigner le nom.")
+        if (!isNotEmpty(phone)) {
+            animate(inputPhone.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+            errors.push("veuillez renseigner le nº de téléphone.")
         }
 
-        if (bank === null) {
-            animate(selectBank.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("veuillez sélectionner la banque.")
+        if (operator === null) {
+            animate(selectOperator.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+            errors.push("veuillez sélectionner l'opérateur.")
+        }
+
+        if (country === null) {
+            animate(selectCountry.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+            errors.push("veuillez sélectionner le pays.")
         }
 
         if (enterprise === null) {
-            animate(selectBank.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+            animate(selectEnterprise.current, { x: [0, 15, 0] }, { bounce: 0.75 })
             errors.push("veuillez sélectionner l'entrerprise.")
         }
 
@@ -77,8 +85,7 @@ export default function CreateMobileMoney() {
 
             return {
                 errors, enteredValue: {
-                    name,
-                    rib,
+                    phone,
                 }
             }
         }
@@ -92,7 +99,7 @@ export default function CreateMobileMoney() {
 
 
     const { mutate } = useMutation({
-        mutationFn: createBankAccount,
+        mutationFn: createMobileMoney,
         onSuccess: (responseData) => {
             const state = responseHttp(responseData);
             if (state) {
@@ -103,24 +110,20 @@ export default function CreateMobileMoney() {
             dispatch(noteActions.show());
             dispatch(noteActions.relaunch());
             dispatch(noteActions.sendData(responseData))
-            queryClient.cancelQueries(["mobilemonies"])
+            queryClient.cancelQueries(["mobilemoney"])
         }
     })
 
 
     function handleBlur(field, value) {
 
-        if (field === "name") {
+        if (field === "phone") {
             if (!isNotEmpty(value)) {
-                animate(inputName.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+                animate(inputPhone.current, { x: [0, 15, 0] }, { bounce: 0.75 })
             }
         }
 
-        if (field === "rib") {
-            if (!isNotEmpty(value)) {
-                animate(inputRib.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            }
-        }
+
     }
 
 
@@ -128,11 +131,12 @@ export default function CreateMobileMoney() {
 
     return <>
 
-        <form action={formAction} className="rounded-lg text-sky-50 p-4" ref={scope}>
+        <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
-                <Select label="Banque *" id="bank" name="bank" selectedTitle="Sélectionner une banque" data={data.banks} ref={selectBank} />
+                <Select label="Pays *" id="country" name="country" selectedTitle="Sélectionner un pays" data={countries} ref={selectCountry} />
+                <Select label="Opérateur *" id="operator" name="operator" selectedTitle="Sélectionner un opérateur" data={data.operators} ref={selectOperator} />
                 <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data.enterprises} ref={selectEnterprise} />
-                <Input label="R.I.B. *" type="text" defaultValue={formState.enteredValue?.rib} name="rib" placeholder="Nº du compte bancaire" className="border border-sky-950" onBlur={(event) => handleBlur("rib", event.target.value)} ref={inputRib} />
+                <Input label="Tél. *" type="text" defaultValue={formState.enteredValue?.phone} name="phone" placeholder="Nº de téléphone" className="border border-sky-950" onBlur={(event) => handleBlur("phone", event.target.value)} ref={inputPhone} />
             </div>
 
             <Submit>

@@ -12,11 +12,6 @@ export default function HomePage() {
   const token = getToken();
 
 
-
-
-
-
-
   return <>
     <Header />
     <Nav />

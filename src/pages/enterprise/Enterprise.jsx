@@ -41,7 +41,7 @@ export default function EnterprisePage() {
         <div className="flex justify-center mb-2">
             {user.role.includes("ROLE_ADMIN") && <Submit onClick={handleModal}>Nouveau</Submit>}
         </div>
-        <Table data={data} headers={enterprises.header} emptyMessage="Aucune entreprise trouvée." globalFilterFields={enterprises.global} sheet="Entreprises" titleRef="Mise à jour informations de l'entreprise" size="lg:h-7.5/11 lg:w-8/15" />
+        <Table data={data} headers={enterprises.header} emptyMessage="Aucune entreprise trouvée." globalFilterFields={enterprises.global} sheet="Entreprises" titleRef="Mise à jour informations de l'entreprise" size="lg:h-6/9 lg:w-8/15" />
         <Modal ref={dialog} size="lg:h-6/9 lg:w-8/15" title="Créer une entreprise">
             <CreateEnterprise />
         </Modal>

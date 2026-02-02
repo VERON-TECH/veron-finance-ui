@@ -1,4 +1,4 @@
-import { faSignOut, faUser } from "@fortawesome/free-solid-svg-icons"
+import { faBuilding, faHome, faSignOut, faUser } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useSubmit } from "react-router"
 import Submit from "../../layout/Submit"
@@ -7,14 +7,16 @@ import Modal from "../../layout/Modal"
 import { AnimatePresence } from "framer-motion"
 import { useDispatch } from "react-redux"
 import { authActions } from "../../store/authSlice"
-import { logout } from "../../utils/http"
+import { getAgencyById, getEnterpriseById, logout } from "../../utils/http"
+import Select from "../../layout/Select"
 
 
 export default function Header() {
-  const [user, setUser] = useState({ username: "", role: [] })
+  const [user, setUser] = useState({ username: "", role: [], enterprise: "", agency: "", store: [], cash: [] })
   const dialog = useRef();
   const submit = useSubmit();
   const dispatch = useDispatch();
+
 
   function handleShowModal() {
     dialog.current.open();
@@ -22,7 +24,7 @@ export default function Header() {
 
   async function handleLogout() {
     const user = JSON.parse(localStorage.getItem("user"))
-    await logout(user?.refUsers);
+    await logout(user?.username);
     submit(null, { method: "post" }, { action: "/" })
     dispatch(authActions.logout())
   }
@@ -30,17 +32,48 @@ export default function Header() {
   function handleExit() {
     dialog.current.close();
   }
+  const userItem = JSON.parse(localStorage.getItem("user"))
 
   useEffect(() => {
-    const userItem = JSON.parse(localStorage.getItem("user"))
-    setUser(prev => {
-      return {
-        ...prev,
-        username: userItem?.username,
-        role: userItem?.role,
-        fullName: userItem?.fullName
+    let enterprise = ""
+    let agency = ""
+    if (enterprise == "" && agency == "") {
+      async function get(signal) {
+        if (userItem.enterprise != 0) {
+          const enterpriseItem = await getEnterpriseById({ id: userItem.enterprise, signal })
+          enterprise = enterpriseItem.slug
+
+        } else {
+          enterprise = userItem.enterprise;
+        }
+
+        if (userItem.agency != 0) {
+
+          const agencyItem = await getAgencyById({ id: userItem.agency, signal })
+          agency = agencyItem.slug
+
+        } else {
+          agency = userItem.enterprise;
+        }
+
+
+
+        setUser(prev => {
+          return {
+            ...prev,
+            username: userItem?.username,
+            role: userItem?.role,
+            fullName: userItem?.fullName,
+            enterprise,
+            agency
+          }
+        })
+
       }
-    })
+      get()
+    }
+
+
   }, [])
 
 
@@ -48,7 +81,40 @@ export default function Header() {
   return <>
 
     <header className="flex gap-10 absolute right-0 top-0 h-2/25 p-4">
+      <span className="font-bold italic"><FontAwesomeIcon icon={faBuilding} className="me-2" />{user?.enterprise}</span>
+      <span className="font-bold italic"><FontAwesomeIcon icon={faHome} className="me-2" />{user?.agency}</span>
       <span className="font-bold italic"> <span className="font-bold italic"><FontAwesomeIcon icon={faUser} className="me-2" /></span>{user.username}</span>
+      {userItem?.cashes.length > 0 &&
+        <select
+          name="cash"
+          id="cash"
+          className="text-sky-950 rounded border border-sky-950 font-bold italic"
+          defaultValue="Caisses"
+        >
+          <option disabled>Caisses</option>
+          {userItem?.cashes.map(c => (
+            <option key={c.key} value={c.value}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      }
+
+      {userItem?.cashes.length > 0 &&
+        <select
+          name="store"
+          id="store"
+          className="text-sky-950 rounded border border-sky-950 font-bold italic"
+          defaultValue="Magasins"
+        >
+          <option disabled>Caisses</option>
+          {userItem?.cashes.map(c => (
+            <option key={c.key} value={c.value}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+      }
       {user?.role?.map(r => (
         <span className="font-bold italic" key={r}>{r.replace("ROLE_", "")}</span>
       ))}

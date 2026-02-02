@@ -1,8 +1,8 @@
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAgencyById, getEnterpriseById, updateAgency } from "../../utils/http";
+import { getAgencyById, getEnterpriseById, queryClient, updateAgency } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isEmail, isNotEmpty } from "../../utils/validation.jsx"
@@ -169,7 +169,7 @@ export default function UpdateAgency() {
 
     return <>
 
-        <form action={formAction} className="rounded-lg text-sky-50 p-4" ref={scope}>
+        <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
                 <Input label="Entreprise *" type="text" name="enterprise" id="enterprise" defaultValue={data?.enterprise} readOnly className="border border-sky-950" ref={inputEnterprise} />
                 <Input label="Nom *" type="text" defaultValue={data?.agency.name} name="name" placeholder="Nom de l'agence" className="border border-sky-950" onBlur={(event) => handleBlur("name", event.target.value)} ref={inputName} />

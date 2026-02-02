@@ -265,3 +265,159 @@ export const operators = {
     ]
 
 }
+
+
+
+export const storePrincipals = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Nom", field: "name" },
+        { key: 3, header: "Agences", field: "agencies" },
+        { key: 4, header: "Créée le", field: "dateCreated" },
+        { key: 5, header: "Par", field: "userCreated" },
+        { key: 6, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 7, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Nom",
+        "Agences",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+export const personals = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Nom", field: "lastName" },
+        { key: 4, header: "Prénom", field: "firstName" },
+        { key: 5, header: "Email", field: "email" },
+        { key: 6, header: "Tél.", field: "phone" },
+        { key: 7, header: "Tél2.", field: "phone2" },
+        { key: 8, header: "Ville", field: "city" },
+        { key: 9, header: "Adresse", field: "address" },
+        { key: 10, header: "B.P.", field: "box" },
+        { key: 11, header: "Genre", field: "gender" },
+        { key: 12, header: "Date de naissance", field: "dateBirth" },
+        { key: 13, header: "Lieu de naissance", field: "placeBirth" },
+        { key: 14, header: "Remunération", field: "remuneration" },
+        { key: 15, header: "Magasins", field: "stores" },
+        { key: 16, header: "Fonction", field: "title" },
+        { key: 17, header: "Créée le", field: "dateCreated" },
+        { key: 18, header: "Par", field: "userCreated" },
+        { key: 19, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 20, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Nom",
+        "Prénom",
+        "Email",
+        "Tél.",
+        "Tél2.",
+        "Ville",
+        "Adresse",
+        "B.P.",
+        "Genre",
+        "Date de naissance",
+        "Lieu de naissance",
+        "Remunération",
+        "Magasins",
+        "Fonction",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+export const titles = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Nom", field: "name" },
+        { key: 2, header: "Créée le", field: "dateCreated" },
+        { key: 3, header: "Par", field: "userCreated" },
+        { key: 4, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 5, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Nom",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+
+export const users = {
+
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Personnel", field: "personal" },
+        { key: 2, header: "Login", field: "username" },
+        { key: 3, header: "Nom", field: "lastName" },
+        { key: 4, header: "Prénom", field: "firstName" },
+        { key: 5, header: "Email", field: "email" },
+        { key: 6, header: "Tél.", field: "phone" },
+        { key: 8, header: "Actif", field: "enabled" },
+        { key: 9, header: "Connecté", field: "connected" },
+        { key: 10, header: "Rôle", field: "authorities" },
+        { key: 11, header: "Nombre connexion", field: "connexion" },
+        { key: 12, header: "Créée le", field: "dateCreated" },
+        { key: 13, header: "Par", field: "userCreated" },
+        { key: 14, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 15, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Nom",
+        "Prénom",
+        "Email",
+        "Tél.",
+        "Tél2.",
+        "Ville",
+        "Adresse",
+        "B.P.",
+        "Genre",
+        "Date de naissance",
+        "Lieu de naissance",
+        "Remunération",
+        "Magasins",
+        "Fonction",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}

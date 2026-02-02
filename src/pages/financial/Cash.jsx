@@ -23,8 +23,8 @@ export default function CashPage() {
 
 
     const { data } = useQuery({
-        queryKey: ["cashes"],
-        queryFn: getAllCashes,
+        queryKey: ["cashes", { enterprise: user.enterprise, agency: user.agency }],
+        queryFn: ({ signal }) => getAllCashes({ signal, enterprise: user.enterprise, agency: user.agency }),
         enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")
     })
 

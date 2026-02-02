@@ -15,6 +15,14 @@ export default function HomeIndexPage() {
       dispatch(identifierMenuActions.updateMenu({ menu: "administration" }))
     }
 
+    if (user.role.includes("ROLE_RESPONSABLE_RH")) {
+      dispatch(identifierMenuActions.updateMenu({ menu: "personal" }))
+    }
+
+    if (user.role.includes("ROLE_COMPTABLE")) {
+      dispatch(identifierMenuActions.updateMenu({ menu: "financial" }))
+    }
+
 
 
 

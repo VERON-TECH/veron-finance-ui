@@ -6,6 +6,9 @@ let title;
 if (user?.role.includes("ROLE_ADMIN")) {
   menu = "administration"
   title = "Entreprise"
+} if (user?.role.includes("ROLE_RESPONSABLE_RH")) {
+  menu = "personal"
+  title = "Personnels"
 }
 
 const identifierSlice = createSlice({

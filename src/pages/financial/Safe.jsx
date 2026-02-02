@@ -22,11 +22,6 @@ export default function SafePage() {
     const menu = useSelector(state => state.identifier.menu)
 
 
-    const { data } = useQuery({
-        queryKey: ["safes"],
-        queryFn: getAllSafes,
-        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")
-    })
 
 
     const dialog = useRef()
@@ -38,6 +33,14 @@ export default function SafePage() {
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "financial" }))
     }, [menu, dispatch])
+
+
+
+    const { data } = useQuery({
+        queryKey: ["safes", { enterprise: user.enterprise, agency: user.agency }],
+        queryFn: ({ signal }) => getAllSafes({ signal, enterprise: user.enterprise, agency: user.agency }),
+        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")
+    })
 
     return <>
         <div className="flex justify-center mb-2">

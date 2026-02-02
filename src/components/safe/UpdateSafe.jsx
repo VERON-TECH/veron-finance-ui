@@ -2,24 +2,29 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAgencyById, getEnterpriseById, getSafeById, updateSafe } from "../../utils/http";
+import { getAgencyById, getEnterpriseById, getSafeById, queryClient, updateSafe } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
 import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
+import { dataTableActions } from "../../store/dataTableSlice.js";
+import Modal from "../../layout/Modal.jsx";
+import AuthorizationSafeCash from "./AuthorizationSafeCash.jsx";
 
 export default function UpdateSafe() {
     const inputEnterprise = useRef();
     const inputAgency = useRef();
     const inputName = useRef();
     const dispatch = useDispatch();
+    const dialog = useRef()
     const [scope, animate] = useAnimate();
     const user = JSON.parse(localStorage.getItem("user"))
     const [data, setData] = useState({
         enterprise: "",
         agency: "",
-        name: ""
+        name: "",
+        slug: ""
     })
     const id = useSelector(state => state.modal.value)
     useEffect(() => {
@@ -33,6 +38,7 @@ export default function UpdateSafe() {
                         ...prev,
                         enterprise: enterprise.slug,
                         agency: agency.slug,
+                        slug: safe.slug,
                         name: safe.name,
                     }
                 })
@@ -120,9 +126,15 @@ export default function UpdateSafe() {
         }
     }
 
+    function handleClick() {
+        dispatch(dataTableActions.getSafeSlug({ safeSlug: data?.slug }))
+        dialog.current.open()
+    }
+
+
     return <>
 
-        <form action={formAction} className="rounded-lg text-sky-50 p-4" ref={scope}>
+        <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
                 <Input label="Entreprise *" type="text" defaultValue={data?.enterprise} name="enterprise" placeholder="Nom de l'entreprise" className="border border-sky-950" onBlur={(event) => handleBlur("enterprise", event.target.value)} ref={inputEnterprise} readOnly />
                 <Input label="Nom *" type="text" defaultValue={data?.agency} name="agency" placeholder="Nom de l'agence" className="border border-sky-950" onBlur={(event) => handleBlur("agency", event.target.value)} ref={inputAgency} readOnly />
@@ -133,6 +145,15 @@ export default function UpdateSafe() {
                 Enregistrer
             </Submit>
         </form>
+
+        <Submit className="absolute bottom-10 left-1/2 transform -translate-x-1/2" onClick={handleClick}>
+            Caisses autorisées
+        </Submit>
+
+        <Modal ref={dialog} size="lg:h-6/11 lg:w-12/15 overflow-auto" title="Caisses autorisées">
+            <AuthorizationSafeCash />
+        </Modal>
+
 
 
     </>

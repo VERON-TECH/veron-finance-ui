@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { createBankAccount, getAllBanks, getAllEnterprises } from "../../utils/http";
+import { createBankAccount, getAllBanks, getAllEnterprises, queryClient } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
@@ -30,10 +30,10 @@ export default function CreateBankAccount() {
             const allBanks = await getAllBanks()
             const allEnterprises = await getAllEnterprises()
             allBanks.forEach(b => {
-                tbEl.tb.push({ id: b.id, name: b.name, value: b.slug })
+                tbEl.tb.push({ key: b.id, name: b.name, value: b.slug })
             })
             allEnterprises.forEach(e => {
-                tbEl.tb1.push({ id: e.id, name: e.name, value: e.slug })
+                tbEl.tb1.push({ key: e.id, name: e.name, value: e.slug })
             })
             setData(prev => {
                 return {
@@ -64,7 +64,7 @@ export default function CreateBankAccount() {
         }
 
         if (enterprise === null) {
-            animate(selectBank.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+            animate(selectEnterprise.current, { x: [0, 15, 0] }, { bounce: 0.75 })
             errors.push("veuillez sélectionner l'entrerprise.")
         }
 
@@ -110,11 +110,7 @@ export default function CreateBankAccount() {
 
     function handleBlur(field, value) {
 
-        if (field === "name") {
-            if (!isNotEmpty(value)) {
-                animate(inputName.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            }
-        }
+
 
         if (field === "rib") {
             if (!isNotEmpty(value)) {
@@ -128,10 +124,10 @@ export default function CreateBankAccount() {
 
     return <>
 
-        <form action={formAction} className="rounded-lg text-sky-50 p-4" ref={scope}>
+        <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
-                <Select label="Banque *" id="bank" name="bank" selectedTitle="Sélectionner une banque" data={data.banks} ref={selectBank} />
-                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data.enterprises} ref={selectEnterprise} />
+                <Select label="Banque *" id="bank" name="bank" selectedTitle="Sélectionner une banque" data={data?.banks} ref={selectBank} />
+                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} />
                 <Input label="R.I.B. *" type="text" defaultValue={formState.enteredValue?.rib} name="rib" placeholder="Nº du compte bancaire" className="border border-sky-950" onBlur={(event) => handleBlur("rib", event.target.value)} ref={inputRib} />
             </div>
 

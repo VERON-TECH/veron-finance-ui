@@ -39,7 +39,7 @@ export default function Nav() {
             {feature.menu === "Moyens Généraux" && <FontAwesomeIcon icon={faArchive} className="me-2" />}
             {feature.menu === "Dashboard" && <FontAwesomeIcon icon={faDashboard} className="me-2" />}
             {feature.menu === "Caisses" && <FontAwesomeIcon icon={faWallet} className="me-2" />}
-            {feature.menu === "Magasins" && <FontAwesomeIcon icon={faStore} className="me-2" />}
+            {feature.menu === "Stock" && <FontAwesomeIcon icon={faStore} className="me-2" />}
             {feature.menu === "Autres réglages" && <FontAwesomeIcon icon={faToolbox} className="me-2" />}
             {feature.menu === "Base de données" && <FontAwesomeIcon icon={faDatabase} className="me-2" />}
             {feature.menu}

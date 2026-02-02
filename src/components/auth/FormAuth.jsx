@@ -10,7 +10,7 @@ import { useRef } from "react";
 import { authActions } from "../../store/authSlice";
 import { useNavigate, useSubmit } from "react-router";
 import Modal from "../../layout/Modal";
-import { connected, getUser, login, logout, editPassword, getAuthoritiByUsername } from "../../utils/http";
+import { connected, getUser, login, logout, editPassword, getAuthoritiByUsername, getPersonalById, getAllCashesByPersonal } from "../../utils/http";
 
 let USERNAME = ""
 
@@ -36,7 +36,7 @@ export default function FormAuth() {
 
   const memo = localStorage.getItem("memo");
 
-  async function handleSubmit(prevState, formData) {
+  async function handleSubmit(prevState, formData, signal) {
     const username = formData.get("username");
     USERNAME = username;
     const password = formData.get("password");
@@ -126,10 +126,30 @@ export default function FormAuth() {
         role.push(auth.name)
       }
 
+      let personal;
+      let tb = [];
+      if (user.personal !== 0) {
+        personal = await getPersonalById({ id: user.personal, signal })
+        const cashes = await getAllCashesByPersonal(personal.id)
+        if (cashes.length > 0) {
+          cashes.forEach(c => {
+            tb.push({ key: c.id, name: c.name, value: c.slug })
+          })
+        }
+      }
+
+
+
+
       const userInfo = {
         username: user.username,
         role: role,
         personal: user.personal,
+        agency: user.personal !== 0 ? personal.agency : 0,
+        enterprise: user.personal !== 0 ? personal.enterprise : 0,
+        cashes: user.personal !== 0 ? tb : []
+
+
       }
       localStorage.setItem("user", JSON.stringify(userInfo))
 
@@ -190,6 +210,8 @@ export default function FormAuth() {
     dispatch(authActions.logout())
     const user = JSON.parse(localStorage.getItem("user"))
     await logout(user.username);
+    localStorage.removeItem("user")
+    localStorage.removeItem("token")
     dialog.current.close()
     navigate("/")
   }
@@ -282,7 +304,7 @@ export default function FormAuth() {
     </AnimatePresence>
 
     <AnimatePresence>
-      <Modal ref={dialog} title="Déconnexion" size="lg:w-1/6 lg:h-2/8">
+      <Modal ref={dialog} title="Déconnexion" size="lg:w-1/6 lg:h-2/9">
         <p className="p-2 text-center mb-2">Souhaitez-vous vous déconnecter?</p>
         <form className="flex justify-center">
           <div className="flex gap-4">
@@ -294,7 +316,7 @@ export default function FormAuth() {
 
     <AnimatePresence>
       <Modal ref={dialog1} title="Mise à jour du mot de passe" size="lg:w-2/8 lg:h-4/11">
-        <form className="flex justify-center flex-col" action={handleUpdatePassword} ref={scope}>
+        <form className="flex justify-center flex-col absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" action={handleUpdatePassword} ref={scope}>
           <Input label="Mot de passe *" type="password" name="password" placeholder="Mot de passe" className="border border-sky-950" onBlur={(event) => handleBlurPassword("password", event.target.value)} ref={inputPwd} />
           <Input label="Confirmer *" type="password" name="confirmationPassword" placeholder="Confirmer" className="border border-sky-950" onBlur={() => handleBlurPassword("passwordConfirm", event.target.value)} ref={inputPwdConfirm} />
           <Submit>

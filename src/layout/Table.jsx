@@ -10,9 +10,9 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Button } from 'primereact/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFolderOpen } from '@fortawesome/free-solid-svg-icons';
+import { faFolderOpen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Modal from './Modal';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { modalActions } from '../store/modalSlice';
 import UpdateEnterprise from '../components/enterprise/UpdateEnteprise';
 import UpdateAgency from '../components/agency/UpdateAgency';
@@ -22,6 +22,11 @@ import UpdateBankAccount from '../components/bankAccount/UpdateBankAccount';
 import UpdateBank from '../components/bankAccount/UpdateBank';
 import UpdateMobileMoney from '../components/mobile_money/UpdateMobileMoney';
 import UpdateOperator from '../components/mobile_money/UpdateOperator';
+import UpdateStorePrincipal from '../components/storePrincipal/UpdateStorePrincipal';
+import ConfirmationDelete from '../components/global/ConfirmationDelete';
+import UpdateTitle from '../components/personal/UpdateTitle';
+import UpdatePersonal from '../components/personal/UpdatePersonal';
+import UpdateUser from '../components/user/UpdateUser';
 
 
 
@@ -35,10 +40,7 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
   const exportColumns = headers.map((col) => ({ title: col.header, dataKey: col.field }));
   const dialog1 = useRef();
   const dispatch = useDispatch()
-
-
-
-
+  const deletestate = useSelector(state => state.stateTable.delete)
 
   const exportCSV = (selectionOnly) => {
     dt.current.exportCSV({ selectionOnly });
@@ -120,7 +122,7 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
             sortable
             body={(rowData) => (
               <button onClick={() => handleClick(rowData.id)}>
-                <FontAwesomeIcon icon={faFolderOpen} />
+                {deletestate === true ? <FontAwesomeIcon icon={faTrash} /> : <FontAwesomeIcon icon={faFolderOpen} />}
               </button>
             )}
           />))}
@@ -164,9 +166,25 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
           <UpdateOperator />
         }
 
+        {titleRef === "Mise à jour informations d'un magasin principal" &&
+          <UpdateStorePrincipal />
+        }
 
+        {titleRef === "Supprimer l'autorisation" &&
+          <ConfirmationDelete />
+        }
 
+        {titleRef === "Mise à jour informations d'une fonction" &&
+          <UpdateTitle />
+        }
 
+        {titleRef === "Mise à jour informations d'un employé" &&
+          <UpdatePersonal />
+        }
+
+        {titleRef === "Mise à jour informations d'un utilisateur" &&
+          <UpdateUser />
+        }
 
 
 

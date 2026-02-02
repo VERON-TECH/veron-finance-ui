@@ -34,7 +34,7 @@ export default function AffectPersonal({ id }) {
         }
         async function get(signal) {
             let personal;
-            if (id !== "") {
+            if (id !== "" && id !== undefined && id !== null) {
                 personal = await getPersonalById({ id, signal })
                 const enterprise01 = await getEnterpriseById({ id: personal.enterprise, signal })
                 const agency01 = await getAgencyById({ id: personal.agency, signal })

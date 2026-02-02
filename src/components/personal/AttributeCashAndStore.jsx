@@ -23,22 +23,26 @@ export default function AttributeCashAndStore({ id }) {
 
     useEffect(() => {
         let tb = []
-        async function get(signal) {
-            const personal = await getPersonalById({ id, signal })
-            const allCashes = await getAllCashes({ signal, enterprise: personal.enterprise, agency: personal.agency })
-            allCashes.forEach(c => {
-                tb.push({ key: c.id, name: c.name, value: c.slug })
-            })
-            setData(prev => {
-                return {
-                    ...prev,
-                    personal,
-                    cashes: tb
-                }
+        if (id !== "" && id !== undefined) {
+            async function get(signal) {
+                const personal = await getPersonalById({ id, signal })
+                const allCashes = await getAllCashes({ signal, enterprise: personal.enterprise, agency: personal.agency })
+                allCashes.forEach(c => {
+                    tb.push({ key: c.id, name: c.name, value: c.slug })
+                })
+                setData(prev => {
+                    return {
+                        ...prev,
+                        personal,
+                        cashes: tb
+                    }
 
-            })
+                })
+            }
+            get()
+
         }
-        get()
+
 
     }, [id])
 

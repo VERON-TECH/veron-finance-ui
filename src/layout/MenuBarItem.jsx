@@ -2,11 +2,12 @@ import { useDispatch } from "react-redux";
 import { NavLink } from "react-router";
 import { modalActions } from "../store/modalSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBank, faBuilding, faCashRegister, faCoins, faHome, faPerson, faPhoneAlt, faStoreAlt, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faBank, faBuilding, faCashRegister, faCoins, faGlobe, faHome, faPerson, faPhoneAlt, faStoreAlt, faUser } from "@fortawesome/free-solid-svg-icons";
 import { authorizeActions } from "../store/authorizeSlice";
+import { faServicestack } from "@fortawesome/free-brands-svg-icons";
 
 
-export default function MenuBarItem({ url, title, size = "w-3/25" }) {
+export default function MenuBarItem({ url, title, size = "w-4/25" }) {
   const dispatch = useDispatch();
   function handleClick() {
     dispatch(modalActions.update(title));
@@ -23,6 +24,7 @@ export default function MenuBarItem({ url, title, size = "w-3/25" }) {
     {title === "Magasins principaux" && < FontAwesomeIcon icon={faStoreAlt} className="me-4" />}
     {title === "Personnels" && < FontAwesomeIcon icon={faPerson} className="me-4" />}
     {title === "Utilisateurs" && < FontAwesomeIcon icon={faUser} className="me-4" />}
+    {title === "Produits & Services" && < FontAwesomeIcon icon={faGlobe} className="me-4" />}
     {title}
   </NavLink >
 }

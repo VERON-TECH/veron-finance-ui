@@ -25,7 +25,7 @@ export default function UserPage() {
         dispatch(identifierMenuActions.updateMenu({ menu: "personal" }))
         let tb = [];
         async function get(signal) {
-            const allPersonals = await getAllPersonals({ signal, enterprise: 0, agency: 0 })
+            const allPersonals = await getAllPersonals({ signal, enterprise: user.enterprise, agency: user.agency })
             allPersonals.forEach(p => {
                 tb.push(p.id)
             })
@@ -59,7 +59,7 @@ export default function UserPage() {
         <div className="flex justify-center gap-2 mb-2">
             {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_RESPONSABLE_RH") ? <Submit onClick={() => handleModal("user")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={users.header} emptyMessage="Aucun utilisateur trouvé." globalFilterFields={users.global} sheet="Utilisateurs" titleRef="Mise à jour informations d'un utilisateur" size="lg:h-5/10 lg:w-7/15" />
+        <Table data={data} headers={users.header} emptyMessage="Aucun utilisateur trouvé." globalFilterFields={users.global} sheet="Utilisateurs" titleRef="Mise à jour informations d'un utilisateur" size="lg:h-5/10 lg:w-8/16" />
 
         <Modal ref={dialog} size="lg:h-4/10 lg:w-4/15" title="Créer un utilisateur">
             <CreateUser />

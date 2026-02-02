@@ -36,7 +36,7 @@ export default function AuthorizationStorePrincipalAgency() {
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("authorization")}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data} headers={agencies.header} emptyMessage="Aucune agence autorisée trouvée." globalFilterFields={agencies.global} sheet="Agences autorisées" titleRef="Supprimer l'autorisation" size="lg:h-2/12 lg:w-4/15" />
-        <Modal ref={dialog} size="lg:h-4/11 lg:w-4/15" title="Autoriser une agence">
+        <Modal ref={dialog} size="lg:h-5/11 lg:w-4/15" title="Autoriser une agence">
             <AuhtorizeAgency />
         </Modal>
 

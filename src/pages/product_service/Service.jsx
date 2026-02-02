@@ -14,7 +14,7 @@ import Operator from "../../components/mobile_money/Operator.jsx";
 
 
 
-export default function MobileMoneyPage() {
+export default function ServicePage() {
     const user = JSON.parse(localStorage.getItem("user"));
     const errorNotification = useSelector(state => state.note.error);
     const relaunch = useSelector(state => state.note.relaunch);

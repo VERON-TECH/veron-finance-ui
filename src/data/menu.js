@@ -5,7 +5,7 @@ export const features = [
   { key: 3, menu: "Dashboard", role: ["ROLE_ADMIN"], path: "reporting" },
   { key: 4, menu: "Caisses", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSIER"], path: "cash" },
   { key: 5, menu: "Ventes", role: ["ROLE_CAISSIER"], path: "sale" },
-  { key: 6, menu: "Stock", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"], path: "stores" },
+  { key: 6, menu: "Magasins & Stocks", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"], path: "stores" },
   { key: 7, menu: "Autres réglages", role: ["ROLE_ADMIN"], path: "setting" },
   { key: 8, menu: "Base de données", role: ["ROLE_ADMIN"], path: "data" },
 ]

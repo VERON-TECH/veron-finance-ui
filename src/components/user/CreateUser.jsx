@@ -12,7 +12,7 @@ import responseHttp from "../../utils/responseHttp.js"
 import Select from "../../layout/Select.jsx";
 
 export default function CreateUser() {
-
+    const user = JSON.parse(localStorage.getItem("user"))
     const selectPersonal = useRef();
     const inputPassword = useRef();
     const inputConfirmationPassword = useRef();
@@ -31,9 +31,9 @@ export default function CreateUser() {
         let tbEl = {
             tb: [],
         }
-        async function get() {
+        async function get(signal) {
             const uuid = await generateUUID()
-            const allpersonals = await getAllPersonals()
+            const allpersonals = await getAllPersonals({ signal, enterprise: user?.enterprise, agency: user.agency })
             allpersonals.forEach(p => {
                 tbEl.tb.push({ key: p.id, name: p.lastName + " " + p.firstName, value: p.slug })
             })

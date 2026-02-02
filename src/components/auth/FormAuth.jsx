@@ -10,7 +10,7 @@ import { useRef } from "react";
 import { authActions } from "../../store/authSlice";
 import { useNavigate, useSubmit } from "react-router";
 import Modal from "../../layout/Modal";
-import { connected, getUser, login, logout, editPassword, getAuthoritiByUsername, getPersonalById, getAllCashesByPersonal } from "../../utils/http";
+import { connected, login, logout, editPassword, getAuthoritiByUsername, getPersonalById, getAllCashesByPersonal, getUserLogin } from "../../utils/http";
 
 let USERNAME = ""
 
@@ -67,7 +67,8 @@ export default function FormAuth() {
       }
     }
 
-    const user = await getUser(username);
+    const user = await getUserLogin(username);
+
 
 
     if (user.connected) {
@@ -75,11 +76,16 @@ export default function FormAuth() {
       dialog.current.open();
     } else if (user.connexion == 0) {
       dialog1.current.open();
-    } else if (!user.enabled) {
+    } else if (!user.enabled && user !== 401) {
       dispatch(noteActions.show());
       dispatch(noteActions.relaunch());
       dispatch(noteActions.error(true));
       dispatch(noteActions.sendData(["Compte inactif"]))
+    } else if (user === 401) {
+      dispatch(noteActions.show());
+      dispatch(noteActions.relaunch());
+      dispatch(noteActions.error(true));
+      dispatch(noteActions.sendData(["Login & mot de passe incorrect"]))
     } else if (user.connexion == 100) {
       dialog1.current.open();
     } else {
@@ -304,7 +310,7 @@ export default function FormAuth() {
     </AnimatePresence>
 
     <AnimatePresence>
-      <Modal ref={dialog} title="Déconnexion" size="lg:w-1/6 lg:h-2/9">
+      <Modal ref={dialog} title="Déconnexion" size="lg:w-2/9 lg:h-3/12">
         <p className="p-2 text-center mb-2">Souhaitez-vous vous déconnecter?</p>
         <form className="flex justify-center">
           <div className="flex gap-4">

@@ -104,6 +104,35 @@ export async function getUser(username) {
   }
 }
 
+export async function getUserLogin(username) {
+  const url = `${BASE_URL}users/get/${username}/`
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  if (response.status === 401) {
+    return response.status;
+  }
+
+  if (response.status === 403) {
+    return response.status;
+  }
+  if (response.status === 404) {
+    return response.status;
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
 
 export async function getAuthoritiByUsername(username) {
   const url = `${BASE_URL}authority/get/${username}/`

@@ -79,7 +79,7 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
     return [{
       header: "Action",
       title: titleRef,
-      field: data?.map(d => d.id) || [] // Préparer les IDs sans muter un objet
+      field: data && data?.map(d => d?.id) || [] // Préparer les IDs sans muter un objet
     }];
   }, [data]);
 

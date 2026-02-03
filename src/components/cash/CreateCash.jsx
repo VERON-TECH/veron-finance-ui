@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { createCash, getAllAgenciesByEnterprise, getAllEnterprises, getEnterpriseById, queryClient } from "../../utils/http";
+import { createCash, getAgencyById, getEnterpriseById, queryClient } from "../../utils/http";
 import Select from "../../layout/Select.jsx"
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
@@ -11,6 +11,7 @@ import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
 
 export default function CreateCash() {
+    const user = JSON.parse(localStorage.getItem("user"))
     const selectEnterprise = useRef();
     const selectAgency = useRef();
     const inputName = useRef();
@@ -24,12 +25,10 @@ export default function CreateCash() {
 
     useEffect(() => {
         let tb = []
-        let tb1 = []
-        async function getAll() {
-            const allEnterprises = await getAllEnterprises()
-            allEnterprises.forEach(e => {
-                tb.push({ key: e.id, name: e.name, value: e.id })
-            })
+        async function getAll(signal) {
+            const allEnterprises = await getEnterpriseById({ id: user.enterprise, signal })
+            tb.push({ key: allEnterprises.id, name: allEnterprises.name, value: allEnterprises.id })
+
             setData(prev => {
                 return {
                     ...prev,
@@ -127,12 +126,10 @@ export default function CreateCash() {
     }
 
 
-    async function handleChange(enterprise) {
+    async function handleChange(signal) {
         let tb = []
-        const allAgencies = await getAllAgenciesByEnterprise(enterprise);
-        allAgencies.forEach(a => {
-            tb.push({ key: a.id, name: a.name, value: a.slug })
-        })
+        const allAgencies = await getAgencyById({ id: user.agency, signal });
+        tb.push({ key: allAgencies.id, name: allAgencies.name, value: allAgencies.slug })
         setData(prev => {
             return {
                 ...prev,
@@ -146,7 +143,7 @@ export default function CreateCash() {
 
         <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
-                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data.enterprises} ref={selectEnterprise} onChange={(e) => handleChange(e.target.value)} />
+                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data.enterprises} ref={selectEnterprise} onChange={() => handleChange()} />
                 <Select label="Agences *" id="agency" name="agency" selectedTitle="Sélectionner une agence" data={data.agencies} ref={selectAgency} />
                 <Input label="Nom *" type="text" defaultValue={formState.enteredValue?.name} name="name" placeholder="Nom de l'agence" className="border border-sky-950" onBlur={(event) => handleBlur("name", event.target.value)} ref={inputName} />
 

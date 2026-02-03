@@ -7,7 +7,7 @@ import Modal from "../../layout/Modal.jsx";
 import { agencies } from "../../data/dataTable.js";
 import AuhtorizeAgency from "../global/AuthorizeAgency.jsx";
 import { useDispatch, useSelector } from "react-redux";
-import { authorizeActions } from "../../store/authorizeSlice.js";
+
 
 
 
@@ -15,7 +15,7 @@ import { authorizeActions } from "../../store/authorizeSlice.js";
 export default function AuthorizationMobileMoneyAgency() {
     const user = JSON.parse(localStorage.getItem("user"));
     const id = useSelector(state => state.modal.value)
-    const dispatch = useDispatch()
+
 
     const { data } = useQuery({
         queryKey: ["agenciesmobilemoney", { id }],
@@ -28,7 +28,7 @@ export default function AuthorizationMobileMoneyAgency() {
 
     function handleModal(identifier) {
         if (identifier === "authorization") {
-            dispatch(authorizeActions.changeAuthorize("mobile"))
+
             dialog.current.open();
         }
 
@@ -38,9 +38,9 @@ export default function AuthorizationMobileMoneyAgency() {
         <div className="flex justify-center gap-2 mb-2">
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("authorization")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={agencies.header} emptyMessage="Aucune agence autorisée trouvée." globalFilterFields={agencies.global} sheet="Agences autorisées" titleRef="Supprimer l'autorisation" size="lg:h-2/12 lg:w-4/15" />
+        <Table data={data} headers={agencies.header} emptyMessage="Aucune agence autorisée trouvée." globalFilterFields={agencies.global} sheet="Agences autorisées" titleRef="Supprimer l'autorisation dans un compte mobile money" size="lg:h-2/12 lg:w-4/15" />
         <Modal ref={dialog} size="lg:h-4/11 lg:w-4/15" title="Autoriser une agence">
-            <AuhtorizeAgency />
+            <AuhtorizeAgency type="mobile" id={id} />
         </Modal>
 
     </>

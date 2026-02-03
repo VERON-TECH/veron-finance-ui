@@ -3,15 +3,14 @@ import { NavLink } from "react-router";
 import { modalActions } from "../store/modalSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBank, faBuilding, faCashRegister, faCoins, faGlobe, faHome, faPerson, faPhoneAlt, faStoreAlt, faUser } from "@fortawesome/free-solid-svg-icons";
-import { authorizeActions } from "../store/authorizeSlice";
-import { faServicestack } from "@fortawesome/free-brands-svg-icons";
+
 
 
 export default function MenuBarItem({ url, title, size = "w-4/25" }) {
   const dispatch = useDispatch();
   function handleClick() {
     dispatch(modalActions.update(title));
-    title === "Mobile Money" ? dispatch(authorizeActions.changeAuthorize("mobile")) : title === "Banques" ? dispatch(authorizeActions.changeAuthorize("bank")) : title === "Magasins principaux" ? dispatch(authorizeActions.changeAuthorize("storePrincipal")) : title === "Coffre-forts" ? dispatch(authorizeActions.changeAuthorize("safe")) : undefined
+
   }
   const className = `cursor-pointer flex justify-center items-center font-medium ${size} hover:border-b-4 focus:border-b-4 active:border-b-4`
   return <NavLink to={url} className={`({isActive})=>isActive ? ${className} : undefined`} onClick={handleClick}>

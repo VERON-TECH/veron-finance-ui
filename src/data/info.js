@@ -27,4 +27,11 @@ export const typeTransfer = [
 ]
 
 
+export const categoryProduct = [
+  { key: 0, name: "PRODUITS", value: "PRODUITS" },
+  { key: 1, name: "FOURNITURES", value: "FOURNITURES" },
+]
+
+
+
 

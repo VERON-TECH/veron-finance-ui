@@ -5,9 +5,8 @@ import responseHttp from "../../utils/responseHttp";
 import { noteActions } from "../../store/noteSlice";
 import { modalActions } from "../../store/modalSlice";
 
-export default function ConfirmationDelete() {
+export default function ConfirmationDelete({ authorize }) {
     const id = useSelector(state => state.modal.value)
-    const authorize = useSelector(state => state.authorize)
     const rib = useSelector(state => state.stateTable.rib)
     const slugMobile = useSelector(state => state.stateTable.mobileMoneySlug)
     const slugStorePrincipal = useSelector(state => state.stateTable.storePrincipalSlug)
@@ -60,7 +59,7 @@ export default function ConfirmationDelete() {
     }
 
     return <>
-        <p>Souhaitez-vous supprimer les autorisations de l'entité {id}?</p>
+        <p className="font-medium">Souhaitez-vous supprimer les autorisations de l'entité {id}?</p>
         <form>
             <div className="flex justify-center gap-4 mt-4">
                 <Submit formAction={handleUnAuthorize}>

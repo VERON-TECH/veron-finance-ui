@@ -10,7 +10,7 @@ import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
 import Select from "../../layout/Select.jsx";
 
-export default function AuhtorizeAgency() {
+export default function AuhtorizeAgency({ type, id }) {
     const inputEnterprise = useRef();
     const selectAgency = useRef();
     const selectCash = useRef();
@@ -30,14 +30,13 @@ export default function AuhtorizeAgency() {
         storePrincipalSlug: "",
         safeSlug: ""
     })
-    const id = useSelector(state => state.modal.value)
-    const authorize = useSelector(state => state.authorize)
+
 
     useEffect(() => {
         let tb = []
         async function get(signal) {
-            if (user.role.includes("ROLE_ADMIN") && id != "" && authorize !== "" || user.role.includes("ROLE_COMPTABLE") && id != "" && authorize !== "") {
-                if (authorize === "bank") {
+            if (user.role.includes("ROLE_ADMIN") && id != "" && type !== "" || user.role.includes("ROLE_COMPTABLE") && id != "" && type !== "") {
+                if (type === "bank") {
                     const bankAccount = await getBankAccountById({ id, signal })
                     const enterprise = await getEnterpriseById({ id: bankAccount.enterprise, signal })
                     const agencies = await getAllAgenciesByEnterprise(bankAccount.enterprise)
@@ -52,7 +51,7 @@ export default function AuhtorizeAgency() {
                             rib: bankAccount.rib,
                         }
                     })
-                } else if (authorize === "mobile") {
+                } else if (type === "mobile") {
                     const mobileMoney = await getMobileMoneyById({ id, signal })
                     const enterprise = await getEnterpriseById({ id: mobileMoney.enterprise, signal })
                     const agencies = await getAllAgenciesByEnterprise(mobileMoney.enterprise)
@@ -67,7 +66,7 @@ export default function AuhtorizeAgency() {
                             mobileSlug: mobileMoney.slug,
                         }
                     })
-                } else if (authorize === "storePrincipal") {
+                } else if (type === "storePrincipal") {
                     const storePrincipal = await getStorePrincipalById({ id, signal })
                     const enterprise = await getEnterpriseById({ id: storePrincipal.enterprise, signal })
                     const agencies = await getAllAgenciesByEnterprise(storePrincipal.enterprise)
@@ -82,7 +81,7 @@ export default function AuhtorizeAgency() {
                             storePrincipalSlug: storePrincipal.slug,
                         }
                     })
-                } else if (authorize === "safe") {
+                } else if (type === "safe") {
                     const safe = await getSafeById({ id, signal })
                     const enterprise = await getEnterpriseById({ id: safe.enterprise, signal })
                     const cashes = await getAllCashesByAgency(safe.agency)
@@ -104,13 +103,13 @@ export default function AuhtorizeAgency() {
         }
         get()
 
-    }, [id, authorize])
+    }, [id, type])
 
 
 
     async function handleSubmit(prevState, formData, signal) {
         let errors = [];
-        if (authorize === "bank") {
+        if (type === "bank") {
             const rib = formData.get("rib")
             const enterprise = formData.get("enterprise")
             const agency = formData.get("agency")
@@ -148,7 +147,7 @@ export default function AuhtorizeAgency() {
 
             mutate({ slug: agency, rib: bankAccount.rib })
             return { errors: null }
-        } else if (authorize === "mobile") {
+        } else if (type === "mobile") {
             const mobileSlug = formData.get("mobileSlug")
             const enterprise = formData.get("enterprise")
             const agency = formData.get("agency")
@@ -186,7 +185,7 @@ export default function AuhtorizeAgency() {
 
             mutate({ slug: agency, identification: mobileMoney.slug })
             return { errors: null }
-        } else if (authorize === "storePrincipal") {
+        } else if (type === "storePrincipal") {
             const storePrincipalSlug = formData.get("storePrincipalSlug")
             const enterprise = formData.get("enterprise")
             const agency = formData.get("agency")
@@ -224,7 +223,7 @@ export default function AuhtorizeAgency() {
 
             mutate({ slug: agency, identification: storePrincipal.slug })
             return { errors: null }
-        } else if (authorize === "safe") {
+        } else if (type === "safe") {
             const safeSlug = formData.get("safeSlug")
             const enterprise = formData.get("enterprise")
             const cash = formData.get("cash")
@@ -272,7 +271,7 @@ export default function AuhtorizeAgency() {
 
 
     const { mutate } = useMutation({
-        mutationFn: authorize === "bank" ? authorizeAgencyBank : authorize === "mobile" ? authorizeAgencyMobile : authorize === "storePrincipal" ? authorizeAgencyStorePrincipal : authorize === "safe" ? authorizeCashSafe : undefined,
+        mutationFn: type === "bank" ? authorizeAgencyBank : type === "mobile" ? authorizeAgencyMobile : type === "storePrincipal" ? authorizeAgencyStorePrincipal : type === "safe" ? authorizeCashSafe : undefined,
         onSuccess: (responseData) => {
             const state = responseHttp(responseData);
             if (state) {
@@ -297,25 +296,25 @@ export default function AuhtorizeAgency() {
             }
         }
 
-        if (authorize === "bank") {
+        if (type === "bank") {
             if (field === "rib") {
                 if (!isNotEmpty(value)) {
                     animate(inputRib.current, { x: [0, 15, 0] }, { bounce: 0.75 })
                 }
             }
-        } else if (authorize === "mobile") {
+        } else if (type === "mobile") {
             if (field === "mobileSlug") {
                 if (!isNotEmpty(value)) {
                     animate(inputMobileSlug.current, { x: [0, 15, 0] }, { bounce: 0.75 })
                 }
             }
-        } else if (authorize === "storePrincipal") {
+        } else if (type === "storePrincipal") {
             if (field === "storePrincipalSlug") {
                 if (!isNotEmpty(value)) {
                     animate(inputStorePrincipalSlug.current, { x: [0, 15, 0] }, { bounce: 0.75 })
                 }
             }
-        } else if (authorize === "safe") {
+        } else if (type === "safe") {
             if (field === "safeSlug") {
                 if (!isNotEmpty(value)) {
                     animate(inputSafeSlug.current, { x: [0, 15, 0] }, { bounce: 0.75 })
@@ -335,12 +334,12 @@ export default function AuhtorizeAgency() {
         <form action={formAction} className="rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
                 <Input label="Entreprise *" type="text" defaultValue={data?.enterprise} name="enterprise" placeholder="Nom de l'entreprise" className="border border-sky-950" onBlur={(event) => handleBlur("enterprise", event.target.value)} ref={inputEnterprise} readOnly />
-                {authorize === "bank" && <Input label="R.I.B. *" type="text" defaultValue={data?.rib} name="rib" placeholder="Nº du compte bancaire" className="border border-sky-950" onBlur={(event) => handleBlur("rib", event.target.value)} ref={inputRib} readOnly />}
-                {authorize === "mobile" && <Input label="Mobile money *" type="text" defaultValue={data?.mobileSlug} name="mobileSlug" placeholder="Nº du compte mobile" className="border border-sky-950" onBlur={(event) => handleBlur("mobileslug", event.target.value)} ref={inputMobileSlug} readOnly />}
-                {authorize === "storePrincipal" && <Input label="Magasin principal *" type="text" defaultValue={data?.storePrincipalSlug} name="storePrincipalSlug" placeholder="Magasin principal" className="border border-sky-950" onBlur={(event) => handleBlur("storePrincipalSlug", event.target.value)} ref={inputStorePrincipalSlug} readOnly />}
-                {authorize === "safe" && <Input label="Coffre-fort *" type="text" defaultValue={data?.safeSlug} name="safeSlug" placeholder="Coffre-fort" className="border border-sky-950" onBlur={(event) => handleBlur("safeSlug", event.target.value)} ref={inputSafeSlug} readOnly />}
-                {authorize === "bank" || authorize === "mobile" || authorize === "storePrincipal" && <Select label="Agence *" id="agency" name="agency" selectedTitle="Sélectionner une agence" data={data?.agencies} ref={selectAgency} />}
-                {authorize === "safe" && <Select label="Caisse *" id="cash" name="cash" selectedTitle="Sélectionner une caisse" data={data?.cashes} ref={selectCash} />}
+                {type === "bank" && <Input label="R.I.B. *" type="text" defaultValue={data?.rib} name="rib" placeholder="Nº du compte bancaire" className="border border-sky-950" onBlur={(event) => handleBlur("rib", event.target.value)} ref={inputRib} readOnly />}
+                {type === "mobile" && <Input label="Mobile money *" type="text" defaultValue={data?.mobileSlug} name="mobileSlug" placeholder="Nº du compte mobile" className="border border-sky-950" onBlur={(event) => handleBlur("mobileslug", event.target.value)} ref={inputMobileSlug} readOnly />}
+                {type === "storePrincipal" && <Input label="Magasin principal *" type="text" defaultValue={data?.storePrincipalSlug} name="storePrincipalSlug" placeholder="Magasin principal" className="border border-sky-950" onBlur={(event) => handleBlur("storePrincipalSlug", event.target.value)} ref={inputStorePrincipalSlug} readOnly />}
+                {type === "safe" && <Input label="Coffre-fort *" type="text" defaultValue={data?.safeSlug} name="safeSlug" placeholder="Coffre-fort" className="border border-sky-950" onBlur={(event) => handleBlur("safeSlug", event.target.value)} ref={inputSafeSlug} readOnly />}
+                {type === "bank" || type === "mobile" || type === "storePrincipal" ? <Select label="Agence *" id="agency" name="agency" selectedTitle="Sélectionner une agence" data={data?.agencies} ref={selectAgency} /> : undefined}
+                {type === "safe" && <Select label="Caisse *" id="cash" name="cash" selectedTitle="Sélectionner une caisse" data={data?.cashes} ref={selectCash} />}
             </div>
 
 

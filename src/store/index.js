@@ -4,7 +4,7 @@ import authSlice from "./authSlice";
 import modalSlice from "./modalSlice";
 import identifierSlice from "./identifierSlice";
 import dataTableSlice from "./dataTableSlice"
-import authorizeSlice from "./authorizeSlice"
+
 
 const store = configureStore({
   reducer: {
@@ -13,7 +13,6 @@ const store = configureStore({
     modal: modalSlice,
     identifier: identifierSlice,
     stateTable: dataTableSlice,
-    authorize: authorizeSlice
   }
 })
 

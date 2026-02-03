@@ -19,29 +19,34 @@ export default function UserPage() {
     const dataItem = useSelector(state => state.note.dataItem)
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
-    const [personals, setPersonals] = useState([])
+    const [data, setData] = useState([])
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "personal" }))
-        let tb = [];
-        async function get(signal) {
-            const allPersonals = await getAllPersonals({ signal, enterprise: user.enterprise, agency: user.agency })
-            allPersonals.forEach(p => {
-                tb.push(p.id)
-            })
-            setPersonals(tb)
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_RESPONSABLE_RH")) {
+            let tbEl = {
+                tb: [],
+                tb1: []
+            };
+            async function get(signal) {
+                const allPersonals = await getAllPersonals({ signal, enterprise: user.enterprise, agency: user.agency })
+                allPersonals.forEach(p => {
+                    tbEl.tb.push(p.id)
+                })
+
+                const users = await getAllUsers({ signal, personals: tbEl.tb, enterprise: user.enterprise, agency: user.agency })
+                setData(users)
+
+            }
+            get()
+
         }
-        get()
 
 
     }, [menu, dispatch])
 
 
-    const { data } = useQuery({
-        queryKey: ["users", { personals, enterprise: user.enterprise, agency: user.agency }],
-        queryFn: ({ signal }) => getAllUsers({ signal, personals, enterprise: user.enterprise, agency: user.agency }),
-        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_RESPONSABLE_RH")
-    })
+
 
 
     const dialog = useRef()
@@ -59,7 +64,7 @@ export default function UserPage() {
         <div className="flex justify-center gap-2 mb-2">
             {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_RESPONSABLE_RH") ? <Submit onClick={() => handleModal("user")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={users.header} emptyMessage="Aucun utilisateur trouvé." globalFilterFields={users.global} sheet="Utilisateurs" titleRef="Mise à jour informations d'un utilisateur" size="lg:h-5/10 lg:w-8/16" />
+        <Table data={data} headers={users?.header} emptyMessage="Aucun utilisateur trouvé." globalFilterFields={users.global} sheet="Utilisateurs" titleRef="Mise à jour informations d'un utilisateur" size="lg:h-5/10 lg:w-8/16" />
 
         <Modal ref={dialog} size="lg:h-4/10 lg:w-4/15" title="Créer un utilisateur">
             <CreateUser />

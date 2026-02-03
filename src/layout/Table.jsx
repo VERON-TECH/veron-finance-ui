@@ -27,6 +27,9 @@ import ConfirmationDelete from '../components/global/ConfirmationDelete';
 import UpdateTitle from '../components/personal/UpdateTitle';
 import UpdatePersonal from '../components/personal/UpdatePersonal';
 import UpdateUser from '../components/user/UpdateUser';
+import UpdateCategory from '../components/service/UpdateCategory';
+import UpdateService from '../components/service/UpdateService';
+import UpdateProduct from '../components/product/UpdateProduct';
 
 
 
@@ -170,8 +173,20 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
           <UpdateStorePrincipal />
         }
 
-        {titleRef === "Supprimer l'autorisation" &&
-          <ConfirmationDelete />
+        {titleRef === "Supprimer l'autorisation dans un compte bancaire" &&
+          <ConfirmationDelete authorize={"bank"} />
+        }
+
+        {titleRef === "Supprimer l'autorisation dans un compte mobile money" &&
+          <ConfirmationDelete authorize={"mobile"} />
+        }
+
+        {titleRef === "Supprimer l'autorisation dans un coffre-fort" &&
+          <ConfirmationDelete authorize={"safe"} />
+        }
+
+        {titleRef === "Supprimer l'autorisation dans un magasin principal" &&
+          <ConfirmationDelete authorize={"storePrincipal"} />
         }
 
         {titleRef === "Mise à jour informations d'une fonction" &&
@@ -186,6 +201,17 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
           <UpdateUser />
         }
 
+        {titleRef === "Mise à jour informations d'une catégorie de service" &&
+          <UpdateCategory />
+        }
+
+        {titleRef === "Mise à jour informations d'un service" &&
+          <UpdateService />
+        }
+
+        {titleRef === "Mise à jour informations d'un produit" &&
+          <UpdateProduct />
+        }
 
 
 

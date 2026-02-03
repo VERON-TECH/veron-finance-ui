@@ -24,8 +24,8 @@ export default function MobileMoneyPage() {
 
 
     const { data } = useQuery({
-        queryKey: ["mobilemoney"],
-        queryFn: getAllMobileMoney,
+        queryKey: ["mobilemoney", { agency: user.agency }],
+        queryFn: ({ signal }) => getAllMobileMoney({ signal, agency: user.agency }),
         enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")
     })
 

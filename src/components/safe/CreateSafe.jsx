@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { createSafe, getAllAgenciesByEnterprise, getAllEnterprises, getEnterpriseById, queryClient } from "../../utils/http";
+import { createSafe, getAgencyById, getAllAgenciesByEnterprise, getEnterpriseById, queryClient } from "../../utils/http";
 import Select from "../../layout/Select.jsx"
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
@@ -15,6 +15,7 @@ export default function CreateSafe() {
     const selectAgency = useRef();
     const inputName = useRef();
     const dispatch = useDispatch();
+    const user = JSON.parse(localStorage.getItem("user"))
     const [scope, animate] = useAnimate();
     const [data, setData] = useState({
         enterprises: [],
@@ -24,11 +25,9 @@ export default function CreateSafe() {
 
     useEffect(() => {
         let tb = []
-        async function getAll() {
-            const allEnterprises = await getAllEnterprises()
-            allEnterprises.forEach(e => {
-                tb.push({ key: e.id, name: e.name, value: e.id })
-            })
+        async function getAll(signal) {
+            const allEnterprises = await getEnterpriseById({ id: user.enterprise, signal })
+            tb.push({ key: allEnterprises.id, name: allEnterprises.name, value: allEnterprises.id })
             setData(prev => {
                 return {
                     ...prev,
@@ -126,12 +125,10 @@ export default function CreateSafe() {
     }
 
 
-    async function handleChange(enterprise) {
+    async function handleChange(signal) {
         let tb = []
-        const allAgencies = await getAllAgenciesByEnterprise(enterprise);
-        allAgencies.forEach(a => {
-            tb.push({ key: a.id, name: a.name, value: a.slug })
-        })
+        const allAgencies = await getAgencyById({ id: user.agency, signal });
+        tb.push({ key: allAgencies.id, name: allAgencies.name, value: allAgencies.slug })
         setData(prev => {
             return {
                 ...prev,
@@ -145,7 +142,7 @@ export default function CreateSafe() {
 
         <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
-                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data.enterprises} ref={selectEnterprise} onChange={(e) => handleChange(e.target.value)} />
+                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data.enterprises} ref={selectEnterprise} onChange={() => handleChange()} />
                 <Select label="Agences *" id="agency" name="agency" selectedTitle="Sélectionner une agence" data={data.agencies} ref={selectAgency} />
                 <Input label="Nom *" type="text" defaultValue={formState.enteredValue?.name} name="name" placeholder="Nom du coffre-fort" className="border border-sky-950" onBlur={(event) => handleBlur("name", event.target.value)} ref={inputName} />
 

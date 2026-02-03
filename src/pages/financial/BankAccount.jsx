@@ -24,8 +24,8 @@ export default memo(function BankAccountPage() {
 
 
     const { data } = useQuery({
-        queryKey: ["bankaccounts"],
-        queryFn: getAllBankAccount,
+        queryKey: ["bankaccounts", { agency: user?.agency }],
+        queryFn: ({ signal }) => getAllBankAccount({ signal, agency: user?.agency }),
         enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")
     })
 

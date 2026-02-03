@@ -421,3 +421,105 @@ export const users = {
     ]
 
 }
+
+
+
+export const categoryServices = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Nom", field: "name" },
+        { key: 2, header: "Créée le", field: "dateCreated" },
+        { key: 3, header: "Par", field: "userCreated" },
+        { key: 4, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 5, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Nom",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+
+export const services = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Nom", field: "name" },
+        { key: 3, header: "Description", field: "description" },
+        { key: 4, header: "Prix", field: "price" },
+        { key: 5, header: "Catégorie", field: "categoryService" },
+        { key: 6, header: "Créée le", field: "dateCreated" },
+        { key: 7, header: "Par", field: "userCreated" },
+        { key: 8, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 9, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Nom",
+        "Description",
+        "Prix",
+        "Catégorie",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+
+export const products = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Réf.", field: "ref" },
+        { key: 3, header: "Catégorie", field: "catégorie" },
+        { key: 4, header: "Nom", field: "name" },
+        { key: 5, header: "Prix d'achat", field: "price" },
+        { key: 6, header: "Prix de vente", field: "sellingPrice" },
+        { key: 7, header: "Cout unitaire", field: "unitCost" },
+        { key: 8, header: "Quantité", field: "stock" },
+        { key: 9, header: "Valeur", field: "value" },
+        { key: 10, header: "Stock de sécurité", field: "securityStock" },
+        { key: 11, header: "Créée le", field: "dateCreated" },
+        { key: 12, header: "Par", field: "userCreated" },
+        { key: 13, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 14, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Réf.",
+        "Catégorie",
+        "Nom",
+        "Prix d'achat",
+        "Prix de vente",
+        "Cout unitaire",
+        "Quantité",
+        "Valeur",
+        "Stock de sécurité",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+

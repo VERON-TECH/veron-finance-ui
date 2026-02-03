@@ -30,6 +30,9 @@ import UpdateUser from '../components/user/UpdateUser';
 import UpdateCategory from '../components/service/UpdateCategory';
 import UpdateService from '../components/service/UpdateService';
 import UpdateProduct from '../components/product/UpdateProduct';
+import UpdateStore from '../components/store/UpdateStore';
+import UpdateSpentFamily from '../components/budget/UpdateFamilySpent';
+import UpdateSpent from '../components/budget/UpdateSpent';
 
 
 
@@ -212,6 +215,22 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
         {titleRef === "Mise à jour informations d'un produit" &&
           <UpdateProduct />
         }
+
+        {titleRef === "Mise à jour informations d'un magasin" &&
+          <UpdateStore />
+        }
+
+        {titleRef === "Mise à jour informations d'une famille" &&
+          <UpdateSpentFamily />
+        }
+
+        {titleRef === "Mise à jour informations d'une dépense" &&
+          <UpdateSpent />
+        }
+
+
+
+
 
 
 

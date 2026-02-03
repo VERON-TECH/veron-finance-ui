@@ -2,7 +2,8 @@ import { useDispatch } from "react-redux";
 import { NavLink } from "react-router";
 import { modalActions } from "../store/modalSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBank, faBuilding, faCashRegister, faCoins, faGlobe, faHome, faPerson, faPhoneAlt, faStoreAlt, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faBank, faBuilding, faCalendarTimes, faCartPlus, faCashRegister, faCoins, faGlobe, faHome, faPerson, faPhoneAlt, faStore, faStoreAlt, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faCashApp } from "@fortawesome/free-brands-svg-icons";
 
 
 
@@ -21,9 +22,12 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
     {title === "Banques" && < FontAwesomeIcon icon={faBank} className="me-4" />}
     {title === "Mobile Money" && < FontAwesomeIcon icon={faPhoneAlt} className="me-4" />}
     {title === "Magasins principaux" && < FontAwesomeIcon icon={faStoreAlt} className="me-4" />}
+    {title === "Magasins sécondaires" && < FontAwesomeIcon icon={faStore} className="me-4" />}
     {title === "Personnels" && < FontAwesomeIcon icon={faPerson} className="me-4" />}
     {title === "Utilisateurs" && < FontAwesomeIcon icon={faUser} className="me-4" />}
     {title === "Produits & Services" && < FontAwesomeIcon icon={faGlobe} className="me-4" />}
+    {title === "Dépenses" && < FontAwesomeIcon icon={faCartPlus} className="me-4" />}
+    {title === "Budgets" && < FontAwesomeIcon icon={faCalendarTimes} className="me-4" />}
     {title}
   </NavLink >
 }

@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faAngleDoubleDown, faBank, faCircleCheck, faCirclePlus, faCoins, faFileCircleCheck, faFloppyDisk, faFolderOpen, faGroupArrowsRotate, faListCheck, faPersonArrowDownToLine, faPrint, faSpinner, faSquarePhone, faUserGear, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { faWindowRestore } from "@fortawesome/free-regular-svg-icons";
+import { faCashApp } from "@fortawesome/free-brands-svg-icons";
 
 
 
@@ -30,6 +31,7 @@ export default function Submit({ children, disabled = false, className, ...props
       {children === "Attribuer un rôle" && < FontAwesomeIcon icon={faUserGroup} className="me-2" />}
       {children === "Caisses & Magasins" && < FontAwesomeIcon icon={faUserGear} className="me-2" />}
       {children === "Catégories de service" && < FontAwesomeIcon icon={faGroupArrowsRotate} className="me-2" />}
+      {children === "Famille de dépenses" && < FontAwesomeIcon icon={faCashApp} className="me-2" />}
 
       {pending ? <div className="flex gap-2">
         <FontAwesomeIcon icon={faSpinner} className="animate-spin" />

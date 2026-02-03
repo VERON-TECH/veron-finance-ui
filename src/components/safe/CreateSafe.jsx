@@ -37,7 +37,7 @@ export default function CreateSafe() {
 
         }
         getAll()
-    }, [])
+    }, [user.enterprise])
 
 
     async function handleSubmit(prevState, formData, signal) {

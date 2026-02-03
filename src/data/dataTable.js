@@ -523,3 +523,89 @@ export const products = {
 }
 
 
+
+export const stores = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Nom", field: "name" },
+        { key: 4, header: "Type", field: "type" },
+        { key: 5, header: "Magasin principal", field: "storePrincipal" },
+        { key: 6, header: "Personels", field: "personals" },
+        { key: 7, header: "Créée le", field: "dateCreated" },
+        { key: 8, header: "Par", field: "userCreated" },
+        { key: 9, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 10, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Nom",
+        "Type",
+        "Magasin principal",
+        "Personels",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+
+export const spents = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Nom", field: "name" },
+        { key: 2, header: "Famille", field: "spentFamily" },
+        { key: 3, header: "Créée le", field: "dateCreated" },
+        { key: 4, header: "Par", field: "userCreated" },
+        { key: 5, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 6, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Nom",
+        "Famille",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+
+export const families = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Nom", field: "name" },
+        { key: 2, header: "Créée le", field: "dateCreated" },
+        { key: 3, header: "Par", field: "userCreated" },
+        { key: 4, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 5, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Nom",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+

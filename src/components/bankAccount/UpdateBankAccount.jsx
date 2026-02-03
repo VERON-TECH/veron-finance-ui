@@ -145,7 +145,7 @@ export default function UpdateBankAccount() {
 
     return <>
 
-        <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
+        <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4 " ref={scope}>
             <div className="flex flex-col justify-between gap-2">
                 <Input label="Banque *" type="text" defaultValue={data?.bank} name="bank" placeholder="Nom de la banque" className="border border-sky-950" onBlur={(event) => handleBlur("bank", event.target.value)} ref={inputBank} readOnly />
                 <Input label="Entreprise *" type="text" defaultValue={data?.enterprise} name="enterprise" placeholder="Nom de l'entreprise" className="border border-sky-950" onBlur={(event) => handleBlur("enterprise", event.target.value)} ref={inputEnterprise} readOnly />
@@ -156,7 +156,7 @@ export default function UpdateBankAccount() {
                 Enregistrer
             </Submit>}
         </form>
-        {user.role.includes("ROLE_ADMIN") && <Submit onClick={handleClick} className="absolute bottom-10 left-1/2 transform -translate-x-1/2">
+        {user.role.includes("ROLE_ADMIN") && <Submit onClick={handleClick} className="absolute bottom-10 xl:bottom-5 left-1/2 transform -translate-x-1/2">
             Agences autorisées
         </Submit>}
 

@@ -18,12 +18,17 @@ const CashPage = lazy(() => import("../pages/financial/Cash.jsx"));
 const MobileMoneyPage = lazy(() => import("../pages/financial/MobileMoney.jsx"));
 const HomeStorePage = lazy(() => import("../pages/store/HomeStore.jsx"));
 const StorePrincipalPage = lazy(() => import("../pages/store/StorePrincipal.jsx"));
+const StorePage = lazy(() => import("../pages/store/Store.jsx"));
 const RessourcesHumanPage = lazy(() => import("../pages/ressources_human/RessourcesHuman.jsx"));
 const PersonalPage = lazy(() => import("../pages/ressources_human/Personal.jsx"))
 const UserPage = lazy(() => import("../pages/ressources_human/User.jsx"))
 const HomeProductServicePage = lazy(() => import("../pages/product_service/HomeProductService.jsx"))
 const ProductPage = lazy(() => import("../pages/product_service/Product.jsx"))
 const ServicePage = lazy(() => import("../pages/product_service/Service.jsx"))
+const HomeBudgetPage = lazy(() => import("../pages/budget/HomeBudget.jsx"))
+const BudgetPage = lazy(() => import("../pages/budget/Budget.jsx"))
+const SpentPage = lazy(() => import("../pages/budget/Spent.jsx"))
+
 
 
 export const router = createBrowserRouter([
@@ -41,6 +46,7 @@ export const router = createBrowserRouter([
       { path: "mobile-money", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><MobileMoneyPage /></Suspense> },
       { path: "stores", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><HomeStorePage /></Suspense> },
       { path: "store-principal", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><StorePrincipalPage /></Suspense> },
+      { path: "store", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><StorePage /></Suspense> },
       { path: "ressources-human", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><RessourcesHumanPage /></Suspense> },
       { path: "personal", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PersonalPage /></Suspense> },
       { path: "user", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><UserPage /></Suspense> },
@@ -51,7 +57,9 @@ export const router = createBrowserRouter([
           { path: "service", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><ServicePage /></Suspense> },
         ]
       },
-
+      { path: "budgets", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><HomeBudgetPage /></Suspense> },
+      { path: "spent", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SpentPage /></Suspense> },
+      { path: "budget", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><BudgetPage /></Suspense> },
     ]
   }
 ])

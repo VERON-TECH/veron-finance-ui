@@ -38,8 +38,8 @@ export default function AuthorizationMobileMoneyAgency() {
         <div className="flex justify-center gap-2 mb-2">
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("authorization")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={agencies.header} emptyMessage="Aucune agence autorisée trouvée." globalFilterFields={agencies.global} sheet="Agences autorisées" titleRef="Supprimer l'autorisation dans un compte mobile money" size="lg:h-2/12 lg:w-4/15" />
-        <Modal ref={dialog} size="lg:h-4/11 lg:w-4/15" title="Autoriser une agence">
+        <Table data={data} headers={agencies.header} emptyMessage="Aucune agence autorisée trouvée." globalFilterFields={agencies.global} sheet="Agences autorisées" titleRef="Supprimer l'autorisation dans un compte mobile money" size="lg:h-2/12 lg:w-4/15 xl:h-3/13" />
+        <Modal ref={dialog} size="lg:h-4/11 lg:w-4/15 xl:h-5/11" title="Autoriser une agence">
             <AuhtorizeAgency type="mobile" id={id} />
         </Modal>
 

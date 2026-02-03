@@ -51,11 +51,11 @@ export default memo(function ServicePage() {
             {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit onClick={() => handleModal("category")}>Catégories de service</Submit> : undefined}
             {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit onClick={() => handleModal("service")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={services.header} emptyMessage="Aucun service trouvé." globalFilterFields={services.global} sheet="Service" titleRef="Mise à jour informations d'un service" size="lg:h-7/12 lg:w-4/15" />
+        <Table data={data} headers={services.header} emptyMessage="Aucun service trouvé." globalFilterFields={services.global} sheet="Service" titleRef="Mise à jour informations d'un service" size="lg:h-7/12 lg:w-4/15 xl:h-9/14" />
         <Modal ref={dialog} size="lg:h-6/11 lg:w-12/15 overflow-auto" title="Informations sur les catégories de service">
             <CategoryService />
         </Modal>
-        <Modal ref={dialog1} size="lg:h-7/14 lg:w-4/15" title="Créer un service">
+        <Modal ref={dialog1} size="lg:h-7/14 lg:w-4/15 xl:h-8/14" title="Créer un service">
             <CreateService />
         </Modal>
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}

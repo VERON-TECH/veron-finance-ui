@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { createStorePrincipal, getAllEnterprises, queryClient } from "../../utils/http";
+import { createSpent, getAllFamily, queryClient } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
@@ -10,13 +10,16 @@ import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
 import Select from "../../layout/Select.jsx";
 
-export default function CreateStorePrincipal() {
-    const selectEnterprise = useRef();
+export default function CreateSpent() {
+
+    const user = JSON.parse(localStorage.getItem("user"));
+
+    const selectSpentFamily = useRef();
     const inputName = useRef();
     const dispatch = useDispatch();
     const [scope, animate] = useAnimate();
     const [data, setData] = useState({
-        enterprises: []
+        spentFamilies: [],
     })
 
     useEffect(() => {
@@ -24,37 +27,40 @@ export default function CreateStorePrincipal() {
             tb: [],
         }
         async function get() {
-            const allEnterprises = await getAllEnterprises()
-
-            allEnterprises.forEach(e => {
-                tbEl.tb.push({ key: e.id, name: e.name, value: e.slug })
+            const allFamily = await getAllFamily()
+            allFamily.forEach(f => {
+                tbEl.tb.push({ key: f.id, name: f.name, value: f.slug })
             })
+
+
             setData(prev => {
                 return {
                     ...prev,
-                    enterprises: tbEl.tb
+                    spentFamilies: tbEl.tb,
                 }
             })
         }
         get()
+
     }, [])
 
     async function handleSubmit(prevState, formData) {
         const allData = Object.fromEntries(formData.entries())
         let errors = [];
-        const enterprise = formData.get("enterprise")
+        const spentFamily = formData.get("spentFamily")
         const name = formData.get("name")
+
 
         if (!isNotEmpty(name)) {
             animate(inputName.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("veuillez renseigner le nom du magasin principal.")
+            errors.push("veuillez renseigner le nom du magasin.")
         }
 
-
-        if (enterprise === null) {
-            animate(selectEnterprise.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("veuillez sélectionner l'entrerprise.")
+        if (spentFamily === null) {
+            animate(selectSpentFamily.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+            errors.push("veuillez sélectionner la famille de dépense.")
         }
+
 
 
         if (errors.length > 0) {
@@ -79,7 +85,7 @@ export default function CreateStorePrincipal() {
 
 
     const { mutate } = useMutation({
-        mutationFn: createStorePrincipal,
+        mutationFn: createSpent,
         onSuccess: (responseData) => {
             const state = responseHttp(responseData);
             if (state) {
@@ -90,7 +96,7 @@ export default function CreateStorePrincipal() {
             dispatch(noteActions.show());
             dispatch(noteActions.relaunch());
             dispatch(noteActions.sendData(responseData))
-            queryClient.cancelQueries(["storePrincipals"])
+            queryClient.cancelQueries(["spents"])
         }
     })
 
@@ -103,20 +109,15 @@ export default function CreateStorePrincipal() {
             }
         }
 
-
     }
-
-
-
 
     return <>
 
         <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
-                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data.enterprises} ref={selectEnterprise} />
-                <Input label="Nom *" type="text" defaultValue={formState.enteredValue?.name} name="name" placeholder="Nom" className="border border-sky-950" onBlur={(event) => handleBlur("name", event.target.value)} ref={inputName} />
+                <Select label="Famille *" id="spentFamily" name="spentFamily" selectedTitle="Sélectionner une famille de dépense" data={data?.spentFamilies} ref={selectSpentFamily} />
+                <Input label="Nom *" type="text" defaultValue={formState.enteredValue?.name} name="name" placeholder="Nom de la dépense" className="border border-sky-950" onBlur={(event) => handleBlur("name", event.target.value)} ref={inputName} />
             </div>
-
             <Submit>
                 Créer
             </Submit>

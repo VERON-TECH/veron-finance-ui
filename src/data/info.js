@@ -32,6 +32,11 @@ export const categoryProduct = [
   { key: 1, name: "FOURNITURES", value: "FOURNITURES" },
 ]
 
+export const paymentMethodPurchase = [
+  { key: 0, name: "A_CREDIT", value: "A_CREDIT" },
+  { key: 1, name: "AVANCE_VERSEE", value: "AVANCE_VERSEE" },
+]
+
 
 
 

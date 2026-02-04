@@ -2,33 +2,37 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { authorizeAgencyBank, authorizeAgencyMobile, authorizeAgencyStorePrincipal, authorizeCashSafe, getAllAgenciesByEnterprise, getAllCashesByAgency, getBankAccountById, getEnterpriseById, getMobileMoneyById, getSafeById, getStorePrincipalById } from "../../utils/http.js";
+import { authorizeAgencyBank, authorizeAgencyMobile, authorizeAgencyStorePrincipal, authorizeCashSafe, authorizeEnterpriseSupplier, getAllAgenciesByEnterprise, getAllCashesByAgency, getAllEnterprises, getBankAccountById, getEnterpriseById, getMobileMoneyById, getSafeById, getStorePrincipalById, getSupplierById } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
-import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
 import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
 import Select from "../../layout/Select.jsx";
+import Submit from "../../layout/Submit.jsx";
 
 export default function AuhtorizeAgency({ type, id }) {
     const inputEnterprise = useRef();
+    const selectEnterprise = useRef();
     const selectAgency = useRef();
     const selectCash = useRef();
     const inputRib = useRef();
     const inputMobileSlug = useRef();
     const inputStorePrincipalSlug = useRef();
     const inputSafeSlug = useRef();
+    const inputSupplierSlug = useRef();
     const dispatch = useDispatch();
     const [scope, animate] = useAnimate();
     const user = JSON.parse(localStorage.getItem("user"))
     const [data, setData] = useState({
         agencies: [],
         cashes: [],
+        enterprises: [],
         enterprise: "",
         rib: "",
         mobileSlug: "",
         storePrincipalSlug: "",
-        safeSlug: ""
+        safeSlug: "",
+        supplierSlug: ""
     })
 
 
@@ -95,6 +99,19 @@ export default function AuhtorizeAgency({ type, id }) {
                             agencies: tb,
                             safeSlug: safe.slug,
                             cashes: tb
+                        }
+                    })
+                } else if (type === "supplier") {
+                    const supplier = await getSupplierById({ id, signal })
+                    const enterprises = await getAllEnterprises()
+                    enterprises.forEach(e => {
+                        tb.push({ key: e.id, name: e.name, value: e.slug })
+                    })
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            enterprises: tb,
+                            supplierSlug: supplier.slug,
                         }
                     })
                 }
@@ -261,17 +278,53 @@ export default function AuhtorizeAgency({ type, id }) {
 
             mutate({ slug: cash, slugSafe: safe.slug })
             return { errors: null }
+        } else if (type === "supplier") {
+            const supplierSlug = formData.get("supplierSlug")
+            const enterprise = formData.get("enterprise")
+
+
+
+            if (!isNotEmpty(supplierSlug)) {
+                animate(inputSupplierSlug.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+                errors.push("veuillez renseigner le fournisseur.")
+            }
+
+
+            if (enterprise === null) {
+                animate(selectEnterprise.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+                errors.push("Veuillez sélectionner une entreprise.")
+            }
+
+
+
+
+            if (errors.length > 0) {
+                dispatch(noteActions.show());
+                dispatch(noteActions.error(true));
+                dispatch(noteActions.relaunch());
+                dispatch(noteActions.sendData(errors))
+
+                return {
+                    errors
+                }
+            }
+
+            const supplier = await getSupplierById({ id, signal })
+            const supplierAuthorizeEnterpriseDto = {
+                enterprise,
+            }
+            mutate({ slug: enterprise, supplierAuthorizeEnterpriseDto })
+            return { errors: null }
         }
 
 
     }
 
-
     const [formState, formAction] = useActionState(handleSubmit, { errors: null })
 
 
     const { mutate } = useMutation({
-        mutationFn: type === "bank" ? authorizeAgencyBank : type === "mobile" ? authorizeAgencyMobile : type === "storePrincipal" ? authorizeAgencyStorePrincipal : type === "safe" ? authorizeCashSafe : undefined,
+        mutationFn: type === "bank" ? authorizeAgencyBank : type === "mobile" ? authorizeAgencyMobile : type === "storePrincipal" ? authorizeAgencyStorePrincipal : type === "safe" ? authorizeCashSafe : type === "supplier" ? authorizeEnterpriseSupplier : undefined,
         onSuccess: (responseData) => {
             const state = responseHttp(responseData);
             if (state) {
@@ -320,6 +373,12 @@ export default function AuhtorizeAgency({ type, id }) {
                     animate(inputSafeSlug.current, { x: [0, 15, 0] }, { bounce: 0.75 })
                 }
             }
+        } else if (type === "supplier") {
+            if (field === "supplierSlug") {
+                if (!isNotEmpty(value)) {
+                    animate(inputSupplierSlug.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+                }
+            }
         }
 
 
@@ -333,13 +392,15 @@ export default function AuhtorizeAgency({ type, id }) {
 
         <form action={formAction} className="rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
-                <Input label="Entreprise *" type="text" defaultValue={data?.enterprise} name="enterprise" placeholder="Nom de l'entreprise" className="border border-sky-950" onBlur={(event) => handleBlur("enterprise", event.target.value)} ref={inputEnterprise} readOnly />
+                {type !== "supplier" && <Input label="Entreprise *" type="text" defaultValue={data?.enterprise} name="enterprise" placeholder="Nom de l'entreprise" className="border border-sky-950" onBlur={(event) => handleBlur("enterprise", event.target.value)} ref={inputEnterprise} readOnly />}
                 {type === "bank" && <Input label="R.I.B. *" type="text" defaultValue={data?.rib} name="rib" placeholder="Nº du compte bancaire" className="border border-sky-950" onBlur={(event) => handleBlur("rib", event.target.value)} ref={inputRib} readOnly />}
                 {type === "mobile" && <Input label="Mobile money *" type="text" defaultValue={data?.mobileSlug} name="mobileSlug" placeholder="Nº du compte mobile" className="border border-sky-950" onBlur={(event) => handleBlur("mobileslug", event.target.value)} ref={inputMobileSlug} readOnly />}
                 {type === "storePrincipal" && <Input label="Magasin principal *" type="text" defaultValue={data?.storePrincipalSlug} name="storePrincipalSlug" placeholder="Magasin principal" className="border border-sky-950" onBlur={(event) => handleBlur("storePrincipalSlug", event.target.value)} ref={inputStorePrincipalSlug} readOnly />}
                 {type === "safe" && <Input label="Coffre-fort *" type="text" defaultValue={data?.safeSlug} name="safeSlug" placeholder="Coffre-fort" className="border border-sky-950" onBlur={(event) => handleBlur("safeSlug", event.target.value)} ref={inputSafeSlug} readOnly />}
+                {type === "supplier" && <Input label="Fournisseur *" type="text" defaultValue={data?.supplierSlug} name="supplierSlug" placeholder="Fournisseur" className="border border-sky-950" onBlur={(event) => handleBlur("supplierSlug", event.target.value)} ref={inputSupplierSlug} readOnly />}
                 {type === "bank" || type === "mobile" || type === "storePrincipal" ? <Select label="Agence *" id="agency" name="agency" selectedTitle="Sélectionner une agence" data={data?.agencies} ref={selectAgency} /> : undefined}
                 {type === "safe" && <Select label="Caisse *" id="cash" name="cash" selectedTitle="Sélectionner une caisse" data={data?.cashes} ref={selectCash} />}
+                {type === "supplier" && <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} />}
             </div>
 
 

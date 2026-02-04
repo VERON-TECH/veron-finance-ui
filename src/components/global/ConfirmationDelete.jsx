@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import Submit from "../../layout/Submit";
-import { cleanAllBudget, getAgencyById, getCashById, unAuthorizeAgencyBank, unAuthorizeAgencyMobileMoney, unAuthorizeAgencyStorePrincipal, unAuthorizeCashSafe, validateAllBudget } from "../../utils/http";
+import { cleanAllBudget, getAgencyById, getBudgetById, getCashById, unAuthorizeAgencyBank, unAuthorizeAgencyMobileMoney, unAuthorizeAgencyStorePrincipal, unAuthorizeCashSafe, validateAllBudget, validateBudget } from "../../utils/http";
 import responseHttp from "../../utils/responseHttp";
 import { noteActions } from "../../store/noteSlice";
 import { modalActions } from "../../store/modalSlice";
@@ -40,7 +40,12 @@ export default function ConfirmationDelete({ authorize }) {
             } else if (authorize === "cleanAllBudget") {
                 responseData = await cleanAllBudget()
                 isExecute = true
+            } else if (authorize === "validateBudget") {
+                const budget = await getBudgetById({ id, signal })
+                responseData = await validateBudget(budget.period)
+                isExecute = true
             }
+
 
 
             if (isExecute) {
@@ -66,7 +71,7 @@ export default function ConfirmationDelete({ authorize }) {
     }
 
     return <>
-        {authorize === "validationAllBudget" ? <p className="font-medium">Souhaitez-vous valider toutes les prévisions en attente de validation ?</p> : authorize === "cleanAllBudget" ? <p className="font-medium">Souhaitez-vous nettoyer toutes les prévisions inactives ?</p> : <p className="font-medium">Souhaitez-vous supprimer les autorisations de l'entité {id}?</p>}
+        {authorize === "validationAllBudget" ? <p className="font-medium">Souhaitez-vous valider toutes les prévisions en attente de validation ?</p> : authorize === "cleanAllBudget" ? <p className="font-medium">Souhaitez-vous nettoyer toutes les prévisions inactives ?</p> : authorize === "validateBudget" ? <p className="font-medium">Souhaitez-vous valider cette prévision ?</p> : <p className="font-medium">Souhaitez-vous supprimer les autorisations de l'entité {id}?</p>}
         <form>
             <div className="flex justify-center gap-4 mt-4">
                 <Submit formAction={handleUnAuthorize}>

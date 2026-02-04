@@ -649,4 +649,82 @@ export const budgets = {
 }
 
 
+export const purchasOrders = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Prix HT", field: "spent" },
+        { key: 4, header: "Remise", field: "startDate" },
+        { key: 5, header: "Prix TTC", field: "endDate" },
+        { key: 6, header: "Avance", field: "endDate" },
+        { key: 7, header: "Solde", field: "budget" },
+        { key: 8, header: "Paiement", field: "realization" },
+        { key: 9, header: "Fournisseur", field: "balance" },
+        { key: 10, header: "Statut", field: "statusBudget" },
+        { key: 11, header: "Créée le", field: "dateCreated" },
+        { key: 12, header: "Par", field: "userCreated" },
+        { key: 13, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 14, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Prix HT",
+        "Remise",
+        "Prix TTC",
+        "Avance",
+        "Paiement",
+        "Solde",
+        "Fournisseur",
+        "Statut",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+export const suppliers = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Nom", field: "name" },
+        { key: 2, header: "Tél.", field: "phone" },
+        { key: 3, header: "Email", field: "email" },
+        { key: 4, header: "Adresse", field: "address" },
+        { key: 5, header: "Point focal", field: "focalPoint" },
+        { key: 6, header: "Solde", field: "balance" },
+        { key: 7, header: "Factures", field: "invoice" },
+        { key: 8, header: "Créée le", field: "dateCreated" },
+        { key: 9, header: "Par", field: "userCreated" },
+        { key: 10, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 11, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Nom",
+        "Tél.",
+        "Email",
+        "Adresse",
+        "Point focal",
+        "Solde",
+        "Factures",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+
 

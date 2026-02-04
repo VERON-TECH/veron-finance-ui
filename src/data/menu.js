@@ -20,11 +20,13 @@ export const subFeactures = [
   { key: 5, menu: "Mobile Money", identifier: "financial", url: "mobile-money", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
   { key: 6, menu: "Magasins principaux", identifier: "store", url: "store-principal", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
   { key: 7, menu: "Magasins sécondaires", identifier: "store", url: "store", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
-  { key: 8, menu: "Produits & Services", identifier: "store", url: "product-service", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
-  { key: 9, menu: "Personnels", identifier: "personal", url: "personal", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },
-  { key: 10, menu: "Utilisateurs", identifier: "personal", url: "user", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },
-  { key: 11, menu: "Dépenses", identifier: "budget", url: "spent", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
-  { key: 12, menu: "Budgets", identifier: "budget", url: "budget", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+  { key: 8, menu: "Fournisseurs", identifier: "store", url: "supplier", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
+  { key: 9, menu: "Produits & Services", identifier: "store", url: "product-service", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
+  { key: 10, menu: "Bons de commande", identifier: "store", url: "purchase-order", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
+  { key: 11, menu: "Personnels", identifier: "personal", url: "personal", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },
+  { key: 12, menu: "Utilisateurs", identifier: "personal", url: "user", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },
+  { key: 13, menu: "Dépenses", identifier: "budget", url: "spent", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+  { key: 14, menu: "Budgets", identifier: "budget", url: "budget", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
 
 ]
 

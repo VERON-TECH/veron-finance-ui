@@ -8,6 +8,9 @@ import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
 import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
+import { modalActions } from "../../store/modalSlice.js";
+import Modal from "../../layout/Modal.jsx";
+import ConfirmationDelete from "../global/ConfirmationDelete.jsx";
 
 export default function UpdateBudget() {
     const id = useSelector(state => state.modal.value)
@@ -18,6 +21,7 @@ export default function UpdateBudget() {
     const inputAgency = useRef();
     const inputSpent = useRef();
     const inputBudget = useRef();
+    const dialog = useRef();
     const dispatch = useDispatch();
     const [scope, animate] = useAnimate();
     const [data, setData] = useState({
@@ -156,9 +160,10 @@ export default function UpdateBudget() {
 
     }
 
-    async function handleValidate(){
-       
-    } 
+    async function handleValidate() {
+        dispatch(modalActions.updateValue(id))
+        dialog.current.open()
+    }
 
     return <>
 
@@ -176,7 +181,7 @@ export default function UpdateBudget() {
             </Submit>
         </form>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
-            {user.role.includes("ROLE_ADMIN") && data?.budget.statusBudget === "EN_ATTENTE_DE_VALIDATION" ? <Submit onClick={handleValidate}>
+            {user.role.includes("ROLE_ADMIN") && data?.budget.statusBudget === "EN_ATTENTE_DE_VALIDATION" ? <Submit onClick={() => handleValidate()}>
                 Valider
             </Submit> : user.role.includes("ROLE_ADMIN") && data?.budget.statusBudget === "ACTIVE" ? <Submit disabled={true}>
                 Validé
@@ -184,7 +189,9 @@ export default function UpdateBudget() {
                 Inactif
             </Submit> : undefined}
         </div>
-
+        <Modal ref={dialog} size="lg:h-3/15 lg:w-5/16" title="Valider une prévision">
+            <ConfirmationDelete authorize="validateBudget" />
+        </Modal>
 
 
     </>

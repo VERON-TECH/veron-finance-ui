@@ -4,7 +4,6 @@ import { logout as logoutAction } from "../utils/logout.js"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import Logo from "../layout/LogoDark.jsx";
-import ErrorPage from "../pages/error/Error.jsx";
 
 
 const AuthPage = lazy(() => import("../pages/auth/Auth.jsx"));
@@ -20,6 +19,7 @@ const MobileMoneyPage = lazy(() => import("../pages/financial/MobileMoney.jsx"))
 const HomeStorePage = lazy(() => import("../pages/store/HomeStore.jsx"));
 const StorePrincipalPage = lazy(() => import("../pages/store/StorePrincipal.jsx"));
 const StorePage = lazy(() => import("../pages/store/Store.jsx"));
+const PurchaseOrderPage = lazy(() => import("../pages/store/PurchaseOrder.jsx"));
 const RessourcesHumanPage = lazy(() => import("../pages/ressources_human/RessourcesHuman.jsx"));
 const PersonalPage = lazy(() => import("../pages/ressources_human/Personal.jsx"))
 const UserPage = lazy(() => import("../pages/ressources_human/User.jsx"))
@@ -29,13 +29,15 @@ const ServicePage = lazy(() => import("../pages/product_service/Service.jsx"))
 const HomeBudgetPage = lazy(() => import("../pages/budget/HomeBudget.jsx"))
 const BudgetPage = lazy(() => import("../pages/budget/Budget.jsx"))
 const SpentPage = lazy(() => import("../pages/budget/Spent.jsx"))
+const SupplierPage = lazy(() => import("../pages/supplier/Supplier.jsx"))
+const ErrorPage = lazy(() => import("../pages/error/Error.jsx"))
 
 
 
 export const router = createBrowserRouter([
-  { path: "", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><AuthPage /> </Suspense> },
+  { path: "", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><AuthPage /> </Suspense>, errorElement: <ErrorPage /> },
   {
-    path: "home", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><HomePage /> </Suspense>, action: logoutAction, errorElement: <ErrorPage />,
+    path: "home", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><HomePage /> </Suspense>, action: logoutAction,
 
     children: [
       { index: true, element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><HomeIndexPage /></Suspense> },
@@ -49,6 +51,7 @@ export const router = createBrowserRouter([
       { path: "stores", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><HomeStorePage /></Suspense> },
       { path: "store-principal", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><StorePrincipalPage /></Suspense> },
       { path: "store", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><StorePage /></Suspense> },
+      { path: "purchase-order", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PurchaseOrderPage /></Suspense> },
       { path: "ressources-human", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><RessourcesHumanPage /></Suspense> },
       { path: "personal", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PersonalPage /></Suspense> },
       { path: "user", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><UserPage /></Suspense> },
@@ -62,6 +65,7 @@ export const router = createBrowserRouter([
       { path: "budgets", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><HomeBudgetPage /></Suspense> },
       { path: "spent", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SpentPage /></Suspense> },
       { path: "budget", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><BudgetPage /></Suspense> },
+      { path: "supplier", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SupplierPage /></Suspense> },
     ]
   }
 ])

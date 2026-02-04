@@ -55,12 +55,12 @@ export default function BudgetPage() {
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("clean")}>Nettoyer tout</Submit> : undefined}
             {user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={() => handleModal("new")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={budgets.header} emptyMessage="Aucun budget trouvée." globalFilterFields={budgets.global} sheet="Budget" titleRef="Mise à jour informations de la prévision" size="lg:h-6/11 lg:w-4/15" />
-        <Modal ref={dialog} size="lg:h-6/11 lg:w-4/15" title="Créer une budget">
+        <Table data={data} headers={budgets.header} emptyMessage="Aucun budget trouvée." globalFilterFields={budgets.global} sheet="Budget" titleRef="Mise à jour informations de la prévision" size="lg:h-6/11 lg:w-4/15 xl:h-7/11" />
+        <Modal ref={dialog} size="lg:h-6/11 lg:w-4/15 xl:h-7/11" title="Créer une budget">
             <CreateBudget />
         </Modal>
 
-        <Modal ref={dialog1} size="lg:h-3/15 lg:w-5/16" title="Validation de toutes les prévisions">
+        <Modal ref={dialog1} size="lg:h-3/15 lg:w-5/16 xl:w-6/16 xl:h-4/16" title="Validation de toutes les prévisions">
             <ConfirmationDelete authorize="validationAllBudget" />
         </Modal>
 

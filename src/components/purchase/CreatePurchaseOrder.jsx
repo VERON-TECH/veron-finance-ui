@@ -10,28 +10,39 @@ import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
 import Select from "../../layout/Select.jsx";
 
-export default function CreateStore() {
+export default function CreatePurchaseOrder() {
 
     const user = JSON.parse(localStorage.getItem("user"));
 
     const selectEnterprise = useRef();
     const selectAgency = useRef();
-    const inputName = useRef();
+    const selectSupplier = useRef();
+    const selectProduct = useRef();
+    const selectPaymentMethod = useRef();
+    const inputQuantity = useRef()
+    const inputPrice = useRef()
+    const inputDiscount = useRef();
     const dispatch = useDispatch();
     const [scope, animate] = useAnimate();
     const [data, setData] = useState({
         enterprises: [],
-        agencies: []
+        agencies: [],
+        products: [],
+        supplierAdvances: []
+
     })
 
     useEffect(() => {
 
         if (user.enterprise > 0 && user.agency > 0) {
+
             let tbEl = {
                 tb: [],
-                tb1: []
+                tb1: [],
+                tb2: []
             }
             async function get(signal) {
+
                 const allAgencies = await getAgencyById({ id: user.agency, signal })
                 const allEnterprises = await getEnterpriseById({ id: user.enterprise, signal })
 
@@ -130,7 +141,6 @@ export default function CreateStore() {
             <div className="flex flex-col justify-between gap-2">
                 <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} />
                 <Select label="Agence *" id="agency" name="agency" selectedTitle="Sélectionner une agence" data={data?.agencies} ref={selectAgency} />
-                <Input label="Nom *" type="text" defaultValue={formState.enteredValue?.name} name="name" placeholder="Nom du magasin" className="border border-sky-950" onBlur={(event) => handleBlur("name", event.target.value)} ref={inputName} />
             </div>
             <Submit>
                 Créer
@@ -139,5 +149,4 @@ export default function CreateStore() {
 
 
     </>
-
 }

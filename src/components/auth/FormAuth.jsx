@@ -321,7 +321,7 @@ export default function FormAuth() {
     </AnimatePresence>
 
     <AnimatePresence>
-      <Modal ref={dialog1} title="Mise à jour du mot de passe" size="lg:w-2/8 lg:h-4/11">
+      <Modal ref={dialog1} title="Mise à jour du mot de passe" size="lg:w-2/8 lg:h-4/11 xl:h-3/11">
         <form className="flex justify-center flex-col absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" action={handleUpdatePassword} ref={scope}>
           <Input label="Mot de passe *" type="password" name="password" placeholder="Mot de passe" className="border border-sky-950" onBlur={(event) => handleBlurPassword("password", event.target.value)} ref={inputPwd} />
           <Input label="Confirmer *" type="password" name="confirmationPassword" placeholder="Confirmer" className="border border-sky-950" onBlur={() => handleBlurPassword("passwordConfirm", event.target.value)} ref={inputPwdConfirm} />

@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
 import Submit from "../../layout/Submit";
-import { getAgencyById, getCashById, unAuthorizeAgencyBank, unAuthorizeAgencyMobileMoney, unAuthorizeAgencyStorePrincipal, unAuthorizeCashSafe } from "../../utils/http";
+import { cleanAllBudget, getAgencyById, getCashById, unAuthorizeAgencyBank, unAuthorizeAgencyMobileMoney, unAuthorizeAgencyStorePrincipal, unAuthorizeCashSafe, validateAllBudget } from "../../utils/http";
 import responseHttp from "../../utils/responseHttp";
 import { noteActions } from "../../store/noteSlice";
 import { modalActions } from "../../store/modalSlice";
@@ -34,7 +34,14 @@ export default function ConfirmationDelete({ authorize }) {
                 const cash = await getCashById({ id, signal })
                 responseData = await unAuthorizeCashSafe({ slug: cash.slug, slugSafe })
                 isExecute = true
+            } else if (authorize === "validationAllBudget") {
+                responseData = await validateAllBudget()
+                isExecute = true
+            } else if (authorize === "cleanAllBudget") {
+                responseData = await cleanAllBudget()
+                isExecute = true
             }
+
 
             if (isExecute) {
                 const state = responseHttp(responseData);
@@ -59,7 +66,7 @@ export default function ConfirmationDelete({ authorize }) {
     }
 
     return <>
-        <p className="font-medium">Souhaitez-vous supprimer les autorisations de l'entité {id}?</p>
+        {authorize === "validationAllBudget" ? <p className="font-medium">Souhaitez-vous valider toutes les prévisions en attente de validation ?</p> : authorize === "cleanAllBudget" ? <p className="font-medium">Souhaitez-vous nettoyer toutes les prévisions inactives ?</p> : <p className="font-medium">Souhaitez-vous supprimer les autorisations de l'entité {id}?</p>}
         <form>
             <div className="flex justify-center gap-4 mt-4">
                 <Submit formAction={handleUnAuthorize}>

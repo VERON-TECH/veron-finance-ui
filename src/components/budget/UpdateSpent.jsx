@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createSpent, getAllFamily, getSpentById, getSpentFamilyById, queryClient, updateSpent } from "../../utils/http.js";
+import { getAllFamily, getSpentById, getSpentFamilyById, queryClient, updateSpent } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
@@ -55,7 +55,7 @@ export default function UpdateSpent() {
 
     async function handleSubmit(prevState, formData, signal) {
         let errors = [];
-        const actualSpentfamily = formData.get("actualSpentfamily")
+        const actualSpentFamily = formData.get("actualSpentFamily")
         const spentFamily = formData.get("spentFamily")
         const name = formData.get("name")
 
@@ -83,7 +83,7 @@ export default function UpdateSpent() {
         const spent = await getSpentById({ id, signal })
         const spentDto = {
             name,
-            spentFamily: spentFamily !== null & spentFamily != actualSpentfamily ? spentFamily : actualSpentfamily
+            spentFamily: spentFamily !== null & spentFamily != actualSpentFamily ? spentFamily : actualSpentFamily
         }
 
         mutate({ slug: spent.slug, spentDto })

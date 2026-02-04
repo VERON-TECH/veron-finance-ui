@@ -33,6 +33,7 @@ import UpdateProduct from '../components/product/UpdateProduct';
 import UpdateStore from '../components/store/UpdateStore';
 import UpdateSpentFamily from '../components/budget/UpdateFamilySpent';
 import UpdateSpent from '../components/budget/UpdateSpent';
+import UpdateBudget from '../components/budget/UpdateBudget';
 
 
 
@@ -227,6 +228,12 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
         {titleRef === "Mise à jour informations d'une dépense" &&
           <UpdateSpent />
         }
+
+        {titleRef === "Mise à jour informations de la prévision" &&
+          <UpdateBudget />
+        }
+
+
 
 
 

@@ -12,7 +12,6 @@ import Select from "../../layout/Select.jsx";
 
 export default function CreateSpent() {
 
-    const user = JSON.parse(localStorage.getItem("user"));
 
     const selectSpentFamily = useRef();
     const inputName = useRef();

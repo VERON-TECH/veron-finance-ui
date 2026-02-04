@@ -1,7 +1,7 @@
 import { useFormStatus } from "react-dom"
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDoubleDown, faBank, faCircleCheck, faCirclePlus, faCoins, faFileCircleCheck, faFloppyDisk, faFolderOpen, faGroupArrowsRotate, faListCheck, faPersonArrowDownToLine, faPrint, faSpinner, faSquarePhone, faUserGear, faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import { faAngleDoubleDown, faBank, faCheckDouble, faCircleCheck, faCirclePlus, faCoins, faDeleteLeft, faEraser, faFileCircleCheck, faFloppyDisk, faFolderOpen, faGroupArrowsRotate, faListCheck, faPersonArrowDownToLine, faPrint, faSpinner, faSquarePhone, faUserGear, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { faWindowRestore } from "@fortawesome/free-regular-svg-icons";
 import { faCashApp } from "@fortawesome/free-brands-svg-icons";
 
@@ -19,7 +19,10 @@ export default function Submit({ children, disabled = false, className, ...props
       {children === "Autoriser" ? <FontAwesomeIcon icon={faFileCircleCheck} className="me-2" /> : undefined}
       {children === "Gestion des affectations" ? <FontAwesomeIcon icon={faAngleDoubleDown} className="me-2" /> : undefined}
       {children === "Valider" ? <FontAwesomeIcon icon={faCircleCheck} className="me-2" /> : undefined}
+      {children === "Validé" ? <FontAwesomeIcon icon={faCheckDouble} className="me-2" /> : undefined}
+      {children === "Inactif" ? <FontAwesomeIcon icon={faDeleteLeft} className="me-2" /> : undefined}
       {children === "Valider tout" ? <FontAwesomeIcon icon={faListCheck} className="me-2" /> : undefined}
+      {children === "Nettoyer tout" ? <FontAwesomeIcon icon={faEraser} className="me-2" /> : undefined}
       {children === "Ouvrir" ? <FontAwesomeIcon icon={faFolderOpen} className="me-2" /> : undefined}
       {children === "Réinitialiser" ? <FontAwesomeIcon icon={faWindowRestore} className="me-2" /> : undefined}
       {children === "Imprimer" ? <FontAwesomeIcon icon={faPrint} className="me-2" /> : undefined}

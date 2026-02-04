@@ -609,3 +609,44 @@ export const families = {
 }
 
 
+export const budgets = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Dépense", field: "spent" },
+        { key: 4, header: "Date de début", field: "startDate" },
+        { key: 5, header: "Date de fin", field: "endDate" },
+        { key: 6, header: "Montant", field: "budget" },
+        { key: 7, header: "Réalisation", field: "realization" },
+        { key: 8, header: "Solde", field: "balance" },
+        { key: 9, header: "Statut", field: "statusBudget" },
+        { key: 10, header: "Créée le", field: "dateCreated" },
+        { key: 11, header: "Par", field: "userCreated" },
+        { key: 12, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 13, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Dépense",
+        "Date de début",
+        "Date de fin",
+        "Montant",
+        "Réalisation",
+        "Solde",
+        "Statut",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+

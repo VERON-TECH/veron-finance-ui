@@ -1,7 +1,7 @@
 import { useFormStatus } from "react-dom"
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAngleDoubleDown, faBank, faCheckDouble, faCircleCheck, faCirclePlus, faCoins, faDeleteLeft, faEraser, faFileCircleCheck, faFloppyDisk, faFolderOpen, faGroupArrowsRotate, faListCheck, faPersonArrowDownToLine, faPrint, faSpinner, faSquarePhone, faUserGear, faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import { faAdd, faAngleDoubleDown, faBank, faCheckDouble, faCircleCheck, faCirclePlus, faCoins, faDeleteLeft, faEraser, faFileCircleCheck, faFloppyDisk, faFolderOpen, faGroupArrowsRotate, faListCheck, faPersonArrowDownToLine, faPrint, faSpinner, faSquarePhone, faUserGear, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { faWindowRestore } from "@fortawesome/free-regular-svg-icons";
 import { faCashApp } from "@fortawesome/free-brands-svg-icons";
 
@@ -23,6 +23,7 @@ export default function Submit({ children, disabled = false, className, ...props
       {children === "Inactif" ? <FontAwesomeIcon icon={faDeleteLeft} className="me-2" /> : undefined}
       {children === "Valider tout" ? <FontAwesomeIcon icon={faListCheck} className="me-2" /> : undefined}
       {children === "Nettoyer tout" ? <FontAwesomeIcon icon={faEraser} className="me-2" /> : undefined}
+      {children === "Annuler" ? <FontAwesomeIcon icon={faEraser} className="me-2" /> : undefined}
       {children === "Ouvrir" ? <FontAwesomeIcon icon={faFolderOpen} className="me-2" /> : undefined}
       {children === "Réinitialiser" ? <FontAwesomeIcon icon={faWindowRestore} className="me-2" /> : undefined}
       {children === "Imprimer" ? <FontAwesomeIcon icon={faPrint} className="me-2" /> : undefined}
@@ -35,6 +36,7 @@ export default function Submit({ children, disabled = false, className, ...props
       {children === "Caisses & Magasins" && < FontAwesomeIcon icon={faUserGear} className="me-2" />}
       {children === "Catégories de service" && < FontAwesomeIcon icon={faGroupArrowsRotate} className="me-2" />}
       {children === "Famille de dépenses" && < FontAwesomeIcon icon={faCashApp} className="me-2" />}
+      {children === "Ajouter" && < FontAwesomeIcon icon={faAdd} className="me-2" />}
 
       {pending ? <div className="flex gap-2">
         <FontAwesomeIcon icon={faSpinner} className="animate-spin" />

@@ -6,7 +6,7 @@ import Notification from "../../layout/Notification";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArtstation, faServicestack } from "@fortawesome/free-brands-svg-icons";
 
-export default function HomeProductServicePage() {
+export default function ApproStockPage() {
     const user = JSON.parse(localStorage.getItem("user"));
     const errorNotification = useSelector(state => state.note.error);
     const relaunch = useSelector(state => state.note.relaunch);
@@ -15,20 +15,12 @@ export default function HomeProductServicePage() {
     const menu = useSelector(state => state.identifier.menu)
 
     useEffect(() => {
-        dispatch(identifierMenuActions.updateMenu({ menu: "store" }))
+        dispatch(identifierMenuActions.updateMenu({ menu: "stock" }))
 
     }, [menu, dispatch, user])
 
     return <>
-        <div className="mb-4">
-            <ul className="bg-sky-950 flex gap-4 p-2 text-xs text-sky-50 rounded">
-                <NavLink to="" className="w-64  p-1 hover:border-b-4 font-medium text-center cursor-pointer"><FontAwesomeIcon icon={faArtstation} className="me-4" />Produits/Fournitures</NavLink>
-                <NavLink to="service" className="w-64  p-1 hover:border-b-4 font-medium text-center cursor-pointer"><FontAwesomeIcon icon={faServicestack} className="me-4" />Services</NavLink>
-            </ul>
-        </div>
-        <div>
-            <Outlet />
-        </div>
+        Hello world
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>
 }

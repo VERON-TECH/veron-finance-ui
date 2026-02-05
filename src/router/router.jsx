@@ -31,6 +31,8 @@ const BudgetPage = lazy(() => import("../pages/budget/Budget.jsx"))
 const SpentPage = lazy(() => import("../pages/budget/Spent.jsx"))
 const SupplierPage = lazy(() => import("../pages/supplier/Supplier.jsx"))
 const ErrorPage = lazy(() => import("../pages/error/Error.jsx"))
+const ApproStockPage = lazy(() => import("../pages/store/ApproStock.jsx"))
+const ProductStockPage = lazy(() => import("../pages/store/ProductStock.jsx"))
 
 
 
@@ -66,6 +68,9 @@ export const router = createBrowserRouter([
       { path: "spent", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SpentPage /></Suspense> },
       { path: "budget", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><BudgetPage /></Suspense> },
       { path: "supplier", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SupplierPage /></Suspense> },
+      { path: "mvt-stock", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><ApproStockPage /></Suspense> },
+      { path: "product-stock", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><ProductStockPage /></Suspense> },
+
     ]
   }
 ])

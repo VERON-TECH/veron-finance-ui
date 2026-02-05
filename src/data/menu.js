@@ -7,8 +7,9 @@ export const features = [
   { key: 5, menu: "Caisses", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSIER"], path: "cash" },
   { key: 6, menu: "Ventes", role: ["ROLE_CAISSIER"], path: "sale" },
   { key: 7, menu: "Magasins & Stocks", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"], path: "stores" },
-  { key: 8, menu: "Autres réglages", role: ["ROLE_ADMIN"], path: "setting" },
-  { key: 9, menu: "Base de données", role: ["ROLE_ADMIN"], path: "data" },
+  { key: 8, menu: "Appro & transferts", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"], path: "mvt-stock" },
+  { key: 9, menu: "Autres réglages", role: ["ROLE_ADMIN"], path: "setting" },
+  { key: 10, menu: "Base de données", role: ["ROLE_ADMIN"], path: "data" },
 ]
 
 export const subFeactures = [
@@ -22,11 +23,13 @@ export const subFeactures = [
   { key: 7, menu: "Magasins sécondaires", identifier: "store", url: "store", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
   { key: 8, menu: "Fournisseurs", identifier: "store", url: "supplier", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
   { key: 9, menu: "Produits & Services", identifier: "store", url: "product-service", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
-  { key: 10, menu: "Bons de commande", identifier: "store", url: "purchase-order", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
-  { key: 11, menu: "Personnels", identifier: "personal", url: "personal", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },
-  { key: 12, menu: "Utilisateurs", identifier: "personal", url: "user", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },
-  { key: 13, menu: "Dépenses", identifier: "budget", url: "spent", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
-  { key: 14, menu: "Budgets", identifier: "budget", url: "budget", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+  { key: 10, menu: "Stock", identifier: "store", url: "product-stock", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
+  { key: 11, menu: "Bons de commande", identifier: "stock", url: "purchase-order", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
+  { key: 12, menu: "Appro & Transferts", identifier: "stock", url: "mvt-stock", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
+  { key: 13, menu: "Personnels", identifier: "personal", url: "personal", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },
+  { key: 14, menu: "Utilisateurs", identifier: "personal", url: "user", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },
+  { key: 15, menu: "Dépenses", identifier: "budget", url: "spent", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+  { key: 16, menu: "Budgets", identifier: "budget", url: "budget", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
 
 ]
 

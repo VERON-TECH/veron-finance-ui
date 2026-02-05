@@ -2,7 +2,7 @@ import { useDispatch } from "react-redux";
 import { NavLink } from "react-router";
 import { modalActions } from "../store/modalSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBank, faBuilding, faCalendarTimes, faCartPlus, faCashRegister, faCoins, faGlobe, faHome, faPerson, faPersonArrowDownToLine, faPhoneAlt, faShop, faShoppingCart, faStore, faStoreAlt, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faArrowCircleDown, faBank, faBuilding, faCalendarTimes, faCartPlus, faCashRegister, faCoins, faGlobe, faHome, faPerson, faPersonArrowDownToLine, faPhoneAlt, faShop, faShoppingCart, faStore, faStoreAlt, faUser } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -30,6 +30,7 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
     {title === "Dépenses" && < FontAwesomeIcon icon={faCartPlus} className="me-4" />}
     {title === "Budgets" && < FontAwesomeIcon icon={faCalendarTimes} className="me-4" />}
     {title === "Fournisseurs" && < FontAwesomeIcon icon={faPersonArrowDownToLine} className="me-4" />}
+    {title === "Appro & Transferts" && < FontAwesomeIcon icon={faArrowCircleDown} className="me-4" />}
     {title}
   </NavLink >
 }

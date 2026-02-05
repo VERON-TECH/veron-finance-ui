@@ -3783,6 +3783,40 @@ export async function authorizeEnterpriseSupplier({ slug, supplierAuthorizeEnter
 }
 
 
+export async function getAllSupplierAdvances({ signal, enterprise, agency }) {
+  const url = `${BASE_URL}supplier-advance/ad-ac-ma-cc-ca/?enterprise=${enterprise}&agency=${agency}`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    signal
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+
+
 
 
 

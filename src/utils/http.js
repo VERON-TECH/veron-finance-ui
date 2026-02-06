@@ -397,7 +397,7 @@ export async function getEnterpriseBySlug({ slug, signal }) {
 
 
 export async function getAllAgencies() {
-  const url = `${BASE_URL}agency/ad-rh/`
+  const url = `${BASE_URL}agency/ad-ac-rh-ma/`
   const token = getToken();
   const response = await fetch(url, {
     method: "GET",
@@ -493,6 +493,39 @@ export async function getAgencyById({ id, signal }) {
     return data;
   }
 }
+
+export async function getAgencyBySlug({ slug, signal }) {
+  const url = `${BASE_URL}agency/ad-ac-rh/${slug}/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    signal
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
 
 
 export async function createAgency(agencyDto) {
@@ -3959,6 +3992,72 @@ export async function annulationPurchaseOrder(slug) {
       "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+
+export async function createProductStock(productStockDto) {
+  const url = `${BASE_URL}product-stock/ac-ma/create/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(productStockDto)
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+
+export async function getAllMvtStocks({ signal, enterprise, agency, startDate, endDate }) {
+  const url = `${BASE_URL}mvt-stock/ad-ac-ma/?enterprise=${enterprise}&agency=${agency}&startDate=${startDate}&endDate=${endDate}`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    signal
   });
   if (response.status === 401) {
     return ["Utilisateur non authentifié"];

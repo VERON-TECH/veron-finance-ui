@@ -726,5 +726,55 @@ export const suppliers = {
 }
 
 
+export const mvtStocks = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Date", field: "dateTransaction" },
+        { key: 4, header: "Réf.", field: "ref" },
+        { key: 5, header: "Magasin principal", field: "storePrincipal" },
+        { key: 6, header: "Magasin 1", field: "store01" },
+        { key: 7, header: "Magasin 2", field: "store02" },
+        { key: 8, header: "Catégorie", field: "category" },
+        { key: 9, header: "Produit", field: "product" },
+        { key: 10, header: "S.I.", field: "initial" },
+        { key: 11, header: "Entrée", field: "incoming" },
+        { key: 12, header: "Sortie", field: "outgoing" },
+        { key: 13, header: "Stock", field: "stock" },
+        { key: 14, header: "Valeur", field: "value" },
+        { key: 15, header: "Créée le", field: "dateCreated" },
+        { key: 16, header: "Par", field: "userCreated" },
+        { key: 17, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 18, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Date",
+        "Réf.",
+        "Magasin principal",
+        "Magasin 1",
+        "Magasin 2",
+        "Catégorie",
+        "Produit",
+        "S.I.",
+        "Entrée",
+        "Sortie",
+        "Stock",
+        "Valeur",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
 
 

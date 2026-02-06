@@ -1,7 +1,7 @@
-import { useAnimate } from "framer-motion";
+
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { annulationPurchaseOrder, createPurchaseOrder, getAgencyById, getAllProducts, getAllSupplierAdvances, getAllSuppliers, getEnterpriseById, getProductById, getProductBySlug, getPurchaseOrderById, getSupplierById, queryClient, updatePurchaseOrder } from "../../utils/http.js";
+import { annulationPurchaseOrder, createProductStock, getAgencyById, getAgencyBySlug, getAllProducts, getAllStorePrincipal, getAllSuppliers, getEnterpriseById, getProductBySlug, getPurchaseOrderById, getSupplierById, queryClient, updatePurchaseOrder } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
@@ -12,16 +12,13 @@ import { paymentMethodPurchase } from "../../data/info.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationTriangle, faPlusCircle, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../layout/Modal.jsx";
-import { redirect, useNavigate } from "react-router-dom";
 import Notification from "../../layout/Notification.jsx";
-import { modalActions } from "../../store/modalSlice.js";
 
 export default function UpdatePurchaseOrder() {
     const errorNotification = useSelector(state => state.note.error);
     const relaunch = useSelector(state => state.note.relaunch);
     const dataItem = useSelector(state => state.note.dataItem)
     const id = useSelector(state => state.modal.value)
-    const user = JSON.parse(localStorage.getItem("user"))
     const dialog = useRef();
     const dialog1 = useRef();
     const dialog2 = useRef();
@@ -34,12 +31,12 @@ export default function UpdatePurchaseOrder() {
     const inputPaymentMethod = useRef()
     const selectPaymentMethod = useRef();
     const selectSupplierAdvance = useRef();
+    const selectStorePrincipal = useRef();
     const inputQuantity = useRef()
     const inputPrice = useRef()
     const inputDiscount = useRef();
-    const navigate = useNavigate()
+    const inputRef = useRef();
     const dispatch = useDispatch();
-    const [scope, animate] = useAnimate();
     const [data, setData] = useState({
         productList: [],
         products: [],
@@ -47,6 +44,7 @@ export default function UpdatePurchaseOrder() {
         actualSupplier: "",
         actualEnterprise: "",
         actualAgency: "",
+        agencyEnterprise: "",
         actualPayment: "",
         supplierAdvanceList: [],
         supplierAdvances: [],
@@ -58,6 +56,7 @@ export default function UpdatePurchaseOrder() {
         errors: [],
         purchaseOrder: {},
         disabled: false,
+        storePrincipals: []
 
     })
 
@@ -68,20 +67,28 @@ export default function UpdatePurchaseOrder() {
             let tbEl = {
                 tb: [],
                 tb1: [],
+                tb2: [],
             }
             async function get(signal) {
+
                 const purchaseOrder = await getPurchaseOrderById({ signal, id })
                 const allProducts = await getAllProducts({ signal, enterprise: purchaseOrder.enterprise })
                 const allSuppliers = await getAllSuppliers({ signal, enterprise: purchaseOrder.enterprise })
                 const supplier = await getSupplierById({ id: purchaseOrder.supplier, signal })
                 const enterprise = await getEnterpriseById({ id: purchaseOrder.enterprise, signal })
                 const agency = await getAgencyById({ id: purchaseOrder.agency, signal })
+                const agencyEnterprise = await getAgencyBySlug({ slug: enterprise.slug, signal })
+                const storePrincipals = await getAllStorePrincipal({ signal, agency: purchaseOrder.agency })
                 allProducts.forEach(p => {
                     tbEl.tb.push({ key: p.id, name: p.name, value: p.slug })
                 })
 
                 allSuppliers.forEach(s => {
                     tbEl.tb1.push({ key: s.id, name: s.name, value: s.slug })
+                })
+
+                storePrincipals.forEach(s => {
+                    tbEl.tb2.push({ key: s.id, name: s.name, value: s.slug })
                 })
 
 
@@ -110,11 +117,13 @@ export default function UpdatePurchaseOrder() {
                         actualSupplier: supplier.slug,
                         actualEnterprise: enterprise.slug,
                         actualAgency: agency.slug,
+                        agencyEnterprise: agencyEnterprise.slug,
                         products,
                         priceHT,
                         discount: purchaseOrder.discount,
                         priceTTC: priceHT - purchaseOrder.discount,
-                        disabled: purchaseOrder.statusPurchase === "ANNULE" ? true : false
+                        disabled: purchaseOrder.statusPurchase === "ANNULE" ? true : false,
+                        storePrincipals: tbEl.tb2
 
                     }
                 })
@@ -170,17 +179,6 @@ export default function UpdatePurchaseOrder() {
 
 
 
-    function handleBlur(field, value) {
-
-        if (field === "name") {
-            if (!isNotEmpty(value)) {
-                animate(inputName.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            }
-        }
-
-    }
-
-
     async function handleChange(identifier, value, signal) {
         if (identifier === "paymentMethod") {
             setData(prev => {
@@ -223,7 +221,7 @@ export default function UpdatePurchaseOrder() {
     }
 
 
-    function handleAdd(identifier) {
+    function handleAdd() {
         let errors = []
         if (!isNotEmpty(inputSupplier.current.value)) {
             errors.push("Veuillez sélectionner un fournisseur")
@@ -347,30 +345,146 @@ export default function UpdatePurchaseOrder() {
     }
 
     function handleCloseModal() {
-        dispatch(modalActions.updateClose())
+        dialog2.current.close()
+        /**dispatch(modalActions.updateClose())**/
     }
 
-    function handleClick(identifier, value) {
+    function handleClick(identifier, value, id) {
+        const products = [...data.products]
         if (identifier == "all") {
-            const products = [...data.products]
-            if (value == "on") {
+
+            if (value == true) {
                 for (let p of products) {
                     p.status = "on"
                 }
 
-            } else if (value == "off") {
+            } else if (value == false) {
                 for (let p of products) {
                     p.status = "off"
                 }
 
             }
-            setData(prev => {
-                return {
-                    ...prev,
-                    products,
+
+        } else if (identifier == "one") {
+
+            if (value == true) {
+                for (let p of products) {
+                    if (p.id === id) {
+                        p.status = "on"
+                    }
+
+                }
+
+            } else if (value == false) {
+                for (let p of products) {
+                    if (p.id === id) {
+                        p.status = "off"
+                    }
+                }
+
+            }
+
+        }
+        setData(prev => {
+            return {
+                ...prev,
+                products,
+            }
+        })
+    }
+
+
+    function handleChanges(identifier, value, id) {
+        const products = [...data.products]
+        if (identifier === "quantity") {
+            products.forEach(p => {
+                if (p.id === id) {
+                    p.quantity = value
+                }
+            })
+        } else if (identifier === "price") {
+            products.forEach(p => {
+                if (p.id === id) {
+                    p.price = value
+                }
+            })
+        } else if (identifier === "lot") {
+            products.forEach(p => {
+                if (p.id === id) {
+                    p.lot = value
+                }
+            })
+        } else if (identifier === "date") {
+            products.forEach(p => {
+                if (p.id === id) {
+                    p.date = value
                 }
             })
         }
+        setData(prev => {
+            return {
+                ...prev,
+                products
+            }
+        })
+    }
+
+
+    async function handleValidate() {
+        const storePrincipal = selectStorePrincipal.current.value
+        const enterprise = inputEnterprise.current.value
+        const agency = inputAgency.current.value
+        const purchaseOrder = data.purchaseOrder.slug
+        const productData = data.products
+
+        let errors = []
+
+        if (storePrincipal == "Sélectionner un magasin principal") {
+            errors.push("Veuillez sélectionner le magasin principal")
+        }
+
+        let products = []
+        productData.forEach(p => {
+            products.push(p.product + ":" + p.quantity + ":" + p.price + ":" + p?.lot + ":" + p?.date + ":" + p.status)
+        })
+
+
+        const productStockDto = {
+            storePrincipal,
+            enterprise,
+            agency,
+            purchaseOrder,
+            products
+
+        }
+
+        if (errors.length > 0) {
+            dispatch(noteActions.show());
+            dispatch(noteActions.error(true));
+            dispatch(noteActions.relaunch());
+            dispatch(noteActions.sendData(errors))
+            return { errors }
+        }
+
+        const responseData = await createProductStock(productStockDto)
+        const state = responseHttp(responseData);
+        if (state) {
+            dispatch(noteActions.error(true))
+        } else {
+            dispatch(noteActions.error(false))
+        }
+        dispatch(noteActions.show());
+        dispatch(noteActions.relaunch());
+        dispatch(noteActions.sendData(responseData))
+        setData(prev => {
+            return {
+                ...prev,
+                disabled: true
+            }
+        })
+
+        return { errors: null }
+
     }
 
     return <>
@@ -403,12 +517,12 @@ export default function UpdatePurchaseOrder() {
                 </div>
 
 
-                <Input label="Quantité *" type="number" name="quantity" defaultValue={data?.quantity} placeholder="Quantité" className="border border-sky-950" onBlur={(event) => handleBlur("quantity", event.target.value)} ref={inputQuantity} disabled={data?.purchaseOrder.statusPurchase === "ANNULE" ? true : false} />
-                <Input label="Prix *" type="number" defaultValue={data?.price} name="price" placeholder="Prix" className="border border-sky-950" onBlur={(event) => handleBlur("price", event.target.value)} ref={inputPrice} disabled={data?.purchaseOrder.statusPurchase === "ANNULE" ? true : false} />
+                <Input label="Quantité *" type="number" name="quantity" defaultValue={data?.quantity} placeholder="Quantité" className="border border-sky-950" ref={inputQuantity} disabled={data?.purchaseOrder.statusPurchase === "ANNULE" ? true : false} />
+                <Input label="Prix *" type="number" defaultValue={data?.price} name="price" placeholder="Prix" className="border border-sky-950" ref={inputPrice} disabled={data?.purchaseOrder.statusPurchase === "ANNULE" ? true : false} />
 
-                <Submit onClick={() => handleAdd("add")} disabled={data?.disabled}>
+                {data?.purchaseOrder.statusPurchase === "EN_INSTANCE" && <Submit onClick={() => handleAdd("add")} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
                     Ajouter
-                </Submit>
+                </Submit>}
                 {data?.errors.length > 0 && <ul>
                     {data.errors.map(e => <li key={e} className="text-red-500">{e}</li>)}
                 </ul>}
@@ -455,17 +569,17 @@ export default function UpdatePurchaseOrder() {
                 {data.products.length > 0 && <div className="flex flex-col justify-end mt-4">
                     <div className="flex gap-4">
                         <div className="border px-12 flex justify-center items-center italic font-bold rounded shadow-xl shadow-sky-950">
-                            {data.purchaseOrder.statusPurchase}
+                            {data?.purchaseOrder.statusPurchase}
                         </div>
-                        <Submit onClick={() => handleOpenAnnulation()} disabled={data?.disabled}>
+                        {data?.purchaseOrder.statusPurchase === "EN_INSTANCE" && <Submit onClick={() => handleOpenAnnulation()} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
                             Annuler
-                        </Submit>
-                        <Submit onClick={() => handleSave()} disabled={data?.disabled}>
+                        </Submit>}
+                        {data.purchaseOrder.statusPurchase === "EN_INSTANCE" && <Submit onClick={() => handleSave()} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
                             Enregistrer
-                        </Submit>
+                        </Submit>}
                     </div>
                     <div className="flex gap-4 mt-8 justify-center">
-                        {data.purchaseOrder.statusPurchase === "EN_INSTANCE" && <Submit onClick={() => handleOpenValidation()} disabled={data?.disabled}>
+                        {data?.purchaseOrder.statusPurchase === "EN_INSTANCE" && <Submit onClick={() => handleOpenValidation()} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
                             Valider
                         </Submit>
                         }
@@ -518,44 +632,66 @@ export default function UpdatePurchaseOrder() {
         </Modal>
 
         <Modal ref={dialog3} title={`Validation du bon commande ${data?.purchaseOrder.ref}`} size="h-3/5 w-3/5">
-            <table className="w-full">
+            <div className="flex justify-center gap-2">
+                <Input label="Entreprise *" type="text" defaultValue={data?.actualEnterprise} name="enterprise" placeholder="Entreprise" className="border border-sky-950" ref={inputEnterprise} readOnly />
+                <Input label="Agence *" type="text" defaultValue={data?.agencyEnterprise} name="agency" placeholder="Agence" className="border border-sky-950" ref={inputAgency} readOnly />
+            </div>
+            <div className="flex justify-center gap-2">
+                <Select label="Magasin principal *" id="storePrincipal" name="storePrincipal" selectedTitle="Sélectionner un magasin principal" data={data?.storePrincipals} ref={selectStorePrincipal} onChange={(e) => handleChange("storePrincipal", e.target.value)} />
+                <Input label="Réf. *" type="text" defaultValue={data?.purchaseOrder.ref} name="ref" placeholder="Réf." className="border border-sky-950" ref={inputRef} readOnly />
+            </div>
+            <table className="w-full mb-4">
                 <thead>
                     <tr className="bg-sky-950 text-sky-50">
-                        <th className="border px-3">
+                        <th className="border">
                             id
                         </th>
-                        <th className="border px-3">
+                        <th className="border">
                             produit
                         </th>
-                        <th className="border px-3">
+                        <th className="border">
                             Quantité
                         </th>
-                        <th className="border px-3">
+                        <th className="border">
                             Prix
                         </th>
-                        <th className="border px-3 py-1 flex items-center justify-center">
-                            Action <input type="checkbox" className="ms-2" onClick={(e) => handleClick("all", e.target.value)} />
+                        <th className="border">
+                            Lot
+                        </th>
+                        <th className="border">
+                            Date de péremption
+                        </th>
+                        <th className="border py-1 flex items-center justify-center">
+                            Action <input type="checkbox" className="ms-2" onClick={(e) => handleClick("all", e.target.checked)} />
                         </th>
                     </tr>
                 </thead>
                 <tbody>
                     {data?.products.length > 0 && data.products.map(p => <tr key={p.product}>
-                        <td className="border border-sky-950 text-center">{p.id}</td>
-                        <td className="border border-sky-950 text-center">{p.product}</td>
-                        <td className="border border-sky-950 text-center">{p.quantity}</td>
-                        <td className="border border-sky-950 text-center">{p.price}</td>
-                        <td className="border border-sky-950 text-center"><input type="checkbox" checked={p.status === "on"} onClick={() => handleClick("one", e.target.value)} /></td>
+                        <td className="border border-sky-950 text-center p-1">{p.id}</td>
+                        <td className="border border-sky-950 text-center p-1">{p.product}</td>
+                        <td className="border border-sky-950 text-center p-1"><input type="number" className="w-full text-end" defaultValue={p.quantity} onChange={(e) => handleChanges("quantity", e.value.target, p.id)} /></td>
+                        <td className="border border-sky-950 text-center p-1"><input type="number" className="w-full text-end" defaultValue={p.price} onChange={(e) => handleChanges("price", e.target.value, p.id)} /></td>
+                        <td className="border border-sky-950 text-center p-1"><input type="text" placeholder="numéro du lot" onChange={(e) => handleChanges("lot", e.target.value, p.id)} /></td>
+                        <td className="border border-sky-950 text-center p-1"><input type="date" onChange={(e) => handleChanges("date", e.target.value, p.id)} /></td>
+                        <td className="border border-sky-950 text-center p-1"><input type="checkbox" checked={p.status === "on"} onClick={(e) => handleClick("one", e.target.checked, p.id)} /></td>
                     </tr>)}
                 </tbody>
                 {data.products.length > 0 && <tfoot>
                     <tr className="bg-sky-950 text-sky-50">
-                        <td className="border text-center" colSpan={2}>Prix H.T.</td>
+                        <td className="border text-center" colSpan={4}>Prix H.T.</td>
                         <td className="border text-center">{data?.priceHT}</td>
                         <td className="border text-center p-1"><input type="number" name="discount" id="discount" defaultValue={data?.purchaseOrder.discount} placeholder="Rémise" className="bg-sky-50 text-sky-950 text-center w-16" ref={inputDiscount} onChange={(e) => handleChange("discount", e.target.value)} /></td>
                         <td className="border text-center">{data.priceTTC}</td>
                     </tr>
                 </tfoot>}
             </table>
+            <div className="flex justify-end">
+                <Submit onClick={handleValidate} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
+                    Enregistrer
+                </Submit>
+            </div>
+            {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
         </Modal>
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
 

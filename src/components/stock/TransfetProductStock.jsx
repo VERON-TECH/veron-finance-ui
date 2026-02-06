@@ -1,7 +1,7 @@
 import { useAnimate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createPurchaseOrder, getAgencyById, getAllProducts, getAllSupplierAdvances, getAllSuppliers, getEnterpriseById, getProductById, getProductBySlug, queryClient } from "../../utils/http.js";
+import { createPurchaseOrder, getAgencyById, getAgencyBySlug, getAllAgencies, getAllProducts, getAllStorePrincipal, getAllSupplierAdvances, getAllSuppliers, getEnterpriseById, getProductById, getProductBySlug, queryClient } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { noteActions } from "../../store/noteSlice.js";
@@ -13,7 +13,7 @@ import { faExclamationTriangle, faPlusCircle, faTrash } from "@fortawesome/free-
 import Modal from "../../layout/Modal.jsx";
 import Notification from "../../layout/Notification.jsx";
 
-export default function CreatePurchaseOrder() {
+export default function TransfertProductStock() {
     const errorNotification = useSelector(state => state.note.error);
     const relaunch = useSelector(state => state.note.relaunch);
     const dataItem = useSelector(state => state.note.dataItem)
@@ -21,7 +21,10 @@ export default function CreatePurchaseOrder() {
     const dialog = useRef();
     const dialog1 = useRef();
     const selectEnterprise = useRef();
-    const selectAgency = useRef();
+    const selectAgency01 = useRef();
+    const selectAgency02 = useRef();
+    const selectStore01 = useRef();
+    const selectStore02 = useRef();
     const selectSupplier = useRef();
     const selectProduct = useRef();
     const selectPaymentMethod = useRef();
@@ -33,18 +36,14 @@ export default function CreatePurchaseOrder() {
     const [scope, animate] = useAnimate();
     const [data, setData] = useState({
         enterprises: [],
-        agencies: [],
-        productList: [],
+        agency01: [],
+        agency02: [],
+        store01: [],
+        store02: [],
         products: [],
-        suppliers: [],
-        supplierAdvanceList: [],
-        supplierAdvances: [],
-        payment: "",
-        price: 0,
-        priceHT: 0,
-        priceTTC: 0,
-        quantity: 0,
+        productList: [],
         errors: []
+
 
     })
 
@@ -55,40 +54,27 @@ export default function CreatePurchaseOrder() {
             let tbEl = {
                 tb: [],
                 tb1: [],
-                tb2: [],
-                tb3: [],
-                tb4: [],
             }
             async function get(signal) {
 
-                const allAgencies = await getAgencyById({ id: user.agency, signal })
                 const allEnterprises = await getEnterpriseById({ id: user.enterprise, signal })
-                const allProducts = await getAllProducts({ signal, enterprise: user.enterprise })
-                const allSuppliers = await getAllSuppliers({ signal, enterprise: user.enterprise })
-                const allSupplierAdvances = await getAllSupplierAdvances({ signal, enterprise: user.enterprise, agency: user.agency })
-
-                tbEl.tb.push({ key: allAgencies.id, name: allAgencies.name, value: allAgencies.slug })
-                tbEl.tb1.push({ key: allEnterprises.id, name: allEnterprises.name, value: allEnterprises.slug })
-                allProducts.forEach(p => {
-                    tbEl.tb2.push({ key: p.id, name: p.name, value: p.slug })
+                const allAgencies = await getAllAgencies()
+                tbEl.tb.push({ key: allEnterprises.id, name: allEnterprises.name, value: allEnterprises.slug })
+                allAgencies.forEach(a => {
+                    if (a.enterprise == allEnterprises.id || a.slug == allEnterprises.slug) {
+                        tbEl.tb1.push({ key: a.id, name: a.name, value: a.slug })
+                    }
                 })
 
-                allSuppliers.forEach(s => {
-                    tbEl.tb3.push({ key: s.id, name: s.name, value: s.slug })
-                })
 
-                allSupplierAdvances.forEach(s => {
-                    tbEl.tb4.push({ key: s.id, name: s.ref, value: s.slug })
-                })
+
 
                 setData(prev => {
                     return {
                         ...prev,
-                        agencies: tbEl.tb,
-                        enterprises: tbEl.tb1,
-                        productList: tbEl.tb2,
-                        suppliers: tbEl.tb3,
-                        supplierAdvanceList: tbEl.tb4
+                        agency01: tbEl.tb1,
+                        enterprises: tbEl.tb,
+
 
                     }
                 })
@@ -162,11 +148,28 @@ export default function CreatePurchaseOrder() {
 
 
     async function handleChange(identifier, value, signal) {
-        if (identifier === "paymentMethod") {
+        let tb = []
+        if (identifier === "agency01") {
+            const agency02 = data.agency01.filter(a => a.value != value)
+            if (value == selectEnterprise.current.value) {
+                const agency = await getAgencyBySlug({ slug: value, signal })
+                const store01 = await getAllStorePrincipal({ signal, agency: agency.id })
+                store01.forEach(s => {
+                    tb.push({ key: s.id, name: s.name, value: s.slug })
+                })
+                setData(prev => {
+                    return {
+                        ...prev,
+                        store01: tb,
+                    }
+                })
+
+            }
+
             setData(prev => {
                 return {
                     ...prev,
-                    payment: value,
+                    agency02,
                 }
             })
         }
@@ -176,30 +179,7 @@ export default function CreatePurchaseOrder() {
             inputPrice.current.value = product.price
         }
 
-        if (identifier === "discount") {
-            if (data.priceHT > 0 && data.priceHT > value) {
-                const priceTTC = data.priceHT - value
-                setData(prev => {
-                    return {
-                        ...prev,
-                        priceTTC,
-                        discount: value,
-                    }
-                })
-            } else {
-                dialog1.current.open()
-                const priceTTC = data.priceHT
-                inputDiscount.current.value = 0
-                setData(prev => {
-                    return {
-                        ...prev,
-                        priceTTC,
-                        discount: 0,
-                    }
-                })
-            }
 
-        }
     }
 
 
@@ -214,7 +194,7 @@ export default function CreatePurchaseOrder() {
                 errors.push("Veuillez sélectionner une entreprise")
             }
 
-            if (selectAgency.current.value === "Sélectionner une agence") {
+            if (selectAgency01.current.value === "Sélectionner une agence") {
                 errors.push("Veuillez sélectionner une agence")
             }
 
@@ -296,34 +276,29 @@ export default function CreatePurchaseOrder() {
 
     }
 
-    function handleAddAdvance(value) {
-        let supplierAdvances = [...data.supplierAdvances]
-        supplierAdvances.push(value)
-        setData(prev => {
-            return {
-                ...prev,
-                supplierAdvances
-            }
-        })
-    }
 
     return <>
 
-        <div className="w-full h-1/1 flex overflow-y-auto">
+        <div className="w-full max-h-full flex overflow-y-auto">
             <div className="w-1/2  p-2 m-1 border-2 border-sky-950 flex flex-col items-center gap-2 shadow-lg shadow-sky-950">
-                <Select label="Fournisseur *" id="supplier" name="supplier" selectedTitle="Sélectionner un fournisseur" data={data?.suppliers} ref={selectSupplier} />
-                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} />
-                <Select label="Agence *" id="agency" name="agency" selectedTitle="Sélectionner une agence" data={data?.agencies} ref={selectAgency} />
-                <Select label="Paiement *" id="paymentMethod" name="paymentMethod" selectedTitle="Sélectionner un moyen de paiement" data={paymentMethodPurchase} ref={selectPaymentMethod} onChange={(e) => handleChange("paymentMethod", e.target.value)} />
-                {data?.payment === "AVANCE_VERSEE" &&
-                    <div className="flex gap-2">
-                        <Select label="Avance versée *" id="supplierAdvance" name="supplierAdvance" selectedTitle="Sélectionner une avance versée" data={data.supplierAdvanceList} ref={selectSupplierAdvance} />
-                        <button className="cursor-pointer" onClick={(e) => handleAddAdvance(e.target.value)}>
-                            <FontAwesomeIcon icon={faPlusCircle} className="w-32" />
-                        </button>
+
+                <div>
+                    <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} />
+                </div>
+                <div className="flex gap-2">
+                    <div className="flex flex-col gap-2">
+                        <Select label="Agence départ*" id="agency01" name="agency01" selectedTitle="Sélectionner une agence de départ" data={data?.agency01} ref={selectAgency01} onChange={(e) => handleChange("agency01", e.target.value)} />
+                        <Select label="Agence d'arrivée'*" id="agency02" name="agency02" selectedTitle="Sélectionner une agence d'arrivée" data={data?.agency02} ref={selectAgency02} />
+
                     </div>
-                }
-                <Select label="Produit *" id="product" name="product" selectedTitle="Sélectionner un produit" data={data?.productList} ref={selectProduct} onChange={(e) => handleChange("product", e.target.value)} />
+                    <div className="flex flex-col gap-2">
+                        <Select label="Magasin départ*" id="store01" name="store01" selectedTitle="Sélectionner une magasin de départ" data={data?.store01} ref={selectStore01} onChange={(e) => handleChange("store01", e.target.value)} />
+                        <Select label="Magasin d'arrivée*" id="store02" name="store02" selectedTitle="Sélectionner une magasin d'arrivée" data={data?.store02} ref={selectStore02} />
+
+                    </div>
+
+                </div>
+                <Select label="Agence arrivée *" id="product" name="product" selectedTitle="Sélectionner un produit" data={data?.productList} ref={selectProduct} onChange={(e) => handleChange("product", e.target.value)} />
                 <Input label="Quantité *" type="number" name="quantity" defaultValue={data?.quantity} placeholder="Quantité" className="border border-sky-950" onBlur={(event) => handleBlur("quantity", event.target.value)} ref={inputQuantity} />
                 <Input label="Prix *" type="number" defaultValue={data?.price} name="price" placeholder="Prix" className="border border-sky-950" onBlur={(event) => handleBlur("price", event.target.value)} ref={inputPrice} />
 
@@ -331,7 +306,7 @@ export default function CreatePurchaseOrder() {
                     Ajouter
                 </Submit>
                 {data?.errors.length > 0 && <ul>
-                    {data.errors.map(e => <li key={e} className="text-red-500">{e}</li>)}
+                    {data?.errors.map(e => <li key={e} className="text-red-500">{e}</li>)}
                 </ul>}
             </div>
             <div className="w-1/2 p-2 m-1 border-2 border-sky-950 shadow-lg shadow-sky-950">
@@ -356,7 +331,7 @@ export default function CreatePurchaseOrder() {
                         </tr>
                     </thead>
                     <tbody>
-                        {data?.products.length > 0 && data.products.map(p => <tr key={p.product}>
+                        {data?.products.length > 0 && data?.products.map(p => <tr key={p.product}>
                             <td className="border border-sky-950 text-center">{p.id}</td>
                             <td className="border border-sky-950 text-center">{p.product}</td>
                             <td className="border border-sky-950 text-center">{p.quantity}</td>

@@ -24,7 +24,7 @@ export default function StorePincipalPage() {
 
     const { data } = useQuery({
         queryKey: ["storeprincipals", { agency: user.agency }],
-        queryFn: ({ signal }) => getAllStorePrincipal({ signal, agency: user.agency }),
+        queryFn: ({ signal }) => getAllStorePrincipal({ signal, enterprise: 0, agency: user.agency }),
         enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")
     })
 
@@ -45,7 +45,7 @@ export default function StorePincipalPage() {
         <div className="flex justify-center gap-2 mb-2">
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("storePrincipal")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={storePrincipals.header} emptyMessage="Aucun magasin principal trouvé." globalFilterFields={storePrincipals.global} sheet="Magasin principal" titleRef="Mise à jour informations d'un magasin principal" size="lg:h-4/12 lg:w-4/15" />
+        <Table data={data} headers={storePrincipals.header} emptyMessage="Aucun magasin principal trouvé." globalFilterFields={storePrincipals.global} sheet="Magasin principal" titleRef="Mise à jour informations d'un magasin principal" size="lg:h-5/12 lg:w-4/15 xl:h-5/12" />
         <Modal ref={dialog} size="lg:h-4/12 lg:w-4/15" title="Créer un magasin principal">
             <CreateStorePrincipal />
         </Modal>

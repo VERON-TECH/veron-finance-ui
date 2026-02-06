@@ -11,12 +11,14 @@ import responseHttp from "../../utils/responseHttp.js"
 import { dataTableActions } from "../../store/dataTableSlice.js";
 import AuthorizationStorePrincipalAgency from "./AuthorizationStorePrincipalAgency.jsx";
 import Modal from "../../layout/Modal.jsx";
+import AuthorizationStorePrincipalStore from "./AuthorizeStorePrincipalStore.jsx";
 
 export default function UpdateStorePrincipal() {
     const inputEnterprise = useRef();
     const inputName = useRef();
     const dispatch = useDispatch();
     const dialog = useRef();
+    const dialog1 = useRef();
     const [scope, animate] = useAnimate();
     const user = JSON.parse(localStorage.getItem("user"))
     const [data, setData] = useState({
@@ -126,9 +128,17 @@ export default function UpdateStorePrincipal() {
     }
 
 
-    function handleClick() {
-        dispatch(dataTableActions.getStorePrincipalSlug({ storePrincipalSlug: data?.slug }))
-        dialog.current.open()
+    function handleClick(identifier) {
+        if (identifier === "agency") {
+            dispatch(dataTableActions.getStorePrincipalSlug({ storePrincipalSlug: data?.slug }))
+            dialog.current.open()
+        } else {
+            if (identifier === "store") {
+                dispatch(dataTableActions.getStorePrincipalSlug({ storePrincipalSlug: data?.slug }))
+                dialog1.current.open()
+            }
+        }
+
     }
 
     return <>
@@ -145,12 +155,21 @@ export default function UpdateStorePrincipal() {
             </Submit>}
         </form>
 
-        {user?.role.includes("ROLE_ADMIN") && <Submit onClick={handleClick} className="absolute bottom-5 left-1/2 transform -translate-x-1/2">
-            Agences autorisées
-        </Submit>}
+        {user?.role.includes("ROLE_ADMIN") && <div className="absolute bottom-2 left-1/2 transform -translate-x-1/2 flex gap-2">
+            <Submit onClick={() => handleClick("agency")} >
+                Agences autorisées
+            </Submit>
+            <Submit onClick={() => handleClick("store")} >
+                Magasins autorisés
+            </Submit>
+        </div>}
 
         <Modal ref={dialog} size="lg:h-6/11 lg:w-12/15 overflow-auto" title="Agences autorisés">
             <AuthorizationStorePrincipalAgency />
+        </Modal>
+
+        <Modal ref={dialog1} size="lg:h-6/11 lg:w-12/15 overflow-auto" title="Magasins autorisés">
+            <AuthorizationStorePrincipalStore />
         </Modal>
 
 

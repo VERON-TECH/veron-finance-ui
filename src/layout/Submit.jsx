@@ -31,12 +31,13 @@ export default function Submit({ children, disabled = false, className, ...props
       {children === "Opérateurs" && < FontAwesomeIcon icon={faSquarePhone} className="me-2" />}
       {children === "Fonctions" && < FontAwesomeIcon icon={faPersonArrowDownToLine} className="me-2" />}
       {children.includes("Reste à payer") ? <FontAwesomeIcon icon={faCoins} className="me-2" /> : undefined}
-      {children.includes("Agences autorisées") || children.includes("Caisses autorisées") || children.includes("Entreprises autorisées") ? <FontAwesomeIcon icon={faFileCircleCheck} className="me-2" /> : undefined}
+      {children.includes("Agences autorisées") || children.includes("Caisses autorisées") || children.includes("Entreprises autorisées") || children.includes("Magasins autorisés") ? <FontAwesomeIcon icon={faFileCircleCheck} className="me-2" /> : undefined}
       {children === "Attribuer un rôle" && < FontAwesomeIcon icon={faUserGroup} className="me-2" />}
       {children === "Caisses & Magasins" && < FontAwesomeIcon icon={faUserGear} className="me-2" />}
       {children === "Catégories de service" && < FontAwesomeIcon icon={faGroupArrowsRotate} className="me-2" />}
       {children === "Famille de dépenses" && < FontAwesomeIcon icon={faCashApp} className="me-2" />}
       {children === "Ajouter" && < FontAwesomeIcon icon={faAdd} className="me-2" />}
+
 
       {pending ? <div className="flex gap-2">
         <FontAwesomeIcon icon={faSpinner} className="animate-spin" />

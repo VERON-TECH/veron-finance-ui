@@ -778,3 +778,46 @@ export const mvtStocks = {
 
 
 
+export const productStocks = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Magasin principal", field: "storePrincipal" },
+        { key: 4, header: "Magasin", field: "store" },
+        { key: 5, header: "Produit", field: "product" },
+        { key: 6, header: "Lot", field: "lot" },
+        { key: 7, header: "Stock", field: "stock" },
+        { key: 8, header: "Date d'expiration", field: "dateExpiration" },
+        { key: 9, header: "Etat", field: "state" },
+        { key: 10, header: "Créée le", field: "dateCreated" },
+        { key: 11, header: "Par", field: "userCreated" },
+        { key: 12, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 13, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Magasin principal",
+        "Magasin",
+        "Produit",
+        "Lot",
+        "Stock",
+        "Date d'expiration",
+        "Etat",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+
+
+

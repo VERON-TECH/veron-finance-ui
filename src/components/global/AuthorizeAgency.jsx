@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { authorizeAgencyBank, authorizeAgencyMobile, authorizeAgencyStorePrincipal, authorizeCashSafe, authorizeEnterpriseSupplier, getAllAgenciesByEnterprise, getAllCashesByAgency, getAllEnterprises, getBankAccountById, getEnterpriseById, getMobileMoneyById, getSafeById, getStorePrincipalById, getSupplierById } from "../../utils/http.js";
+import { authorizeAgencyBank, authorizeAgencyMobile, authorizeAgencyStorePrincipal, authorizeCashSafe, authorizeEnterpriseSupplier, authorizeStorePrincipalStore, getAllAgenciesByEnterprise, getAllCashesByAgency, getAllEnterprises, getAllStores, getBankAccountById, getEnterpriseById, getMobileMoneyById, getSafeById, getStorePrincipalById, getSupplierById } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
 import { noteActions } from "../../store/noteSlice.js";
@@ -15,6 +15,7 @@ export default function AuhtorizeAgency({ type, id }) {
     const selectEnterprise = useRef();
     const selectAgency = useRef();
     const selectCash = useRef();
+    const selectStore = useRef();
     const inputRib = useRef();
     const inputMobileSlug = useRef();
     const inputStorePrincipalSlug = useRef();
@@ -27,12 +28,13 @@ export default function AuhtorizeAgency({ type, id }) {
         agencies: [],
         cashes: [],
         enterprises: [],
+        stores: [],
         enterprise: "",
         rib: "",
         mobileSlug: "",
         storePrincipalSlug: "",
         safeSlug: "",
-        supplierSlug: ""
+        supplierSlug: "",
     })
 
 
@@ -112,6 +114,20 @@ export default function AuhtorizeAgency({ type, id }) {
                             ...prev,
                             enterprises: tb,
                             supplierSlug: supplier.slug,
+                        }
+                    })
+                } else if (type === "store") {
+                    const stores = await getAllStores({ signal, enterprise: user.enterprise, agency: 0 })
+                    stores.forEach(s => {
+                        if (s.name !== "REBUTS" && s.name !== "CLIENT") {
+                            tb.push({ key: s.id, name: s.name, value: s.slug })
+                        }
+
+                    })
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            stores: tb
                         }
                     })
                 }
@@ -315,6 +331,33 @@ export default function AuhtorizeAgency({ type, id }) {
             }
             mutate({ slug: enterprise, supplierAuthorizeEnterpriseDto })
             return { errors: null }
+        } else if (type === "store") {
+            const store = formData.get("store")
+
+            if (store === null) {
+                animate(selectStore.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+                errors.push("Veuillez sélectionner la magasin.")
+            }
+
+
+            if (errors.length > 0) {
+                dispatch(noteActions.show());
+                dispatch(noteActions.error(true));
+                dispatch(noteActions.relaunch());
+                dispatch(noteActions.sendData(errors))
+
+                return {
+                    errors
+                }
+            }
+
+            const storePrincipal = await getStorePrincipalById({ id, signal })
+
+            const storeAuthorizeDto = {
+                storePrincipal: storePrincipal.slug,
+            }
+            mutate({ slug: store, storeAuthorizeDto })
+            return { errors: null }
         }
 
 
@@ -324,7 +367,7 @@ export default function AuhtorizeAgency({ type, id }) {
 
 
     const { mutate } = useMutation({
-        mutationFn: type === "bank" ? authorizeAgencyBank : type === "mobile" ? authorizeAgencyMobile : type === "storePrincipal" ? authorizeAgencyStorePrincipal : type === "safe" ? authorizeCashSafe : type === "supplier" ? authorizeEnterpriseSupplier : undefined,
+        mutationFn: type === "bank" ? authorizeAgencyBank : type === "mobile" ? authorizeAgencyMobile : type === "storePrincipal" ? authorizeAgencyStorePrincipal : type === "safe" ? authorizeCashSafe : type === "supplier" ? authorizeEnterpriseSupplier : type === "store" ? authorizeStorePrincipalStore : undefined,
         onSuccess: (responseData) => {
             const state = responseHttp(responseData);
             if (state) {
@@ -392,7 +435,7 @@ export default function AuhtorizeAgency({ type, id }) {
 
         <form action={formAction} className="rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
-                {type !== "supplier" && <Input label="Entreprise *" type="text" defaultValue={data?.enterprise} name="enterprise" placeholder="Nom de l'entreprise" className="border border-sky-950" onBlur={(event) => handleBlur("enterprise", event.target.value)} ref={inputEnterprise} readOnly />}
+                {type !== "supplier" && type !== "store" ? <Input label="Entreprise *" type="text" defaultValue={data?.enterprise} name="enterprise" placeholder="Nom de l'entreprise" className="border border-sky-950" onBlur={(event) => handleBlur("enterprise", event.target.value)} ref={inputEnterprise} readOnly /> : undefined}
                 {type === "bank" && <Input label="R.I.B. *" type="text" defaultValue={data?.rib} name="rib" placeholder="Nº du compte bancaire" className="border border-sky-950" onBlur={(event) => handleBlur("rib", event.target.value)} ref={inputRib} readOnly />}
                 {type === "mobile" && <Input label="Mobile money *" type="text" defaultValue={data?.mobileSlug} name="mobileSlug" placeholder="Nº du compte mobile" className="border border-sky-950" onBlur={(event) => handleBlur("mobileslug", event.target.value)} ref={inputMobileSlug} readOnly />}
                 {type === "storePrincipal" && <Input label="Magasin principal *" type="text" defaultValue={data?.storePrincipalSlug} name="storePrincipalSlug" placeholder="Magasin principal" className="border border-sky-950" onBlur={(event) => handleBlur("storePrincipalSlug", event.target.value)} ref={inputStorePrincipalSlug} readOnly />}
@@ -401,6 +444,7 @@ export default function AuhtorizeAgency({ type, id }) {
                 {type === "bank" || type === "mobile" || type === "storePrincipal" ? <Select label="Agence *" id="agency" name="agency" selectedTitle="Sélectionner une agence" data={data?.agencies} ref={selectAgency} /> : undefined}
                 {type === "safe" && <Select label="Caisse *" id="cash" name="cash" selectedTitle="Sélectionner une caisse" data={data?.cashes} ref={selectCash} />}
                 {type === "supplier" && <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} />}
+                {type === "store" && <Select label="Magasins *" id="store" name="store" selectedTitle="Sélectionner une magasin" data={data?.stores} ref={selectStore} />}
             </div>
 
 

@@ -45,7 +45,7 @@ export default function ApproStockPage() {
             {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit onClick={() => handleModal("stock")}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data} headers={mvtStocks.header} emptyMessage="Aucun mouvement trouvé." globalFilterFields={mvtStocks.global} sheet="Mouvement de stock" titleRef="Visualiser un mouvement de stock" size="lg:h-9/12 lg:w-11/15 xl:w-13/15 xl:h-9/12" />
-        <Modal ref={dialog} size="lg:h-9/12 lg:w-11/15 xl:w-13/15 xl:h-9/12" title="Créer une transfert inter-magasins">
+        <Modal ref={dialog} size="lg:h-9/12 lg:w-11/15 xl:w-15/15 xl:h-8/12" title="Créer une transfert inter-magasins">
             <TransferProductStock />
         </Modal>
 

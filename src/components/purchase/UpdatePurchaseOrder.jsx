@@ -78,7 +78,7 @@ export default function UpdatePurchaseOrder() {
                 const enterprise = await getEnterpriseById({ id: purchaseOrder.enterprise, signal })
                 const agency = await getAgencyById({ id: purchaseOrder.agency, signal })
                 const agencyEnterprise = await getAgencyBySlug({ slug: enterprise.slug, signal })
-                const storePrincipals = await getAllStorePrincipal({ signal, agency: purchaseOrder.agency })
+                const storePrincipals = await getAllStorePrincipal({ signal, enterprise: 0, agency: purchaseOrder.agency })
                 allProducts.forEach(p => {
                     tbEl.tb.push({ key: p.id, name: p.name, value: p.slug })
                 })
@@ -243,6 +243,7 @@ export default function UpdatePurchaseOrder() {
         if (inputQuantity.current.value === "" || inputQuantity.current.value <= 0) {
             errors.push("Veuillez renseigner la quantité")
         }
+
 
 
         if (errors.length > 0) {
@@ -631,7 +632,7 @@ export default function UpdatePurchaseOrder() {
             </form>
         </Modal>
 
-        <Modal ref={dialog3} title={`Validation du bon commande ${data?.purchaseOrder.ref}`} size="h-3/5 w-3/5">
+        <Modal ref={dialog3} title={`Validation du bon commande ${data?.purchaseOrder.ref}`} size="h-4/5 w-4/5">
             <div className="flex justify-center gap-2">
                 <Input label="Entreprise *" type="text" defaultValue={data?.actualEnterprise} name="enterprise" placeholder="Entreprise" className="border border-sky-950" ref={inputEnterprise} readOnly />
                 <Input label="Agence *" type="text" defaultValue={data?.agencyEnterprise} name="agency" placeholder="Agence" className="border border-sky-950" ref={inputAgency} readOnly />

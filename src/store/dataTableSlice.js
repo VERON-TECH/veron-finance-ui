@@ -20,6 +20,7 @@ const dataTableSlice = createSlice({
             state.storePrincipalSlug = action.payload.storePrincipalSlug
         },
 
+
         getSafeSlug(state, action) {
             state.safeSlug = action.payload.safeSlug
         },

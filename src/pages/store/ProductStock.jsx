@@ -6,6 +6,10 @@ import { useEffect, useRef } from "react";
 import Table from "../../layout/Table.jsx"
 import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { productStocks, purchasOrders } from "../../data/dataTable.js";
+import Submit from "../../layout/Submit.jsx";
+import Modal from "../../layout/Modal.jsx";
+import CreateSupplies from "../../components/stock/CreateSupplies.jsx";
+import CreateRebuts from "../../components/stock/CreateRebuts.jsx";
 
 
 
@@ -26,16 +30,40 @@ export default function ProductStockPage() {
 
 
     const dialog = useRef()
+    const dialog1 = useRef()
+
+
+    function handleClick(identifier) {
+        if (identifier === "supplies") {
+            dialog.current.open()
+        }
+        if (identifier === "rebuts") {
+            dialog1.current.open()
+        }
+    }
 
 
     useEffect(() => {
-        dispatch(identifierMenuActions.updateMenu({ menu: "stock" }))
+        dispatch(identifierMenuActions.updateMenu({ menu: "store" }))
     }, [menu, dispatch])
 
     return <>
+        <div className="flex justify-center gap-4">
+            <Submit onClick={() => handleClick("supplies")}>
+                Fournitures
+            </Submit>
+            <Submit onClick={() => handleClick("rebuts")}>
+                Rébuts
+            </Submit>
+        </div>
         <Table data={data} headers={productStocks.header} emptyMessage="Aucun stock trouvé." globalFilterFields={purchasOrders.global} sheet="Stock" titleRef="Visulaiser le stock" size="lg:h-9/12 lg:w-11/15 xl:w-13/15 xl:h-9/12" />
 
-
+        <Modal ref={dialog} size="lg:h-9/12 lg:w-11/15 xl:w-9/15 xl:h-10/12" title="Créer un sortie de founiture">
+            <CreateSupplies />
+        </Modal>
+        <Modal ref={dialog1} size="lg:h-9/12 lg:w-11/15 xl:w-15/15 xl:h-8/12" title="Créer un rébut">
+            <CreateRebuts />
+        </Modal>
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>
 }

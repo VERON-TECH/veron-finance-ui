@@ -26,12 +26,10 @@ export const subFeactures = [
   { key: 10, menu: "Stock", identifier: "store", url: "product-stock", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
   { key: 11, menu: "Bons de commande", identifier: "stock", url: "purchase-order", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
   { key: 12, menu: "Appro & Transferts", identifier: "stock", url: "mvt-stock", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
-  { key: 13, menu: "Fournitures", identifier: "stock", url: "supplies", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
-  { key: 14, menu: "Rébuts", identifier: "stock", url: "rebuts", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
-  { key: 15, menu: "Personnels", identifier: "personal", url: "personal", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },
-  { key: 16, menu: "Utilisateurs", identifier: "personal", url: "user", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },
-  { key: 17, menu: "Dépenses", identifier: "budget", url: "spent", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
-  { key: 18, menu: "Budgets", identifier: "budget", url: "budget", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+  { key: 13, menu: "Personnels", identifier: "personal", url: "personal", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },
+  { key: 14, menu: "Utilisateurs", identifier: "personal", url: "user", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },
+  { key: 15, menu: "Dépenses", identifier: "budget", url: "spent", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+  { key: 16, menu: "Budgets", identifier: "budget", url: "budget", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
 
 ]
 

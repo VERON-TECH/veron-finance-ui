@@ -12,7 +12,7 @@ import Notification from "../../layout/Notification.jsx";
 import responseHttp from "../../utils/responseHttp.js";
 import { noteActions } from "../../store/noteSlice.js";
 
-export default function TransfertProductStock() {
+export default function CreateRebuts() {
     const errorNotification = useSelector(state => state.note.error);
     const relaunch = useSelector(state => state.note.relaunch);
     const dataItem = useSelector(state => state.note.dataItem)

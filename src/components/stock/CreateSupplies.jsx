@@ -1,7 +1,7 @@
 import { useAnimate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAgencyBySlug, getAllAgencies, getAllLotById, getAllProducts, getAllStocks, getAllStorePrincipal, getAllStores, getEnterpriseById, getEnterpriseBySlug, getLotById, getLotBySlug, getProductBySlug, getStock, getStoreById, getStoreBySlug, getStorePrincipalById, getStorePrincipalBySlug, transferStock } from "../../utils/http.js";
+import { getAgencyBySlug, getAllAgencies, getAllLotById, getAllProducts, getAllStocks, getAllStorePrincipal, getAllStores, getEnterpriseById, getEnterpriseBySlug, getLotById, getLotBySlug, getProductBySlug, getStock, getStoreById, getStoreBySlug, getStorePrincipalById, getStorePrincipalBySlug, suppliesStock, transferStock } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import Select from "../../layout/Select.jsx";
@@ -12,7 +12,7 @@ import Notification from "../../layout/Notification.jsx";
 import responseHttp from "../../utils/responseHttp.js";
 import { noteActions } from "../../store/noteSlice.js";
 
-export default function TransfertProductStock() {
+export default function CreateSupplies() {
     const errorNotification = useSelector(state => state.note.error);
     const relaunch = useSelector(state => state.note.relaunch);
     const dataItem = useSelector(state => state.note.dataItem)
@@ -20,22 +20,17 @@ export default function TransfertProductStock() {
     const dialog = useRef();
     const selectEnterprise = useRef();
     const selectAgency01 = useRef();
-    const selectAgency02 = useRef();
     const selectStore01 = useRef();
-    const selectStore02 = useRef();
     const selectProduct = useRef();
     const selectLot = useRef();
     const inputQuantity = useRef()
-    const inputPrice = useRef()
     const inputStock = useRef();
     const dispatch = useDispatch();
-    const [scope, animate] = useAnimate();
+    const [animate] = useAnimate();
     const [data, setData] = useState({
         enterprises: [],
         agency01: [],
-        agency02: [],
         store01: [],
-        store02: [],
         products: [],
         productList: [],
         errors: [],
@@ -67,7 +62,10 @@ export default function TransfertProductStock() {
                 })
 
                 allProducts.forEach(p => {
-                    tbEl.tb2.push({ key: p.id, name: p.name, value: p.slug })
+                    if (p.category === "FOURNITURES") {
+                        tbEl.tb2.push({ key: p.id, name: p.name, value: p.slug })
+                    }
+
                 })
 
 
@@ -91,23 +89,17 @@ export default function TransfertProductStock() {
 
         let products = []
         data.products.forEach(p => {
-            products.push(p.product + ":" + p.quantity + ":" + p.lot)
+            products.push(p.product + ":" + p.store + ":" + p.quantity + ":" + p.lot)
         })
         const enterprise = selectEnterprise.current.value
-        const agency01 = selectAgency01.current.value
-        const agency02 = selectAgency02.current.value
-        const store01 = selectStore01.current.value
-        const store02 = selectStore02.current.value
-        const productTransfertDto = {
+        const agency = selectAgency01.current.value
+        const suppliesDto = {
             enterprise,
-            agency01,
-            agency02,
-            store01,
-            store02,
+            agency,
             products,
         }
 
-        const responseData = await transferStock(productTransfertDto)
+        const responseData = await suppliesStock(suppliesDto)
         const state = responseHttp(responseData);
         if (state) {
             dispatch(noteActions.error(true))
@@ -138,11 +130,7 @@ export default function TransfertProductStock() {
             }
         }
 
-        if (field === "price") {
-            if (value <= 0) {
-                animate(inputPrice.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            }
-        }
+
 
     }
 
@@ -189,43 +177,6 @@ export default function TransfertProductStock() {
         }
 
 
-        if (identifier === "agency02") {
-            if (value == selectEnterprise.current.value) {
-                const enterprise = await getEnterpriseBySlug({ slug: value, signal })
-                const store02 = await getAllStorePrincipal({ signal, enterprise: enterprise.id, agency: 0 })
-                store02.forEach(s => {
-                    if (s.slug != selectStore01.current.value && selectStore01 != "Sélectionner un magasin de départ") {
-                        tb.push({ key: s.id, name: s.name, value: s.slug })
-                    }
-
-                })
-                setData(prev => {
-                    return {
-                        ...prev,
-                        store02: tb,
-                    }
-                })
-
-            } else {
-                const agency = await getAgencyBySlug({ slug: value, signal })
-                const enterprise = await getEnterpriseBySlug({ slug: selectEnterprise.current.value, signal })
-                const store02 = await getAllStores({ signal, enterprise: enterprise.id, agency: agency.id })
-                store02.forEach(s => {
-                    if (s.slug != selectStore01.current.value && selectStore01 != "Sélectionner un magasin de départ") {
-                        tb.push({ key: s.id, name: s.name, value: s.slug })
-                    }
-                })
-                setData(prev => {
-                    return {
-                        ...prev,
-                        store02: tb,
-                    }
-                })
-
-            }
-
-
-        }
 
         if (identifier === "product") {
             let tb1 = []
@@ -292,21 +243,13 @@ export default function TransfertProductStock() {
                 errors.push("Veuillez sélectionner l'agence de départ")
             }
 
-            if (selectAgency02.current.value === "Sélectionner une agence d'arrivée") {
-                errors.push("Veuillez sélectionner l'agence d'arrivée")
-            }
+
 
             if (selectStore01.current.value === "Sélectionner un magasin de départ") {
                 errors.push("Veuillez sélectionner le magasin de départ")
             }
 
-            if (selectStore02.current.value === "Sélectionner un magasin d'arrivée") {
-                errors.push("Veuillez sélectionner le magasin d'arrivée")
-            }
 
-            if (selectStore01.current.value !== "Sélectionner un magasin de départ" && selectStore02.current.value !== "Sélectionner un magasin d'arrivée" && selectStore01.current.value === selectStore02.current.value) {
-                errors.push("Le magasin de départ doit être différent du magasin d'arrivé")
-            }
 
             if (selectProduct.current.value === "Sélectionner un produit") {
                 errors.push("Veuillez sélectionner un produit.")
@@ -344,7 +287,7 @@ export default function TransfertProductStock() {
                 dialog.current.open();
                 return { errors }
             }
-            products.push({ id: length + 1, product: selectProduct.current.value, quantity: inputQuantity.current.value, lot: selectLot.current.value, enterprise: selectEnterprise.current.value, agency01: selectAgency01.current.value, store01: selectStore01.current.value, agency02: selectAgency02.current.value, store02: selectStore02.current.value })
+            products.push({ id: length + 1, product: selectProduct.current.value, quantity: inputQuantity.current.value, lot: selectLot.current.value, store: selectStore01.current.value })
             setData(prev => {
                 return {
                     ...prev,
@@ -376,107 +319,73 @@ export default function TransfertProductStock() {
 
     return <>
 
-        <div className="w-full max-h-full flex overflow-y-auto">
-            <div className="w-1/2  p-2 m-1 border-2 border-sky-950 flex flex-col items-center gap-2 shadow-lg shadow-sky-950 rounded">
-
-                <div>
-                    <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} disabled={data?.enabled} />
-                </div>
-                <div className="flex gap-2">
-                    <div className="flex flex-col gap-2">
-                        <Select label="Agence départ*" id="agency01" name="agency01" selectedTitle="Sélectionner une agence de départ" data={data?.agency01} ref={selectAgency01} onChange={(e) => handleChange("agency01", e.target.value)} disabled={data?.enabled} />
-                        <Select label="Agence d'arrivée'*" id="agency02" name="agency02" selectedTitle="Sélectionner une agence d'arrivée" data={data?.agency02} ref={selectAgency02} onChange={(e) => handleChange("agency02", e.target.value)} disabled={data?.enabled} />
-
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <Select label="Magasin départ*" id="store01" name="store01" selectedTitle="Sélectionner un magasin de départ" data={data?.store01} ref={selectStore01} onChange={(e) => handleChange("store01", e.target.value)} disabled={data?.enable} />
-                        <Select label="Magasin d'arrivée*" id="store02" name="store02" selectedTitle="Sélectionner un magasin d'arrivée" data={data?.store02} ref={selectStore02} disabled={data?.enabled} />
-
-                    </div>
-
-
-                </div>
-                <div className="flex gap-4">
-                    <div className="flex flex-col gap-2">
-                        <Select label="Article *" id="product" name="product" selectedTitle="Sélectionner un article" data={data?.productList} ref={selectProduct} onChange={(e) => handleChange("product", e.target.value)} />
-                        <Input label="Stock *" type="number" name="stock" defaultValue={data?.stock} placeholder="Stock" className="border border-sky-950" ref={inputStock} readOnly />
-                    </div>
-                    <div className="flex flex-col gap-2">
-                        <Select label="Lot *" id="lot" name="lot" selectedTitle="Sélectionner un lot" data={data?.lots} ref={selectLot} onChange={(e) => handleChange("lot", e.target.value)} />
-
-
-                        <Input label="Quantité *" type="number" name="quantity" defaultValue={data?.quantity} placeholder="Quantité" className="border border-sky-950" onBlur={(event) => handleBlur("quantity", event.target.value)} ref={inputQuantity} />
-
-                    </div>
-
-                </div>
-
-                <Submit onClick={() => handleAdd("add")}>
-                    Ajouter
-                </Submit>
-                {data?.errors.length > 0 && <ul>
-                    {data?.errors.map(e => <li key={e} className="text-red-500">{e}</li>)}
-                </ul>}
+        <div className="flex flex-col overflow-y-auto border border-sky-950 shadow-2xs shadow-sky-950 p-2 rounded mb-4">
+            <div className="flex justify-center gap-4">
+                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} disabled={data?.enabled} />
+                <Select label="Agence *" id="agency01" name="agency01" selectedTitle="Sélectionner une agence de départ" data={data?.agency01} ref={selectAgency01} onChange={(e) => handleChange("agency01", e.target.value)} disabled={data?.enabled} />
             </div>
-            <div className="w-1/2 p-2 m-1 border-2 border-sky-950 shadow-lg shadow-sky-950 rounded">
-                <table className="w-full">
-                    <thead>
-                        <tr className="bg-sky-950 text-sky-50">
-                            <th className="border px-6">
-                                id
-                            </th>
-                            <th className="border px-6">
-                                produit
-                            </th>
-                            <th className="border px-6">
-                                Quantité
-                            </th>
-                            <th className="border px-6">
-                                Lot
-                            </th>
-                            <th className="border px-6">
-                                Action
-                            </th>
-                            <th className="border px-6 hidden">
-                                Entreprise
-                            </th>
-                            <th className="border px-6 hidden">
-                                Agence de départ
-                            </th>
-                            <th className="border px-6 hidden">
-                                Magasin de départ
-                            </th>
-                            <th className="border px-6 hidden">
-                                Agence d'arrivée'
-                            </th>
-                            <th className="border px-6 hidden">
-                                Magasin d'arrivée'
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data?.products.length > 0 && data?.products.map(p => <tr key={p.product}>
-                            <td className="border border-sky-950 text-center">{p.id}</td>
-                            <td className="border border-sky-950 text-center">{p.product}</td>
-                            <td className="border border-sky-950 text-center">{p.quantity}</td>
-                            <td className="border border-sky-950 text-center">{p.lot}</td>
-                            <td className="border border-sky-950 text-center"><FontAwesomeIcon icon={faTrash} className="cursor-pointer text-red-500" onClick={() => handleDelete(p.id)} /></td>
-                            <td className="border border-sky-950 text-center hidden">{selectEnterprise.current.value}</td>
-                            <td className="border border-sky-950 text-center hidden">{selectAgency01.current.value}</td>
-                            <td className="border border-sky-950 text-center hidden">{selectStore01.current.value}</td>
-                            <td className="border border-sky-950 text-center hidden">{selectAgency02.current.value}</td>
-                            <td className="border border-sky-950 text-center hidden">{selectStore02.current.value}</td>
-                        </tr>)}
-                    </tbody>
-
-                </table>
-                {data.products.length > 0 && <div className="flex justify-end mt-4">
-                    <Submit onClick={() => handleSave()}>
-                        Enregistrer
-                    </Submit>
-                </div>}
+            <div className="flex justify-center gap-4">
+                <Select label="Magasin *" id="store01" name="store01" selectedTitle="Sélectionner un magasin de départ" data={data?.store01} ref={selectStore01} onChange={(e) => handleChange("store01", e.target.value)} disabled={data?.enable} />
+                <Select label="Article *" id="product" name="product" selectedTitle="Sélectionner un article" data={data?.productList} ref={selectProduct} onChange={(e) => handleChange("product", e.target.value)} />
             </div>
+
+            <div className="flex justify-center gap-4">
+                <Select label="Lot *" id="lot" name="lot" selectedTitle="Sélectionner un lot" data={data?.lots} ref={selectLot} onChange={(e) => handleChange("lot", e.target.value)} />
+                <Input label="Stock *" type="number" name="stock" defaultValue={data?.stock} placeholder="Stock" className="border border-sky-950" ref={inputStock} readOnly />
+            </div>
+            <div className="flex justify-center">
+                <Input label="Quantité *" type="number" name="quantity" defaultValue={data?.quantity} placeholder="Quantité" className="border border-sky-950" onBlur={(event) => handleBlur("quantity", event.target.value)} ref={inputQuantity} />
+            </div>
+
         </div>
+
+        <Submit onClick={() => handleAdd("add")} className="mb-4">
+            Ajouter
+        </Submit>
+        {data?.errors.length > 0 && <ul>
+            {data?.errors.map(e => <li key={e} className="text-red-500">{e}</li>)}
+        </ul>}
+        <table className="w-full">
+            <thead>
+                <tr className="bg-sky-950 text-sky-50">
+                    <th className="border px-6">
+                        id
+                    </th>
+                    <th className="border px-6">
+                        produit
+                    </th>
+                    <th className="border px-6">
+                        Quantité
+                    </th>
+                    <th className="border px-6">
+                        Lot
+                    </th>
+                    <th className="border px-6">
+                        Action
+                    </th>
+                    <th className="border px-6">
+                        Magasin
+                    </th>
+
+                </tr>
+            </thead>
+            <tbody>
+                {data?.products.length > 0 && data?.products.map(p => <tr key={p.product}>
+                    <td className="border border-sky-950 text-center">{p.id}</td>
+                    <td className="border border-sky-950 text-center">{p.product}</td>
+                    <td className="border border-sky-950 text-center">{p.quantity}</td>
+                    <td className="border border-sky-950 text-center">{p.lot}</td>
+                    <td className="border border-sky-950 text-center"><FontAwesomeIcon icon={faTrash} className="cursor-pointer text-red-500" onClick={() => handleDelete(p.id)} /></td>
+                    <td className="border border-sky-950 text-center">{p.store}</td>
+                </tr>)}
+            </tbody>
+
+        </table>
+        {data.products.length > 0 && <div className="flex justify-end mt-4">
+            <Submit onClick={() => handleSave()}>
+                Enregistrer
+            </Submit>
+        </div>}
 
         <Modal ref={dialog} title="Produit existant" size="h-1/5">
             <p className="mb-4"><FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />Ce produit existe déjà dans le panier.</p>

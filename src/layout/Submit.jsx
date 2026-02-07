@@ -1,7 +1,7 @@
 import { useFormStatus } from "react-dom"
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAdd, faAngleDoubleDown, faBank, faCheckDouble, faCircleCheck, faCirclePlus, faCoins, faDeleteLeft, faEraser, faFileCircleCheck, faFloppyDisk, faFolderOpen, faGroupArrowsRotate, faListCheck, faPersonArrowDownToLine, faPrint, faSpinner, faSquarePhone, faUserGear, faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import { faAdd, faAngleDoubleDown, faArrowCircleRight, faBank, faCheckDouble, faCircleCheck, faCirclePlus, faCoins, faDeleteLeft, faEraser, faFileCircleCheck, faFloppyDisk, faFolderOpen, faGroupArrowsRotate, faListCheck, faPersonArrowDownToLine, faPrint, faSpinner, faSquarePhone, faTrashArrowUp, faUserGear, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { faWindowRestore } from "@fortawesome/free-regular-svg-icons";
 import { faCashApp } from "@fortawesome/free-brands-svg-icons";
 
@@ -37,6 +37,8 @@ export default function Submit({ children, disabled = false, className, ...props
       {children === "Catégories de service" && < FontAwesomeIcon icon={faGroupArrowsRotate} className="me-2" />}
       {children === "Famille de dépenses" && < FontAwesomeIcon icon={faCashApp} className="me-2" />}
       {children === "Ajouter" && < FontAwesomeIcon icon={faAdd} className="me-2" />}
+      {children === "Fournitures" && < FontAwesomeIcon icon={faArrowCircleRight} className="me-2" />}
+      {children === "Rébuts" && < FontAwesomeIcon icon={faTrashArrowUp} className="me-2" />}
 
 
       {pending ? <div className="flex gap-2">

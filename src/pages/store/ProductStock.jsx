@@ -10,6 +10,7 @@ import Submit from "../../layout/Submit.jsx";
 import Modal from "../../layout/Modal.jsx";
 import CreateSupplies from "../../components/stock/CreateSupplies.jsx";
 import CreateRebuts from "../../components/stock/CreateRebuts.jsx";
+import CreatePackage from "../../components/stock/CreatePackage.jsx";
 
 
 
@@ -31,6 +32,7 @@ export default function ProductStockPage() {
 
     const dialog = useRef()
     const dialog1 = useRef()
+    const dialog2 = useRef()
 
 
     function handleClick(identifier) {
@@ -39,6 +41,9 @@ export default function ProductStockPage() {
         }
         if (identifier === "rebuts") {
             dialog1.current.open()
+        }
+        if (identifier === "packages") {
+            dialog2.current.open()
         }
     }
 
@@ -55,14 +60,21 @@ export default function ProductStockPage() {
             <Submit onClick={() => handleClick("rebuts")}>
                 Rébuts
             </Submit>
+            <Submit onClick={() => handleClick("packages")}>
+                Paquets
+            </Submit>
         </div>
         <Table data={data} headers={productStocks.header} emptyMessage="Aucun stock trouvé." globalFilterFields={purchasOrders.global} sheet="Stock" titleRef="Visulaiser le stock" size="lg:h-9/12 lg:w-11/15 xl:w-13/15 xl:h-9/12" />
 
         <Modal ref={dialog} size="lg:h-9/12 lg:w-11/15 xl:w-9/15 xl:h-10/12" title="Créer un sortie de founiture">
             <CreateSupplies />
         </Modal>
-        <Modal ref={dialog1} size="lg:h-9/12 lg:w-11/15 xl:w-15/15 xl:h-8/12" title="Créer un rébut">
+        <Modal ref={dialog1} size="lg:h-6/12 lg:w-7/14 xl:w-8/15 xl:h-8/14" title="Créer un rébut">
             <CreateRebuts />
+        </Modal>
+
+        <Modal ref={dialog2} size="lg:h-9/12 lg:w-11/15 xl:w-15/15 xl:h-8/12" title="Créer un pacquet">
+            <CreatePackage />
         </Modal>
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>

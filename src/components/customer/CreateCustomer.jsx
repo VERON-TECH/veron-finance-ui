@@ -1,9 +1,9 @@
 
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { createPersonal, getAllAgenciesByEnterprise, getAllEnterprises, getAllTitles, getEnterpriseBySlug, queryClient } from "../../utils/http";
+import { createCustomer, createPersonal, getAllAgenciesByEnterprise, getAllCustomers, getAllEnterprises, getAllTitles, getEnterpriseById, getEnterpriseBySlug, queryClient } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
@@ -11,14 +11,11 @@ import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
 import Select from "../../layout/Select.jsx";
 import { cities, genders } from "../../data/info.js";
+import { identifierMenuActions } from "../../store/identifierSlice.js";
 
-export default function CreatePersonal() {
-
-    const selectEnterprise = useRef();
-    const selectAgency = useRef();
-    const selectCity = useRef();
+export default function CreateCustomer() {
+    const user = JSON.parse(localStorage.getItem("user"))
     const selectGender = useRef();
-    const selectTitle = useRef();
 
     const inputFirstName = useRef();
     const inputLastName = useRef();
@@ -26,66 +23,53 @@ export default function CreatePersonal() {
     const inputPhone = useRef();
     const inputPhone2 = useRef();
     const inputAddress = useRef();
-    const inputBox = useRef();
     const inputDateBirth = useRef();
     const inputPlaceBirth = useRef();
+    const inputEnterprise = useRef();
 
     const dispatch = useDispatch();
     const [scope, animate] = useAnimate();
     const [data, setData] = useState({
-        agencies: [],
-        enterprises: [],
-        titles: []
+        enterprise: ""
     })
 
-
     useEffect(() => {
-        let tbEl = {
-            tb: [],
-            tb1: [],
-        }
-        async function get() {
-            const allEnterprises = await getAllEnterprises()
-            const allTitles = await getAllTitles()
-            allTitles.forEach(t => {
-                tbEl.tb.push({ key: t.id, name: t.name, value: t.slug })
-            })
-            allEnterprises.forEach(e => {
-                tbEl.tb1.push({ key: e.id, name: e.name, value: e.slug })
-            })
+        async function get(signal) {
+            const enterprise_ = await getEnterpriseById({ id: user.enterprise, signal })
             setData(prev => {
-                return {
-                    ...prev,
-                    titles: tbEl.tb,
-                    enterprises: tbEl.tb1
-                }
+                return { ...prev, enterprise: enterprise_.slug }
             })
         }
         get()
+
+
     }, [])
 
-    async function handleSubmit(prevState, formData) {
+
+
+    async function handleSubmit(prevState, formData, signal) {
         const allData = Object.fromEntries(formData.entries())
         let errors = [];
-
-        const enterprise = formData.get("enterprise")
-        const agency = formData.get("agency")
         const firstName = formData.get("firstName")
         const lastName = formData.get("lastName")
         const email = formData.get("email")
         const phone = formData.get("phone")
-        const phone2 = formData.get("phone2")
         const address = formData.get("address")
-        const city = formData.get("city")
-        const box = formData.get("box")
+        const phone2 = formData.get("phone2")
         const gender = formData.get("gender")
         const dateBirth = formData.get("dateBirth")
         const placeBirth = formData.get("placeBirth")
-        const title = formData.get("title")
+        const enterprise = formData.get("enterprise")
+
 
         if (!isNotEmpty(firstName)) {
             animate(inputFirstName.current, { x: [0, 15, 0] }, { bounce: 0.75 })
             errors.push("veuillez renseigner le prénom.")
+        }
+
+        if (!isNotEmpty(enterprise)) {
+            animate(inputEnterprise.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+            errors.push("Aucune entreprise disponible.")
         }
 
         if (!isNotEmpty(lastName)) {
@@ -113,37 +97,15 @@ export default function CreatePersonal() {
             errors.push("veuillez renseigner le lieu de naissance.")
         }
 
-
-        if (title === null) {
-            animate(selectTitle.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("veuillez sélectionner la fonction.")
-        }
-
-        if (city === null) {
-            animate(selectCity.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("veuillez sélectionner la ville.")
-        }
-
-
-        if (gender === null) {
-            animate(selectGender.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("veuillez sélectionner le genre.")
-        }
-
         if (dateBirth === null) {
             animate(inputDateBirth.current, { x: [0, 15, 0] }, { bounce: 0.75 })
             errors.push("veuillez sélectionner la date de naissance.")
         }
 
 
-        if (agency === null) {
-            animate(selectAgency.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("veuillez sélectionner l'agence.")
-        }
-
-        if (enterprise === null) {
-            animate(selectEnterprise.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("veuillez sélectionner l'entrerprise.")
+        if (gender === null) {
+            animate(selectGender.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+            errors.push("veuillez sélectionner le genre.")
         }
 
 
@@ -162,13 +124,15 @@ export default function CreatePersonal() {
                     phone,
                     phone2,
                     address,
-                    box,
                     placeBirth
                 }
             }
         }
 
         mutate(allData)
+        const getAllCustomer = await getAllCustomers({ signal, enterprise: user.enterprise })
+        const customer = getAllCustomer[getAllCustomer.length - 1]
+        dispatch(identifierMenuActions.updateCustomer({ customer }))
         return { errors: null }
     }
 
@@ -177,7 +141,7 @@ export default function CreatePersonal() {
 
 
     const { mutate } = useMutation({
-        mutationFn: createPersonal,
+        mutationFn: createCustomer,
         onSuccess: (responseData) => {
             const state = responseHttp(responseData);
             if (state) {
@@ -188,7 +152,7 @@ export default function CreatePersonal() {
             dispatch(noteActions.show());
             dispatch(noteActions.relaunch());
             dispatch(noteActions.sendData(responseData))
-            queryClient.cancelQueries(["personals"])
+            queryClient.cancelQueries(["customers"])
         }
     })
 
@@ -231,11 +195,7 @@ export default function CreatePersonal() {
             }
         }
 
-        if (field === "box") {
-            if (!isNotEmpty(value)) {
-                animate(inputBox.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            }
-        }
+
 
         if (field === "placeBirth") {
             if (!isNotEmpty(value)) {
@@ -244,23 +204,6 @@ export default function CreatePersonal() {
         }
     }
 
-    async function handleChange(identifier, id, signal) {
-        let tb = []
-        if (identifier === "enterprise") {
-            const enterprise = await getEnterpriseBySlug({ slug: id, signal })
-            const allAgencies = await getAllAgenciesByEnterprise(enterprise.id)
-            allAgencies.forEach(a => {
-                tb.push({ key: a.id, name: a.name, value: a.slug })
-            })
-            setData(prev => {
-                return {
-                    ...prev,
-                    agencies: tb
-                }
-            })
-
-        }
-    }
 
 
 
@@ -269,15 +212,6 @@ export default function CreatePersonal() {
 
         <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
 
-            <div className="flex justify-between gap-2">
-                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} onChange={(e) => handleChange("enterprise", e.target.value)} />
-                <Select label="Agence *" id="agency" name="agency" selectedTitle="Sélectionner une agence" data={data?.agencies} ref={selectAgency} />
-            </div>
-
-            <div className="flex justify-between gap-2">
-                <Select label="Fonction *" id="title" name="title" selectedTitle="Sélectionner une fonction" data={data?.titles} ref={selectTitle} />
-                <Select label="Genre *" id="gender" name="gender" selectedTitle="Sélectionner un genre" data={genders} ref={selectGender} />
-            </div>
 
             <div className="flex justify-between gap-2">
                 <Input label="Nom *" id="lastName" type="text" defaultValue={formState.enteredValue?.lastName} name="lastName" placeholder="Nom" className="border border-sky-950" onBlur={(event) => handleBlur("lastName", event.target.value)} ref={inputLastName} />
@@ -297,12 +231,13 @@ export default function CreatePersonal() {
 
             <div className="flex justify-between gap-2">
                 <Input label="Email *" id="email" type="email" defaultValue={formState.enteredValue?.email} name="email" placeholder="Email" className="border border-sky-950" onBlur={(event) => handleBlur("email", event.target.value)} ref={inputEmail} />
-                <Input label="B.P." id="box" type="text" defaultValue={formState.enteredValue?.box} name="box" placeholder="Boite postale" className="border border-sky-950" onBlur={(event) => handleBlur("box", event.target.value)} ref={inputBox} />
-            </div>F
+                <Select label="Genre *" id="gender" name="gender" selectedTitle="Sélectionner un genre" data={genders} ref={selectGender} />
+            </div>
 
             <div className="flex justify-between gap-2">
-                <Select label="Ville *" id="city" name="city" selectedTitle="Sélectionner une ville" data={cities} ref={selectCity} />
                 <Input label="Adresse *" id="adress" type="text" defaultValue={formState.enteredValue?.address} name="address" placeholder="Adresse" className="border border-sky-950" onBlur={(event) => handleBlur("address", event.target.value)} ref={inputAddress} />
+                <Input label="Entreprise *" id="enterprise" type="text" defaultValue={data?.enterprise} name="enterprise" placeholder="Entreprise" className="border border-sky-950" ref={inputEnterprise} readOnly />
+
             </div>
 
 

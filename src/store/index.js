@@ -4,6 +4,8 @@ import authSlice from "./authSlice";
 import modalSlice from "./modalSlice";
 import identifierSlice from "./identifierSlice";
 import dataTableSlice from "./dataTableSlice"
+import cashSlice from "./cashSlice"
+import printSlice from "./print.js"
 
 
 const store = configureStore({
@@ -13,6 +15,8 @@ const store = configureStore({
     modal: modalSlice,
     identifier: identifierSlice,
     stateTable: dataTableSlice,
+    cash: cashSlice,
+    print: printSlice
   }
 })
 

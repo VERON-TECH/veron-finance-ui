@@ -1,4 +1,4 @@
-import { faBuilding, faHome, faSignOut, faUser } from "@fortawesome/free-solid-svg-icons"
+import { faBuilding, faHome, faMoneyBillWave, faSignOut, faUser } from "@fortawesome/free-solid-svg-icons"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { useSubmit } from "react-router"
 import Submit from "../../layout/Submit"
@@ -7,12 +7,12 @@ import Modal from "../../layout/Modal"
 import { AnimatePresence } from "framer-motion"
 import { useDispatch } from "react-redux"
 import { authActions } from "../../store/authSlice"
-import { getAgencyById, getEnterpriseById, logout } from "../../utils/http"
-import Select from "../../layout/Select"
+import { getAgencyById, getCashBySlug, getEnterpriseById, getUser, logout } from "../../utils/http"
+import { cashActions } from "../../store/cashSlice"
 
 
 export default function Header() {
-  const [user, setUser] = useState({ username: "", role: [], enterprise: "", agency: "", store: [], cash: [] })
+  const [user, setUser] = useState({ username: "", role: [], enterprise: "", agency: "", store: [], cash: [], balance: 0 })
   const dialog = useRef();
   const submit = useSubmit();
   const dispatch = useDispatch();
@@ -34,9 +34,11 @@ export default function Header() {
   }
   const userItem = JSON.parse(localStorage.getItem("user"))
 
+
   useEffect(() => {
     let enterprise = ""
     let agency = ""
+    let balance = 0
     if (enterprise == "" && agency == "") {
       async function get(signal) {
         if (userItem.enterprise != 0) {
@@ -56,6 +58,15 @@ export default function Header() {
           agency = userItem.enterprise;
         }
 
+        const users = await getUser(userItem.username)
+
+        let cash = {}
+        for (let b of userItem.cashes) {
+          cash = await getCashBySlug({ slug: b.value, signal })
+          balance += cash.balance
+        }
+
+
 
 
         setUser(prev => {
@@ -65,7 +76,8 @@ export default function Header() {
             role: userItem?.role,
             fullName: userItem?.fullName,
             enterprise,
-            agency
+            agency,
+            balance
           }
         })
 
@@ -77,10 +89,14 @@ export default function Header() {
   }, [])
 
 
+  function handleChange(value) {
+    dispatch(cashActions.getCash(value))
+  }
 
   return <>
 
     <header className="flex gap-10 absolute right-0 top-0 h-2/25 p-4">
+      {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <span className="font-bold italic text-sky-50 bg-sky-950 shadow-md shadow-sky-950 rounded border text-center px-5"><FontAwesomeIcon icon={faMoneyBillWave} className="me-2" />Solde global: {user?.balance.toLocaleString()}</span> : undefined}
       <span className="font-bold italic"><FontAwesomeIcon icon={faBuilding} className="me-2" />{user?.enterprise}</span>
       <span className="font-bold italic"><FontAwesomeIcon icon={faHome} className="me-2" />{user?.agency}</span>
       <span className="font-bold italic"> <span className="font-bold italic"><FontAwesomeIcon icon={faUser} className="me-2" /></span>{user.username}</span>
@@ -88,8 +104,9 @@ export default function Header() {
         <select
           name="cash"
           id="cash"
-          className="text-sky-950 rounded border border-sky-950 font-bold italic"
+          className="text-sky-950 rounded border border-sky-950 font-bold italic w-32"
           defaultValue="Caisses"
+          onChange={(e) => handleChange(e.target.value)}
         >
           <option disabled>Caisses</option>
           {userItem?.cashes.map(c => (
@@ -100,15 +117,15 @@ export default function Header() {
         </select>
       }
 
-      {userItem?.cashes.length > 0 &&
+      {userItem?.stores.length > 0 &&
         <select
           name="store"
           id="store"
-          className="text-sky-950 rounded border border-sky-950 font-bold italic"
+          className="text-sky-950 rounded border border-sky-950 font-bold italic w-32"
           defaultValue="Magasins"
         >
-          <option disabled>Caisses</option>
-          {userItem?.cashes.map(c => (
+          <option disabled>Magasins</option>
+          {userItem?.stores.map(c => (
             <option key={c.key} value={c.value}>
               {c.name}
             </option>

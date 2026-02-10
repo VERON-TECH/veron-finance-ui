@@ -146,7 +146,7 @@ export default function UpdateSafe() {
             </Submit>
         </form>
 
-        <Submit className="absolute bottom-10 left-1/2 transform -translate-x-1/2" onClick={handleClick}>
+        <Submit className="absolute bottom-5 left-1/2 transform -translate-x-1/2" onClick={handleClick}>
             Caisses autorisées
         </Submit>
 

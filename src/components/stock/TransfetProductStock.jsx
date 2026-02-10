@@ -450,7 +450,7 @@ export default function TransfertProductStock() {
                                 Agence d'arrivée'
                             </th>
                             <th className="border px-6 hidden">
-                                Magasin d'arrivée'
+                                Magasin d'arrivée
                             </th>
                         </tr>
                     </thead>

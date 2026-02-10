@@ -4,12 +4,13 @@ export const features = [
   { key: 2, menu: "Gestion Budgétaire", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"], path: "budgets" },
   { key: 3, menu: "Ressources Humaines", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"], path: "ressources-human" },
   { key: 4, menu: "Dashboard", role: ["ROLE_ADMIN"], path: "reporting" },
-  { key: 5, menu: "Caisses", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSIER"], path: "cash" },
-  { key: 6, menu: "Ventes", role: ["ROLE_CAISSIER"], path: "sale" },
+  { key: 5, menu: "Ventes", role: ["ROLE_CAISSIER"], path: "sale" },
+  { key: 6, menu: "Caisses", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSIER"], path: "mvt-cash" },
   { key: 7, menu: "Magasins & Stocks", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"], path: "stores" },
   { key: 8, menu: "Appro & transferts", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"], path: "mvt-stock" },
+  { key: 8, menu: "Engagements", role: ["ROLE_COMPTABLE", "ROLE_ADMIN"], path: "engagement" },
   { key: 9, menu: "Autres réglages", role: ["ROLE_ADMIN"], path: "setting" },
-  { key: 10, menu: "Base de données", role: ["ROLE_ADMIN"], path: "data" },
+  /**{ key: 10, menu: "Base de données", role: ["ROLE_ADMIN"], path: "data" },**/
 ]
 
 export const subFeactures = [
@@ -30,7 +31,16 @@ export const subFeactures = [
   { key: 14, menu: "Utilisateurs", identifier: "personal", url: "user", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },
   { key: 15, menu: "Dépenses", identifier: "budget", url: "spent", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
   { key: 16, menu: "Budgets", identifier: "budget", url: "budget", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
-
+  { key: 17, menu: "Emprunts & prêts", identifier: "engagement", url: "engagement", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+  { key: 18, menu: "Factures clients", identifier: "engagement", url: "invoice-customer", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+  { key: 19, menu: "Factures fournisseurs", identifier: "engagement", url: "invoice-supplier", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+  { key: 20, menu: "Avances versées", identifier: "engagement", url: "advance-paid", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
+  { key: 21, menu: "Ventes", identifier: "sale", url: "sale", role: ["ROLE_CAISSIER"] },
+  { key: 22, menu: "Factures", identifier: "sale", url: "invoice", role: ["ROLE_CAISSIER"] },
+  { key: 23, menu: "Opération de caisse", identifier: "cash", url: "mvt-cash", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSEIR"] },
+  { key: 24, menu: "Manquants", identifier: "cash", url: "missing", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSEIR"] },
+  { key: 25, menu: "Excédents", identifier: "cash", url: "surplus", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSEIR"] },
+  { key: 26, menu: "Journalier", identifier: "reporting", url: "day", role: ["ROLE_ADMIN"] },
 ]
 
 

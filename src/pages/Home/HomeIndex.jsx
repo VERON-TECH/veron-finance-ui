@@ -23,6 +23,14 @@ export default function HomeIndexPage() {
       dispatch(identifierMenuActions.updateMenu({ menu: "financial" }))
     }
 
+    if (user.role.includes("ROLE_COMPTABLE_MATIERE")) {
+      dispatch(identifierMenuActions.updateMenu({ menu: "store" }))
+    }
+
+    if (user.role.includes("ROLE_CAISSIER")) {
+      dispatch(identifierMenuActions.updateMenu({ menu: "sale" }))
+    }
+
 
 
 
@@ -30,8 +38,12 @@ export default function HomeIndexPage() {
 
 
 
+
+
+
   return <>
-    {user.role.includes("ROLE_ADMIN") && <Logo position="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2" className="animate-bounce" />}
+    <Logo position="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2" className="animate-bounce" />
+
 
   </>
 }

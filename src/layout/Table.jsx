@@ -36,6 +36,7 @@ import UpdateSpent from '../components/budget/UpdateSpent';
 import UpdateBudget from '../components/budget/UpdateBudget';
 import UpdateSupplier from '../components/supplier/UpdateSupplier';
 import UpdatePurchaseOrder from '../components/purchase/UpdatePurchaseOrder';
+import GetInvoice from '../components/sale/GetInvoice';
 
 
 
@@ -242,6 +243,12 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
         {titleRef === "Mise à jour informations d'un bon de commande" &&
           <UpdatePurchaseOrder />
         }
+
+        {titleRef === "Visualiser les factures" &&
+          <GetInvoice />
+        }
+
+
 
 
 

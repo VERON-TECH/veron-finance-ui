@@ -33,6 +33,21 @@ const SupplierPage = lazy(() => import("../pages/supplier/Supplier.jsx"))
 const ErrorPage = lazy(() => import("../pages/error/Error.jsx"))
 const ApproStockPage = lazy(() => import("../pages/store/ApproStock.jsx"))
 const ProductStockPage = lazy(() => import("../pages/store/ProductStock.jsx"))
+const EngagementPage = lazy(() => import("../pages/engagement/Engagement.jsx"))
+const InvoicePage = lazy(() => import("../pages/engagement/Invoice.jsx"))
+const InvoiceSupplierPage = lazy(() => import("../pages/engagement/InvoiceSupplier.jsx"))
+const SupplierAdvancePage = lazy(() => import("../pages/engagement/SupplierAdvance.jsx"))
+const SalePage = lazy(() => import("../pages/sale/Sale.jsx"))
+const InvoiceSalePage = lazy(() => import("../pages/sale/InvoiceSale.jsx"))
+const MvtCashPage = lazy(() => import("../pages/cash/MvtCash.jsx"))
+const MissingPage = lazy(() => import("../pages/cash/Missing.jsx"))
+const SurplusPage = lazy(() => import("../pages/cash/Surplus.jsx"))
+const PrintSalePage = lazy(() => import("../pages/print/PrintSale.jsx"))
+const CashReportPage = lazy(() => import("../pages/print/PrintCash.jsx"))
+const DashBoardPage = lazy(() => import("../pages/dashboard/Dashboard.jsx"))
+const DashBoardDayPage = lazy(() => import("../pages/dashboard/DashBooardDay.jsx"))
+
+
 
 
 
@@ -70,7 +85,22 @@ export const router = createBrowserRouter([
       { path: "supplier", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SupplierPage /></Suspense> },
       { path: "mvt-stock", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><ApproStockPage /></Suspense> },
       { path: "product-stock", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><ProductStockPage /></Suspense> },
-
+      { path: "engagement", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><EngagementPage /></Suspense> },
+      { path: "invoice-customer", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><InvoicePage /></Suspense> },
+      { path: "invoice-supplier", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><InvoiceSupplierPage /></Suspense> },
+      { path: "advance-paid", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SupplierAdvancePage /></Suspense> },
+      { path: "sale", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SalePage /></Suspense> },
+      { path: "invoice", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><InvoiceSalePage /></Suspense> },
+      { path: "mvt-cash", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><MvtCashPage /></Suspense> },
+      { path: "missing", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><MissingPage /></Suspense> },
+      { path: "surplus", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SurplusPage /></Suspense> },
+      { path: "surplus", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SurplusPage /></Suspense> },
+      { path: "reporting", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><DashBoardPage /></Suspense> },
+      { path: "day", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><DashBoardDayPage /></Suspense> },
     ]
-  }
+
+  },
+  { path: "/print-sale", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PrintSalePage /></Suspense> },
+  { path: "/print-cash", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><CashReportPage /></Suspense> },
+
 ])

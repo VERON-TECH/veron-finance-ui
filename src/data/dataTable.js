@@ -151,6 +151,139 @@ export const cashes = {
 }
 
 
+export const mvtCashes = {
+
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Date", field: "dateTransaction" },
+        { key: 4, header: "Réf", field: "ref" },
+        { key: 5, header: "Type", field: "type" },
+        { key: 6, header: "Réf. Ext", field: "refExt" },
+        { key: 7, header: "Motif", field: "motif" },
+        { key: 8, header: "Sens", field: "sens" },
+        { key: 9, header: "Solde avant", field: "balanceBefore" },
+        { key: 10, header: "Montant", field: "amount" },
+        { key: 11, header: "Frais", field: "fee" },
+        { key: 12, header: "Solde après", field: "balanceAfter" },
+        { key: 13, header: "Caisse", field: "cash" },
+        { key: 14, header: "Coffre-fort", field: "safe" },
+        { key: 15, header: "Validé", field: "isValidated" },
+        { key: 16, header: "Créée le", field: "dateCreated" },
+        { key: 17, header: "Par", field: "userCreated" },
+        { key: 18, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 19, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Date",
+        "Réf",
+        "Type",
+        "Réf. Ext",
+        "Motif",
+        "Sens",
+        "Solde avant",
+        "Montant",
+        "Frais",
+        "Solde après",
+        "Caisse",
+        "Coffre-fort",
+        "Validé",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+
+
+export const missings = {
+
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Date", field: "dateTransaction" },
+        { key: 4, header: "Réf", field: "ref" },
+        { key: 5, header: "Personnel", field: "personal" },
+        { key: 6, header: "Montant", field: "amount" },
+        { key: 7, header: "Avance", field: "advance" },
+        { key: 8, header: "Statut", field: "status" },
+        { key: 9, header: "Créée le", field: "dateCreated" },
+        { key: 10, header: "Par", field: "userCreated" },
+        { key: 11, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 12, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Date",
+        "Réf",
+        "Personnel",
+        "Montant",
+        "Avance",
+        "Statut",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+
+    ]
+
+}
+
+
+export const surplus = {
+
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Date", field: "dateTransaction" },
+        { key: 4, header: "Réf", field: "ref" },
+        { key: 5, header: "Personnel", field: "personal" },
+        { key: 6, header: "Montant", field: "amount" }, { key: 7, header: "Avance", field: "advance" },
+        { key: 8, header: "Statut", field: "status" },
+        { key: 9, header: "Créée le", field: "dateCreated" },
+        { key: 10, header: "Par", field: "userCreated" },
+        { key: 11, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 12, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Date",
+        "Réf",
+        "Personnel",
+        "Montant",
+        "Statut",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+
+    ]
+
+}
+
+
 
 export const bankAccounts = {
     header: [
@@ -818,6 +951,185 @@ export const productStocks = {
 }
 
 
+export const engagements = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Type", field: "typeTiers" },
+        { key: 4, header: "Réf.", field: "refTiers" },
+        { key: 5, header: "Nom", field: "fullName" },
+        { key: 6, header: "Tél.", field: "phone" },
+        { key: 7, header: "Email", field: "email" },
+        { key: 8, header: "Type d'engagement", field: "typeEngagement" },
+        { key: 9, header: "Montant", field: "amount" },
+        { key: 10, header: "Avance", field: "advance" },
+        { key: 11, header: "Solde", field: "balance" },
+        { key: 12, header: "Créée le", field: "dateCreated" },
+        { key: 13, header: "Par", field: "userCreated" },
+        { key: 14, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 15, header: "Par", field: "userUpdated" },
+    ],
 
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Type",
+        "Réf.",
+        "Nom",
+        "Tél.",
+        "Email",
+        "Type d'engagement",
+        "Montant",
+        "Avance",
+        "Solde",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+export const invoices = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Date", field: "dateTransaction" },
+        { key: 4, header: "Réf.", field: "ref" },
+        { key: 5, header: "Type_tiers", field: "typeTiers" },
+        { key: 6, header: "Tiers", field: "tiers" },
+        { key: 9, header: "Montant", field: "amount" },
+        { key: 10, header: "Avance", field: "advance" },
+        { key: 11, header: "Solde", field: "balance" },
+        { key: 12, header: "Statut", field: "statusInvoice" },
+        { key: 13, header: "Créée le", field: "dateCreated" },
+        { key: 14, header: "Par", field: "userCreated" },
+        { key: 15, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 16, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Date",
+        "Réf.",
+        "Type_tiers",
+        "Tiers",
+        "Montant",
+        "Avance",
+        "Solde",
+        "Statut",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+export const supplierAdvances = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Date", field: "dateTransaction" },
+        { key: 4, header: "Réf.", field: "ref" },
+        { key: 5, header: "Fournisseur", field: "supplier" },
+        { key: 6, header: "Montant", field: "amount" },
+        { key: 7, header: "Avance", field: "advance" },
+        { key: 8, header: "Solde", field: "balance" },
+        { key: 9, header: "Créée le", field: "dateCreated" },
+        { key: 10, header: "Par", field: "userCreated" },
+        { key: 11, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 12, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Date",
+        "Réf.",
+        "Type_tiers",
+        "Tiers",
+        "Montant",
+        "Avance",
+        "Solde",
+        "Statut",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+
+export const sales = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 1, header: "Agence", field: "agency" },
+        { key: 2, header: "Réf.", field: "ref" },
+        { key: 3, header: "Date", field: "dateTransaction" },
+        { key: 4, header: "Heure", field: "time" },
+        { key: 5, header: "Caisse", field: "cash" },
+        { key: 6, header: "Récepteur", field: "paymentReceiver" },
+        { key: 7, header: "Client", field: "customer" },
+        { key: 8, header: "Facture", field: "invoice" },
+        { key: 9, header: "Moyen de paiement", field: "paymentMethod" },
+        { key: 10, header: "Prix H.T.", field: "priceHt" },
+        { key: 11, header: "Rémise", field: "discount" },
+        { key: 12, header: "Taxe", field: "tax" },
+        { key: 13, header: "Prix T.T.C.", field: "priceTtc" },
+        { key: 14, header: "Acompte", field: "payment" },
+        { key: 15, header: "Reste", field: "rest" },
+        { key: 16, header: "Statut", field: "status" },
+        { key: 17, header: "Créée le", field: "dateCreated" },
+        { key: 18, header: "Par", field: "userCreated" },
+        { key: 19, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 20, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Réf.",
+        "Date",
+        "Heure",
+        "Caisse",
+        "Récepteur",
+        "Client",
+        "Facture",
+        "Moyen de paiement",
+        "Prix H.T.",
+        "Rémise",
+        "Taxe",
+        "Prix T.T.C.",
+        "Acompte",
+        "Reste",
+        "statut",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
 
 

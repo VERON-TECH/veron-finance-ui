@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAgencyById, getAllTitles, getEnterpriseById, getPersonalById, getTitleById, queryClient, updatePersonal } from "../../utils/http";
+import { getAgencyById, getAllTitles, getAuthoritiByUsername, getEnterpriseById, getPersonalById, getTitleById, getUserByPersonal, queryClient, updatePersonal } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
@@ -44,6 +44,7 @@ export default function UpdatePersonal() {
         enterprise: "",
         agency: "",
         title: "",
+        authorities: [],
         titles: []
     })
     const id = useSelector(state => state.modal.value);
@@ -53,15 +54,22 @@ export default function UpdatePersonal() {
         if (user?.role.includes("ROLE_RESPONSABLE_RH") && id != 0 || user.role.includes("ROLE_ADMIN") && id != 0) {
             let tbEl = {
                 tb: [],
+                tb1: []
             }
             async function get(signal) {
                 const personal = await getPersonalById({ id, signal })
+                const users = await getUserByPersonal({ personal: personal.id, signal })
+                const authorities = await getAuthoritiByUsername(users.username)
                 const enterprise = await getEnterpriseById({ id: personal.enterprise, signal })
                 const agency = await getAgencyById({ id: personal.agency, signal })
                 const title = await getTitleById({ id: personal.title, signal })
                 const allTitles = await getAllTitles()
                 allTitles.forEach(t => {
                     tbEl.tb.push({ key: t.id, name: t.name, value: t.slug })
+                })
+
+                authorities.forEach(a => {
+                    tbEl.tb1.push(a.name)
                 })
 
                 setData(prev => {
@@ -71,7 +79,8 @@ export default function UpdatePersonal() {
                         personal,
                         enterprise: enterprise.slug,
                         agency: agency.slug,
-                        title: title.slug
+                        title: title.slug,
+                        authorities: tbEl.tb1,
                     }
                 })
             }
@@ -326,9 +335,9 @@ export default function UpdatePersonal() {
             <Submit onClick={() => handleClick("affect")}>
                 Gestion des affectations
             </Submit>
-            <Submit onClick={() => handleClick("attribute")}>
+            {data?.authorities?.includes("ROLE_CAISSIER") && <Submit onClick={() => handleClick("attribute")}>
                 Caisses & Magasins
-            </Submit>
+            </Submit>}
         </div> : undefined}
 
         <Modal ref={dialog} size="lg:h-4/9 lg:w-5/15" title="Gestion des affectations">

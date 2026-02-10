@@ -64,7 +64,7 @@ export default function UserPage() {
         <div className="flex justify-center gap-2 mb-2">
             {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_RESPONSABLE_RH") ? <Submit onClick={() => handleModal("user")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={users?.header} emptyMessage="Aucun utilisateur trouvé." globalFilterFields={users.global} sheet="Utilisateurs" titleRef="Mise à jour informations d'un utilisateur" size="lg:h-5/10 lg:w-8/16" />
+        <Table data={data} headers={users?.header} emptyMessage="Aucun utilisateur trouvé." globalFilterFields={users.global} sheet="Utilisateurs" titleRef="Mise à jour informations d'un utilisateur" size="lg:h-5/10 lg:w-8/16 xl:h-6/10" />
 
         <Modal ref={dialog} size="lg:h-4/10 lg:w-4/15" title="Créer un utilisateur">
             <CreateUser />

@@ -10,7 +10,7 @@ import { useRef } from "react";
 import { authActions } from "../../store/authSlice";
 import { useNavigate, useSubmit } from "react-router";
 import Modal from "../../layout/Modal";
-import { connected, login, logout, editPassword, getAuthoritiByUsername, getPersonalById, getAllCashesByPersonal, getUserLogin } from "../../utils/http";
+import { connected, login, logout, editPassword, getAuthoritiByUsername, getPersonalById, getAllCashesByPersonal, getUserLogin, getAllStoresById } from "../../utils/http";
 
 let USERNAME = ""
 
@@ -134,14 +134,25 @@ export default function FormAuth() {
 
       let personal;
       let tb = [];
+      let tb2 = []
       if (user.personal !== 0) {
         personal = await getPersonalById({ id: user.personal, signal })
         const cashes = await getAllCashesByPersonal(personal.id)
+
         if (cashes.length > 0) {
           cashes.forEach(c => {
             tb.push({ key: c.id, name: c.name, value: c.slug })
           })
         }
+
+        if (personal.stores != null && personal.stores.length > 0) {
+
+          const getAllStores = await getAllStoresById(personal.stores)
+          getAllStores.forEach(s => {
+            tb2.push({ key: s.id, name: s.name, value: s.slug })
+          })
+        }
+
       }
 
 
@@ -153,7 +164,8 @@ export default function FormAuth() {
         personal: user.personal,
         agency: user.personal !== 0 ? personal.agency : 0,
         enterprise: user.personal !== 0 ? personal.enterprise : 0,
-        cashes: user.personal !== 0 ? tb : []
+        cashes: user.personal !== 0 ? tb : [],
+        stores: user.personal !== 0 ? tb2 : []
 
 
       }

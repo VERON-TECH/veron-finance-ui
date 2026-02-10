@@ -1,7 +1,7 @@
 import { useAnimate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAgencyBySlug, getAllAgencies, getAllLotById, getAllProducts, getAllStocks, getAllStorePrincipal, getAllStores, getEnterpriseById, getEnterpriseBySlug, getLotById, getLotBySlug, getProductBySlug, getStock, getStoreById, getStoreBySlug, getStorePrincipalById, getStorePrincipalBySlug, suppliesStock, transferStock } from "../../utils/http.js";
+import { createPackage, getAgencyBySlug, getAllAgencies, getAllLotById, getAllProducts, getAllStocks, getAllStorePrincipal, getAllStores, getEnterpriseById, getEnterpriseBySlug, getLotById, getLotBySlug, getProductBySlug, getStock, getStoreById, getStoreBySlug, getStorePrincipalById, getStorePrincipalBySlug, suppliesStock, transferStock } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import Select from "../../layout/Select.jsx";
@@ -11,8 +11,9 @@ import Modal from "../../layout/Modal.jsx";
 import Notification from "../../layout/Notification.jsx";
 import responseHttp from "../../utils/responseHttp.js";
 import { noteActions } from "../../store/noteSlice.js";
+import { isNotEmpty } from "../../utils/validation.jsx";
 
-export default function CreateSupplies() {
+export default function CreatePackage() {
     const errorNotification = useSelector(state => state.note.error);
     const relaunch = useSelector(state => state.note.relaunch);
     const dataItem = useSelector(state => state.note.dataItem)
@@ -25,6 +26,8 @@ export default function CreateSupplies() {
     const selectLot = useRef();
     const inputQuantity = useRef()
     const inputStock = useRef();
+    const inputName = useRef();
+    const inputPrice = useRef();
     const dispatch = useDispatch();
     const [animate] = useAnimate();
     const [data, setData] = useState({
@@ -37,7 +40,9 @@ export default function CreateSupplies() {
         quantity: 0,
         stock: 0,
         lots: [],
-        enabled: false
+        enabled: false,
+        name: "",
+        price: 0
 
     })
 
@@ -56,13 +61,13 @@ export default function CreateSupplies() {
                 const allProducts = await getAllProducts({ signal, enterprise: user.enterprise })
                 tbEl.tb.push({ key: allEnterprises.id, name: allEnterprises.name, value: allEnterprises.slug })
                 allAgencies.forEach(a => {
-                    if (a.enterprise == allEnterprises.id || a.slug == allEnterprises.slug) {
+                    if (a.enterprise == allEnterprises.id && a.slug !== allEnterprises.slug) {
                         tbEl.tb1.push({ key: a.id, name: a.name, value: a.slug })
                     }
                 })
 
                 allProducts.forEach(p => {
-                    if (p.category === "FOURNITURES") {
+                    if (p.category === "PRODUITS") {
                         tbEl.tb2.push({ key: p.id, name: p.name, value: p.slug })
                     }
 
@@ -89,17 +94,21 @@ export default function CreateSupplies() {
 
         let products = []
         data.products.forEach(p => {
-            products.push(p.product + ":" + p.store + ":" + p.quantity + ":" + p.lot)
+            products.push(p.product + ":" + p.store + ":" + p.quantity + ":" + p.lot + ":" + p.price)
         })
         const enterprise = selectEnterprise.current.value
         const agency = selectAgency01.current.value
-        const suppliesDto = {
+        const store = selectStore01.current.value
+        const name = inputName.current.value
+        const packageKitDto = {
             enterprise,
             agency,
+            name,
+            store,
             products,
         }
 
-        const responseData = await suppliesStock(suppliesDto)
+        const responseData = await createPackage(packageKitDto)
         const state = responseHttp(responseData);
         if (state) {
             dispatch(noteActions.error(true))
@@ -127,6 +136,18 @@ export default function CreateSupplies() {
         if (field === "quantity") {
             if (value <= 0) {
                 animate(inputQuantity.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+            }
+        }
+
+        if (field === "name") {
+            if (!isNotEmpty(value)) {
+                animate(inputName.current, { x: [0, 15, 0] }, { bounce: 0.75 })
+            }
+        }
+
+        if (field === "price") {
+            if (value <= 0) {
+                animate(inputPrice.current, { x: [0, 15, 0] }, { bounce: 0.75 })
             }
         }
 
@@ -200,6 +221,7 @@ export default function CreateSupplies() {
                     tb.push({ key: l.id, name: l.name, value: l.slug })
             })
 
+            inputPrice.current.value = product.price
             setData(prev => {
                 return {
                     ...prev,
@@ -260,15 +282,21 @@ export default function CreateSupplies() {
                 errors.push("Veuillez sélectionner un lot.")
             }
 
-            if (inputQuantity.current.value <= 0) {
+            if (Number(inputQuantity.current.value) <= 0) {
                 errors.push("Veuillez renseigner la quantité.")
+            }
+
+            if (Number(inputPrice.current.value) <= 0) {
+                errors.push("Veuillez renseigner le prix.")
             }
 
             if (Number(inputQuantity.current.value) > Number(inputStock.current.value)) {
                 errors.push("Le stock du produit " + selectProduct.current.value + " est insuffisant.")
             }
 
-
+            if (!isNotEmpty(inputName.current.value)) {
+                errors.push("Veuillez renseigner le nom du paquet.")
+            }
 
 
             if (errors.length > 0) {
@@ -288,7 +316,7 @@ export default function CreateSupplies() {
                 dialog.current.open();
                 return { errors }
             }
-            products.push({ id: length + 1, product: selectProduct.current.value, quantity: inputQuantity.current.value, lot: selectLot.current.value, store: selectStore01.current.value })
+            products.push({ id: length + 1, product: selectProduct.current.value, quantity: inputQuantity.current.value, price: inputPrice.current.value, lot: selectLot.current.value, store: selectStore01.current.value })
             setData(prev => {
                 return {
                     ...prev,
@@ -319,74 +347,91 @@ export default function CreateSupplies() {
 
 
     return <>
+        <div className="w-full max-h-full flex overflow-y-auto">
+            <div className="w-1/2 p-2 m-1 border-2 border-sky-950 shadow-lg shadow-sky-950 rounded">
+                <div className="flex justify-center gap-4">
+                    <Input label="Nom du paquet*" type="text" name="name" placeholder="Nom du paquet" className="border border-sky-950" ref={inputName} /> </div>
+                <div className="flex justify-center gap-4">
+                    <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} disabled={data?.enabled} />
+                    <Select label="Agence *" id="agency01" name="agency01" selectedTitle="Sélectionner une agence de départ" data={data?.agency01} ref={selectAgency01} onChange={(e) => handleChange("agency01", e.target.value)} disabled={data?.enabled} />
+                </div>
+                <div className="flex justify-center gap-4">
+                    <Select label="Magasin *" id="store01" name="store01" selectedTitle="Sélectionner un magasin de départ" data={data?.store01} ref={selectStore01} onChange={(e) => handleChange("store01", e.target.value)} disabled={data?.enable} />
+                    <Select label="Article *" id="product" name="product" selectedTitle="Sélectionner un article" data={data?.productList} ref={selectProduct} onChange={(e) => handleChange("product", e.target.value)} />
+                </div>
 
-        <div className="flex flex-col overflow-y-auto border border-sky-950 shadow-2xs shadow-sky-950 p-2 rounded mb-4">
-            <div className="flex justify-center gap-4">
-                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} disabled={data?.enabled} />
-                <Select label="Agence *" id="agency01" name="agency01" selectedTitle="Sélectionner une agence de départ" data={data?.agency01} ref={selectAgency01} onChange={(e) => handleChange("agency01", e.target.value)} disabled={data?.enabled} />
+                <div className="flex justify-center gap-4">
+                    <Select label="Lot *" id="lot" name="lot" selectedTitle="Sélectionner un lot" data={data?.lots} ref={selectLot} onChange={(e) => handleChange("lot", e.target.value)} />
+                    <Input label="Stock *" type="number" name="stock" defaultValue={data?.stock} placeholder="Stock" className="border border-sky-950" ref={inputStock} readOnly />
+                </div>
+                <div className="flex justify-center gap-4">
+                    <Input label="Prix *" type="number" name="price" defaultValue={data?.price} placeholder="Prix" className="border border-sky-950" onBlur={(event) => handleBlur("price", event.target.value)} ref={inputPrice} />
+                    <Input label="Quantité *" type="number" name="quantity" defaultValue={data?.quantity} placeholder="Quantité" className="border border-sky-950" onBlur={(event) => handleBlur("quantity", event.target.value)} ref={inputQuantity} />
+                </div>
+                <Submit onClick={() => handleAdd("add")} className="mb-4">
+                    Ajouter
+                </Submit>
+                {data?.errors.length > 0 && <ul className="text-center">
+                    {data?.errors.map(e => <li key={e} className="text-red-500">{e}</li>)}
+                </ul>}
+
             </div>
-            <div className="flex justify-center gap-4">
-                <Select label="Magasin *" id="store01" name="store01" selectedTitle="Sélectionner un magasin de départ" data={data?.store01} ref={selectStore01} onChange={(e) => handleChange("store01", e.target.value)} disabled={data?.enable} />
-                <Select label="Article *" id="product" name="product" selectedTitle="Sélectionner un article" data={data?.productList} ref={selectProduct} onChange={(e) => handleChange("product", e.target.value)} />
+            <div className="w-1/2 p-2 m-1 border-2 border-sky-950 shadow-lg shadow-sky-950 rounded">
+
+
+
+                <table className="w-full">
+                    <thead>
+                        <tr className="bg-sky-950 text-sky-50">
+                            <th className="border px-6">
+                                id
+                            </th>
+                            <th className="border px-6">
+                                produit
+                            </th>
+                            <th className="border px-6">
+                                Quantité
+                            </th>
+                            <th className="border px-6">
+                                Prix
+                            </th>
+                            <th className="border px-6">
+                                Lot
+                            </th>
+                            <th className="border px-6">
+                                Action
+                            </th>
+                            <th className="border px-6">
+                                Magasin
+                            </th>
+
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {data?.products.length > 0 && data?.products.map(p => <tr key={p.product}>
+                            <td className="border border-sky-950 text-center">{p.id}</td>
+                            <td className="border border-sky-950 text-center">{p.product}</td>
+                            <td className="border border-sky-950 text-center">{p.quantity}</td>
+                            <td className="border border-sky-950 text-center">{p.price}</td>
+                            <td className="border border-sky-950 text-center">{p.lot}</td>
+                            <td className="border border-sky-950 text-center"><FontAwesomeIcon icon={faTrash} className="cursor-pointer text-red-500" onClick={() => handleDelete(p.id)} /></td>
+                            <td className="border border-sky-950 text-center">{p.store}</td>
+                        </tr>)}
+                    </tbody>
+
+                </table>
+                {data.products.length > 0 && <div className="flex justify-end mt-4">
+                    <Submit onClick={() => handleSave()}>
+                        Enregistrer
+                    </Submit>
+                </div>}
             </div>
 
-            <div className="flex justify-center gap-4">
-                <Select label="Lot *" id="lot" name="lot" selectedTitle="Sélectionner un lot" data={data?.lots} ref={selectLot} onChange={(e) => handleChange("lot", e.target.value)} />
-                <Input label="Stock *" type="number" name="stock" defaultValue={data?.stock} placeholder="Stock" className="border border-sky-950" ref={inputStock} readOnly />
-            </div>
-            <div className="flex justify-center">
-                <Input label="Quantité *" type="number" name="quantity" defaultValue={data?.quantity} placeholder="Quantité" className="border border-sky-950" onBlur={(event) => handleBlur("quantity", event.target.value)} ref={inputQuantity} />
-            </div>
-            <Submit onClick={() => handleAdd("add")} className="mb-4">
-                Ajouter
-            </Submit>
+
+
         </div>
 
 
-        {data?.errors.length > 0 && <ul>
-            {data?.errors.map(e => <li key={e} className="text-red-500">{e}</li>)}
-        </ul>}
-        <table className="w-full">
-            <thead>
-                <tr className="bg-sky-950 text-sky-50">
-                    <th className="border px-6">
-                        id
-                    </th>
-                    <th className="border px-6">
-                        produit
-                    </th>
-                    <th className="border px-6">
-                        Quantité
-                    </th>
-                    <th className="border px-6">
-                        Lot
-                    </th>
-                    <th className="border px-6">
-                        Action
-                    </th>
-                    <th className="border px-6">
-                        Magasin
-                    </th>
-
-                </tr>
-            </thead>
-            <tbody>
-                {data?.products.length > 0 && data?.products.map(p => <tr key={p.product}>
-                    <td className="border border-sky-950 text-center">{p.id}</td>
-                    <td className="border border-sky-950 text-center">{p.product}</td>
-                    <td className="border border-sky-950 text-center">{p.quantity}</td>
-                    <td className="border border-sky-950 text-center">{p.lot}</td>
-                    <td className="border border-sky-950 text-center"><FontAwesomeIcon icon={faTrash} className="cursor-pointer text-red-500" onClick={() => handleDelete(p.id)} /></td>
-                    <td className="border border-sky-950 text-center">{p.store}</td>
-                </tr>)}
-            </tbody>
-
-        </table>
-        {data.products.length > 0 && <div className="flex justify-end mt-4">
-            <Submit onClick={() => handleSave()}>
-                Enregistrer
-            </Submit>
-        </div>}
 
         <Modal ref={dialog} title="Produit existant" size="h-1/5">
             <p className="mb-4"><FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />Ce produit existe déjà dans le panier.</p>

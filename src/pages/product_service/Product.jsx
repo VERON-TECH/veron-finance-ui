@@ -25,7 +25,7 @@ export default function ProductPage() {
     const { data } = useQuery({
         queryKey: ["products", { enterprise: user.enterprise }],
         queryFn: ({ signal }) => getAllProducts({ signal, enterprise: user.enterprise }),
-        enabled: user.role.includes("ROLE_COMPTABLE_MATIERE") || user.role.includes("ROLE_COMPTABLE")
+        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE_MATIERE") || user.role.includes("ROLE_COMPTABLE")
     })
 
 

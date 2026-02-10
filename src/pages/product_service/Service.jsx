@@ -24,9 +24,9 @@ export default memo(function ServicePage() {
 
 
     const { data } = useQuery({
-        queryKey: ["services", { enterprise: user?.enterprise }],
-        queryFn: ({ signal }) => getAllServices({ signal, enterprise: user?.enterprise }),
-        enabled: user.role.includes("ROLE_COMPTABLE_MATIERE") || user.role.includes("ROLE_COMPTABLE")
+        queryKey: ["services", { enterprise: user?.enterprise, category: 0 }],
+        queryFn: ({ signal }) => getAllServices({ signal, enterprise: user?.enterprise, category: 0 }),
+        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE_MATIERE") || user.role.includes("ROLE_COMPTABLE")
     })
 
 

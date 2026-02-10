@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { getAllPersonals } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
-import { useEffect, useRef } from "react";
+import { memo, useEffect, useRef } from "react";
 import Submit from "../../layout/Submit.jsx"
 import Table from "../../layout/Table.jsx"
 import Modal from "../../layout/Modal.jsx";
@@ -11,7 +11,7 @@ import { personals } from "../../data/dataTable.js";
 import Title from "../../components/personal/Title.jsx";
 import CreatePersonal from "../../components/personal/CreatePersonal.jsx";
 
-export default function PersonalPage() {
+export default memo(function PersonalPage() {
     const user = JSON.parse(localStorage.getItem("user"));
     const errorNotification = useSelector(state => state.note.error);
     const relaunch = useSelector(state => state.note.relaunch);
@@ -48,10 +48,10 @@ export default function PersonalPage() {
 
     return <>
         <div className="flex justify-center gap-2 mb-2">
-            {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("title")}>Fonctions</Submit> : undefined}
-            {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("personal")}>Nouveau</Submit> : undefined}
+            {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_RESPONSABLE_RH") ? <Submit onClick={() => handleModal("title")}>Fonctions</Submit> : undefined}
+            {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_RESPONSABLE_RH") ? <Submit onClick={() => handleModal("personal")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={personals.header} emptyMessage="Aucun personnel trouvé." globalFilterFields={personals.global} sheet="Personnel" titleRef="Mise à jour informations d'un employé" size="lg:h-6/9 lg:w-8/15" />
+        <Table data={data} headers={personals.header} emptyMessage="Aucun personnel trouvé." globalFilterFields={personals.global} sheet="Personnel" titleRef="Mise à jour informations d'un employé" size="lg:h-6/9 lg:w-8/15 xl:h-7/9" />
         <Modal ref={dialog} size="lg:h-6/11 lg:w-12/15 overflow-auto" title="Informations sur les fonctions">
             <Title />
         </Modal>
@@ -60,4 +60,4 @@ export default function PersonalPage() {
         </Modal>
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>
-}
+})

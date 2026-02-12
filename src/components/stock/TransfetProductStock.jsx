@@ -18,7 +18,7 @@ export default function TransfertProductStock() {
     const dataItem = useSelector(state => state.note.dataItem)
     const user = JSON.parse(localStorage.getItem("user"));
     const dialog = useRef();
-    const selectEnterprise = useRef();
+    const inputEnterprise = useRef();
     const selectAgency01 = useRef();
     const selectAgency02 = useRef();
     const selectStore01 = useRef();
@@ -31,7 +31,7 @@ export default function TransfertProductStock() {
     const dispatch = useDispatch();
     const [scope, animate] = useAnimate();
     const [data, setData] = useState({
-        enterprises: [],
+        enterprise: "",
         agency01: [],
         agency02: [],
         store01: [],
@@ -50,18 +50,17 @@ export default function TransfertProductStock() {
         if (user.enterprise > 0 && user.agency > 0) {
 
             let tbEl = {
-                tb: [],
                 tb1: [],
                 tb2: []
             }
             async function get(signal) {
 
-                const allEnterprises = await getEnterpriseById({ id: user.enterprise, signal })
+                const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
                 const allAgencies = await getAllAgencies()
                 const allProducts = await getAllProducts({ signal, enterprise: user.enterprise })
-                tbEl.tb.push({ key: allEnterprises.id, name: allEnterprises.name, value: allEnterprises.slug })
+
                 allAgencies.forEach(a => {
-                    if (a.enterprise == allEnterprises.id || a.slug == allEnterprises.slug) {
+                    if (a.enterprise == enterprise.id || a.slug == enterprise.slug) {
                         tbEl.tb1.push({ key: a.id, name: a.name, value: a.slug })
                     }
                 })
@@ -77,7 +76,7 @@ export default function TransfertProductStock() {
                     return {
                         ...prev,
                         agency01: tbEl.tb1,
-                        enterprises: tbEl.tb,
+                        enterprise: enterprise.slug,
                         productList: tbEl.tb2
                     }
                 })
@@ -93,7 +92,7 @@ export default function TransfertProductStock() {
         data.products.forEach(p => {
             products.push(p.product + ":" + p.quantity + ":" + p.lot)
         })
-        const enterprise = selectEnterprise.current.value
+        const enterprise = inputEnterprise.current.value
         const agency01 = selectAgency01.current.value
         const agency02 = selectAgency02.current.value
         const store01 = selectStore01.current.value
@@ -151,8 +150,8 @@ export default function TransfertProductStock() {
         let tb = []
         if (identifier === "agency01") {
             const agency02 = data.agency01
-            if (value == selectEnterprise.current.value) {
-                const enterprise = await getEnterpriseBySlug({ slug: value, signal })
+            if (value == inputEnterprise.current.value) {
+                const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
                 const store01 = await getAllStorePrincipal({ signal, enterprise: enterprise.id, agency: 0 })
                 store01.forEach(s => {
                     tb.push({ key: s.id, name: s.name, value: s.slug })
@@ -166,7 +165,7 @@ export default function TransfertProductStock() {
 
             } else {
                 const agency = await getAgencyBySlug({ slug: value, signal })
-                const enterprise = await getEnterpriseBySlug({ slug: selectEnterprise.current.value, signal })
+                const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
                 const store01 = await getAllStores({ signal, enterprise: enterprise.id, agency: agency.id })
                 store01.forEach(s => {
                     tb.push({ key: s.id, name: s.name, value: s.slug })
@@ -190,8 +189,8 @@ export default function TransfertProductStock() {
 
 
         if (identifier === "agency02") {
-            if (value == selectEnterprise.current.value) {
-                const enterprise = await getEnterpriseBySlug({ slug: value, signal })
+            if (value == inputEnterprise.current.value) {
+                const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
                 const store02 = await getAllStorePrincipal({ signal, enterprise: enterprise.id, agency: 0 })
                 store02.forEach(s => {
                     if (s.slug != selectStore01.current.value && selectStore01 != "Sélectionner un magasin de départ") {
@@ -208,7 +207,7 @@ export default function TransfertProductStock() {
 
             } else {
                 const agency = await getAgencyBySlug({ slug: value, signal })
-                const enterprise = await getEnterpriseBySlug({ slug: selectEnterprise.current.value, signal })
+                const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
                 const store02 = await getAllStores({ signal, enterprise: enterprise.id, agency: agency.id })
                 store02.forEach(s => {
                     if (s.slug != selectStore01.current.value && selectStore01 != "Sélectionner un magasin de départ") {
@@ -233,7 +232,7 @@ export default function TransfertProductStock() {
             const agency = await getAgencyBySlug({ slug: selectAgency01.current.value })
             let storePrincipal = null
             let store = null
-            if (selectEnterprise.current.value === selectAgency01.current.value) {
+            if (inputEnterprise.current.value === selectAgency01.current.value) {
                 storePrincipal = await getStorePrincipalBySlug({ slug: selectStore01.current.value, signal })
             } else {
                 store = await getStoreBySlug({ slug: selectStore01.current.value, signal })
@@ -258,11 +257,11 @@ export default function TransfertProductStock() {
 
         if (identifier === "lot") {
             const product = await getProductBySlug({ signal, slug: selectProduct.current.value })
-            const enterprise = await getEnterpriseBySlug({ slug: selectEnterprise.current.value, signal })
+            const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
             const agency = await getAgencyBySlug({ slug: selectAgency01.current.value, signal })
             let storePrincipal = null
             let store = null
-            if (selectEnterprise.current.value === selectAgency01.current.value) {
+            if (inputEnterprise.current.value === selectAgency01.current.value) {
                 storePrincipal = await getStorePrincipalBySlug({ slug: selectStore01.current.value, signal })
             } else {
                 store = await getStoreBySlug({ slug: selectStore01.current.value, signal })
@@ -284,9 +283,7 @@ export default function TransfertProductStock() {
     function handleAdd(identifier) {
         let errors = []
         if (identifier === "add") {
-            if (selectEnterprise.current.value === "Sélectionner une entreprise") {
-                errors.push("Veuillez sélectionner l'entreprise")
-            }
+
 
             if (selectAgency01.current.value === "Sélectionner une agence de départ") {
                 errors.push("Veuillez sélectionner l'agence de départ")
@@ -344,7 +341,7 @@ export default function TransfertProductStock() {
                 dialog.current.open();
                 return { errors }
             }
-            products.push({ id: length + 1, product: selectProduct.current.value, quantity: inputQuantity.current.value, lot: selectLot.current.value, enterprise: selectEnterprise.current.value, agency01: selectAgency01.current.value, store01: selectStore01.current.value, agency02: selectAgency02.current.value, store02: selectStore02.current.value })
+            products.push({ id: length + 1, product: selectProduct.current.value, quantity: inputQuantity.current.value, lot: selectLot.current.value, enterprise: inputEnterprise.current.value, agency01: selectAgency01.current.value, store01: selectStore01.current.value, agency02: selectAgency02.current.value, store02: selectStore02.current.value })
             setData(prev => {
                 return {
                     ...prev,
@@ -354,7 +351,7 @@ export default function TransfertProductStock() {
             })
 
 
-
+            inputQuantity.current.value = 0
             return { errors: null }
 
         }
@@ -379,8 +376,8 @@ export default function TransfertProductStock() {
         <div className="w-full max-h-full flex overflow-y-auto">
             <div className="w-1/2  p-2 m-1 border-2 border-sky-950 flex flex-col items-center gap-2 shadow-lg shadow-sky-950 rounded">
 
-                <div>
-                    <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} disabled={data?.enabled} />
+                <div className="hidden">
+                    <Input label="Entreprise *" type="text" name="enterprise" defaultValue={data?.enterprise} placeholder="entreprise" className="border border-sky-950" ref={inputEnterprise} readOnly />
                 </div>
                 <div className="flex gap-2">
                     <div className="flex flex-col gap-2">
@@ -389,7 +386,7 @@ export default function TransfertProductStock() {
 
                     </div>
                     <div className="flex flex-col gap-2">
-                        <Select label="Magasin départ*" id="store01" name="store01" selectedTitle="Sélectionner un magasin de départ" data={data?.store01} ref={selectStore01} onChange={(e) => handleChange("store01", e.target.value)} disabled={data?.enable} />
+                        <Select label="Magasin départ*" id="store01" name="store01" selectedTitle="Sélectionner un magasin de départ" data={data?.store01} ref={selectStore01} onChange={(e) => handleChange("store01", e.target.value)} disabled={data?.enabled} />
                         <Select label="Magasin d'arrivée*" id="store02" name="store02" selectedTitle="Sélectionner un magasin d'arrivée" data={data?.store02} ref={selectStore02} disabled={data?.enabled} />
 
                     </div>
@@ -461,7 +458,7 @@ export default function TransfertProductStock() {
                             <td className="border border-sky-950 text-center">{p.quantity}</td>
                             <td className="border border-sky-950 text-center">{p.lot}</td>
                             <td className="border border-sky-950 text-center"><FontAwesomeIcon icon={faTrash} className="cursor-pointer text-red-500" onClick={() => handleDelete(p.id)} /></td>
-                            <td className="border border-sky-950 text-center hidden">{selectEnterprise.current.value}</td>
+                            <td className="border border-sky-950 text-center hidden">{inputEnterprise.current.value}</td>
                             <td className="border border-sky-950 text-center hidden">{selectAgency01.current.value}</td>
                             <td className="border border-sky-950 text-center hidden">{selectStore01.current.value}</td>
                             <td className="border border-sky-950 text-center hidden">{selectAgency02.current.value}</td>

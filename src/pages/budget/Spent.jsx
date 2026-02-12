@@ -50,8 +50,8 @@ export default function SpentPage() {
 
     return <>
         <div className="flex justify-center gap-2 mb-2">
-            {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={() => handleModal("family")}>Famille de dépenses</Submit> : undefined}
-            {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={() => handleModal("spent")}>Nouveau</Submit> : undefined}
+            {user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={() => handleModal("family")}>Famille de dépenses</Submit> : undefined}
+            {user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={() => handleModal("spent")}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data} headers={spents.header} emptyMessage="Aucune dépense trouvé." globalFilterFields={spents.global} sheet="Dépense" titleRef="Mise à jour informations d'une dépense" size="lg:h-5/13 lg:w-4/15 xl:h-6/13" />
         <Modal ref={dialog} size="lg:h-5/12 lg:w-4/15 xl:h-5/13" title="Créer une dépense">

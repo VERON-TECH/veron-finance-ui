@@ -3,7 +3,6 @@ import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
 import { createCash, getAgencyById, getEnterpriseById, queryClient } from "../../utils/http";
-import Select from "../../layout/Select.jsx"
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
@@ -12,32 +11,30 @@ import responseHttp from "../../utils/responseHttp.js"
 
 export default function CreateCash() {
     const user = JSON.parse(localStorage.getItem("user"))
-    const selectEnterprise = useRef();
-    const selectAgency = useRef();
     const inputName = useRef();
     const dispatch = useDispatch();
     const [scope, animate] = useAnimate();
     const [data, setData] = useState({
-        enterprises: [],
-        agencies: []
+        enterprise: "",
+        agencies: ""
     })
 
 
     useEffect(() => {
         let tb = []
-        async function getAll(signal) {
-            const allEnterprises = await getEnterpriseById({ id: user.enterprise, signal })
-            tb.push({ key: allEnterprises.id, name: allEnterprises.name, value: allEnterprises.id })
-
+        async function get(signal) {
+            const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
+            const agency = await getAgencyById({ id: user.agency, signal })
             setData(prev => {
                 return {
                     ...prev,
-                    enterprises: tb
+                    enterprise: enterprise.slug,
+                    agency: agency.slug
                 }
             })
 
         }
-        getAll()
+        get()
     }, [])
 
 
@@ -57,16 +54,6 @@ export default function CreateCash() {
         }
 
 
-        if (agency === null) {
-            animate(selectAgency.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("Veuillez sélectionner l'agence.")
-        }
-
-        if (enterprise === null) {
-            animate(selectEnterprise.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("Veuillez sélectionner l'entreprise.")
-        }
-
 
         if (errors.length > 0) {
             dispatch(noteActions.show());
@@ -81,9 +68,8 @@ export default function CreateCash() {
             }
         }
 
-        const enterpriseItem = await getEnterpriseById({ id: enterprise, signal })
         const allData = {
-            enterprise: enterpriseItem.slug,
+            enterprise,
             agency,
             name
         }
@@ -126,25 +112,16 @@ export default function CreateCash() {
     }
 
 
-    async function handleChange(signal) {
-        let tb = []
-        const allAgencies = await getAgencyById({ id: user.agency, signal });
-        tb.push({ key: allAgencies.id, name: allAgencies.name, value: allAgencies.slug })
-        setData(prev => {
-            return {
-                ...prev,
-                agencies: tb
-            }
-        })
-    }
 
 
     return <>
 
         <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
-                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data.enterprises} ref={selectEnterprise} onChange={() => handleChange()} />
-                <Select label="Agences *" id="agency" name="agency" selectedTitle="Sélectionner une agence" data={data.agencies} ref={selectAgency} />
+                <div className="hidden">
+                    <Input label="Entreprise *" type="text" defaultValue={data?.enterprise} name="enterprise" placeholder="Entreprise" className="border border-sky-950" readOnly />
+                    <Input label="Agence *" type="text" defaultValue={data?.agency} name="agency" placeholder="Agence" className="border border-sky-950" readOnly />
+                </div>
                 <Input label="Nom *" type="text" defaultValue={formState.enteredValue?.name} name="name" placeholder="Nom de l'agence" className="border border-sky-950" onBlur={(event) => handleBlur("name", event.target.value)} ref={inputName} />
 
             </div>

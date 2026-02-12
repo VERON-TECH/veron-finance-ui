@@ -45,7 +45,7 @@ export default function PurchaseOrderPage() {
             {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit onClick={() => handleModal("store")}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data} headers={purchasOrders.header} emptyMessage="Aucun bon de commande trouvé." globalFilterFields={purchasOrders.global} sheet="Bon de commande" titleRef="Mise à jour informations d'un bon de commande" size="lg:h-9/12 lg:w-11/15 xl:w-13/15 xl:h-9/12" />
-        <Modal ref={dialog} size="lg:h-9/12 lg:w-11/15 xl:w-13/15 xl:h-9/12" title="Créer une commande">
+        <Modal ref={dialog} size="lg:h-10/12 lg:w-15/15 xl:w-15/15 xl:h-10/12" title="Créer une commande">
             <CreatePurchaseOrder />
         </Modal>
 

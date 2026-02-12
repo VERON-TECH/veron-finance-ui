@@ -13,7 +13,6 @@ import Select from "../../layout/Select.jsx";
 export default function CreateService() {
 
     const user = JSON.parse(localStorage.getItem("user"));
-    const selectEnterprise = useRef();
     const selectCategory = useRef();
     const inputName = useRef();
     const inputPrice = useRef();
@@ -21,18 +20,17 @@ export default function CreateService() {
     const dispatch = useDispatch();
     const [scope, animate] = useAnimate();
     const [data, setData] = useState({
-        enterprises: [],
+        enterprise: "",
         categories: []
     })
 
     useEffect(() => {
         let tbEl = {
             tb: [],
-            tb1: []
         }
         async function get(signal) {
             const allCategories = await getCategoryService()
-            const allEnterprises = await getEnterpriseById({ id: user.enterprise, signal })
+            const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
             allCategories.forEach(c => {
                 if (c.name !== "VENTES") {
                     tbEl.tb.push({ key: c.id, name: c.name, value: c.slug })
@@ -40,13 +38,11 @@ export default function CreateService() {
 
             })
 
-            tbEl.tb1.push({ key: allEnterprises.id, name: allEnterprises.name, value: allEnterprises.slug })
-
             setData(prev => {
                 return {
                     ...prev,
                     categories: tbEl.tb,
-                    enterprises: tbEl.tb1
+                    enterprise: enterprise.slug
                 }
             })
         }
@@ -72,10 +68,6 @@ export default function CreateService() {
             errors.push("veuillez sélectionner la catégorie du service.")
         }
 
-        if (enterprise === null) {
-            animate(selectEnterprise.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("veuillez sélectionner l'entrerprise.")
-        }
 
         if (!isNotEmpty(description)) {
             animate(inputDescription.current, { x: [0, 15, 0] }, { bounce: 0.75 })
@@ -164,12 +156,14 @@ export default function CreateService() {
     return <>
 
         <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
-            <div className="flex flex-col justify-between gap-2">
-                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} />
+            <div className="flex flex-col justify-between gap-2 mb-4">
+                <div className="hidden">
+                    <Input label="Entreprise *" type="text" defaultValue={data?.enterprise} name="enterprise" placeholder="Entreprise" className="border border-sky-950" readOnly />
+                </div>
                 <Select label="Catégorie *" id="category" name="category" selectedTitle="Sélectionner une catégorie" data={data?.categories} ref={selectCategory} />
                 <Input label="Nom *" type="text" defaultValue={formState.enteredValue?.name} name="name" placeholder="Nom du service" className="border border-sky-950" onBlur={(event) => handleBlur("name", event.target.value)} ref={inputName} onChange={() => handleChange("name")} />
                 <Input label="Prix *" type="number" defaultValue={formState.enteredValue?.price} name="price" placeholder="Prix du service" className="border border-sky-950" onBlur={(event) => handleBlur("price", event.target.value)} ref={inputPrice} onChange={() => handleChange("price")} />
-                <Input label="Description *" type="textarea" defaultValue={formState.enteredValue?.description} name="description" placeholder="Description du service" className="border border-sky-950" onBlur={(event) => handleBlur("description", event.target.value)} ref={inputDescription} />
+                <textarea label="Description *" type="textarea" defaultValue={formState.enteredValue?.description} name="description" placeholder="Description du service" className="border border-sky-950 h-16 text-sky-950" onBlur={(event) => handleBlur("description", event.target.value)} ref={inputDescription} />
             </div>
 
             <Submit>

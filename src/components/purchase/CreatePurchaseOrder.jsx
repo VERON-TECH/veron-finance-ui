@@ -1,7 +1,7 @@
 import { useAnimate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createPurchaseOrder, getAgencyById, getAllProducts, getAllSupplierAdvances, getAllSuppliers, getEnterpriseById, getProductById, getProductBySlug, queryClient } from "../../utils/http.js";
+import { createPurchaseOrder, getAgencyById, getAllProducts, getAllPurchaseOrders, getAllSupplierAdvances, getAllSuppliers, getEnterpriseById, getProductById, getProductBySlug, getSupplierById, queryClient } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { noteActions } from "../../store/noteSlice.js";
@@ -12,6 +12,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationTriangle, faPlusCircle, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../layout/Modal.jsx";
 import Notification from "../../layout/Notification.jsx";
+import { useNavigate } from "react-router-dom";
+import { printActions } from "../../store/print.js";
 
 export default function CreatePurchaseOrder() {
     const errorNotification = useSelector(state => state.note.error);
@@ -20,8 +22,6 @@ export default function CreatePurchaseOrder() {
     const user = JSON.parse(localStorage.getItem("user"));
     const dialog = useRef();
     const dialog1 = useRef();
-    const selectEnterprise = useRef();
-    const selectAgency = useRef();
     const selectSupplier = useRef();
     const selectProduct = useRef();
     const selectPaymentMethod = useRef();
@@ -29,11 +29,14 @@ export default function CreatePurchaseOrder() {
     const inputQuantity = useRef()
     const inputPrice = useRef()
     const inputDiscount = useRef();
+    const inputEnterprise = useRef();
+    const inputAgency = useRef();
+    const navigate = useNavigate()
     const dispatch = useDispatch();
     const [scope, animate] = useAnimate();
     const [data, setData] = useState({
-        enterprises: [],
-        agencies: [],
+        enterprise: "",
+        agencie: "",
         productList: [],
         products: [],
         suppliers: [],
@@ -53,22 +56,18 @@ export default function CreatePurchaseOrder() {
         if (user.enterprise > 0 && user.agency > 0) {
 
             let tbEl = {
-                tb: [],
-                tb1: [],
                 tb2: [],
                 tb3: [],
                 tb4: [],
             }
             async function get(signal) {
 
-                const allAgencies = await getAgencyById({ id: user.agency, signal })
-                const allEnterprises = await getEnterpriseById({ id: user.enterprise, signal })
+                const agency = await getAgencyById({ id: user.agency, signal })
+                const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
                 const allProducts = await getAllProducts({ signal, enterprise: user.enterprise })
                 const allSuppliers = await getAllSuppliers({ signal, enterprise: user.enterprise })
                 const allSupplierAdvances = await getAllSupplierAdvances({ signal, enterprise: user.enterprise, agency: user.agency })
 
-                tbEl.tb.push({ key: allAgencies.id, name: allAgencies.name, value: allAgencies.slug })
-                tbEl.tb1.push({ key: allEnterprises.id, name: allEnterprises.name, value: allEnterprises.slug })
                 allProducts.forEach(p => {
                     tbEl.tb2.push({ key: p.id, name: p.name, value: p.slug })
                 })
@@ -84,8 +83,8 @@ export default function CreatePurchaseOrder() {
                 setData(prev => {
                     return {
                         ...prev,
-                        agencies: tbEl.tb,
-                        enterprises: tbEl.tb1,
+                        agency: agency.slug,
+                        enterprise: enterprise.slug,
                         productList: tbEl.tb2,
                         suppliers: tbEl.tb3,
                         supplierAdvanceList: tbEl.tb4
@@ -98,13 +97,13 @@ export default function CreatePurchaseOrder() {
 
     }, [])
 
-    async function handleSave() {
+    async function handleSave(signal) {
         let products = []
         data.products.forEach(p => {
             products.push(p.product + ":" + p.quantity + ":" + p.price)
         })
-        const enterprise = selectEnterprise.current.value
-        const agency = selectAgency.current.value
+        const enterprise = inputEnterprise.current.value
+        const agency = inputAgency.current.value
         const supplier = selectSupplier.current.value
         const paymentMethod = selectPaymentMethod.current.value
         const supplierAdvances = data.supplierAdvances
@@ -120,6 +119,22 @@ export default function CreatePurchaseOrder() {
         }
 
         const responseData = await createPurchaseOrder(purchaseOrderDto)
+        const allPurchaseOrders = await getAllPurchaseOrders({ signal, enterprise: user.enterprise, agency: user.agency })
+        const purchaseOrder = allPurchaseOrders[allPurchaseOrders.length - 1]
+        const supplier_ = await getSupplierById({ id: purchaseOrder.supplier, signal })
+        const enterprise_ = await getEnterpriseById({ id: user.enterprise, signal })
+        let products_ = []
+        for (let p of data.products) {
+            let product_ = await getProductBySlug({ signal, slug: p.product })
+            products_.push({ ref: product_.ref, name: product_.name, quantity: p.quantity, price: p.price, totalPrice: p.quantity * p.price })
+        }
+
+        const print = {
+            purchaseOrder,
+            enterprise: enterprise_,
+            products_,
+            supplier: supplier_.name
+        }
         const state = responseHttp(responseData);
         if (state) {
             dispatch(noteActions.error(true))
@@ -132,6 +147,10 @@ export default function CreatePurchaseOrder() {
 
             })
             dispatch(noteActions.error(false))
+            if (responseData[0].includes("a été créée avec succès")) {
+                dispatch(printActions.getPrint(print))
+                navigate("/print-purchase")
+            }
         }
         dispatch(noteActions.show());
         dispatch(noteActions.relaunch());
@@ -210,11 +229,11 @@ export default function CreatePurchaseOrder() {
                 errors.push("Veuillez sélectionner un fournisseur")
             }
 
-            if (selectEnterprise.current.value === "Sélectionner une entreprise") {
+            if (inputEnterprise.current.value === "Sélectionner une entreprise") {
                 errors.push("Veuillez sélectionner une entreprise")
             }
 
-            if (selectAgency.current.value === "Sélectionner une agence") {
+            if (inputAgency.current.value === "Sélectionner une agence") {
                 errors.push("Veuillez sélectionner une agence")
             }
 
@@ -272,6 +291,9 @@ export default function CreatePurchaseOrder() {
             }
         })
 
+        selectSupplier.current.disabled = true
+        selectPaymentMethod.current.disabled = true
+        inputQuantity.current.value = 0
         return { errors: null }
     }
 
@@ -309,12 +331,16 @@ export default function CreatePurchaseOrder() {
 
     return <>
 
-        <div className="w-full h-1/1 flex overflow-y-auto">
-            <div className="w-1/2  p-2 m-1 border-2 border-sky-950 flex flex-col items-center gap-2 shadow-lg shadow-sky-950">
-                <Select label="Fournisseur *" id="supplier" name="supplier" selectedTitle="Sélectionner un fournisseur" data={data?.suppliers} ref={selectSupplier} />
-                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} />
-                <Select label="Agence *" id="agency" name="agency" selectedTitle="Sélectionner une agence" data={data?.agencies} ref={selectAgency} />
-                <Select label="Paiement *" id="paymentMethod" name="paymentMethod" selectedTitle="Sélectionner un moyen de paiement" data={paymentMethodPurchase} ref={selectPaymentMethod} onChange={(e) => handleChange("paymentMethod", e.target.value)} />
+        <div className="w-full flex overflow-y-auto">
+            <div className="w-1/2 p-2 m-1 border-2 border-sky-950 flex flex-col items-center gap-2 shadow-lg shadow-sky-950">
+                <div className="flex gap-2 justify-between">
+                    <Select label="Fournisseur *" id="supplier" name="supplier" selectedTitle="Sélectionner un fournisseur" data={data?.suppliers} ref={selectSupplier} />
+                    <Select label="Paiement *" id="paymentMethod" name="paymentMethod" selectedTitle="Sélectionner un moyen de paiement" data={paymentMethodPurchase} ref={selectPaymentMethod} onChange={(e) => handleChange("paymentMethod", e.target.value)} />
+                </div>
+                <div className="hidden">
+                    <Input label="Entreprise *" type="text" defaultValue={data?.enterprise} name="enterprise" placeholder="Entreprise" className="border border-sky-950" readOnly ref={inputEnterprise} />
+                    <Input label="Agence *" type="text" defaultValue={data?.agency} name="agency" placeholder="Agence" className="border border-sky-950" readOnly ref={inputAgency} />
+                </div>
                 {data?.payment === "AVANCE_VERSEE" &&
                     <div className="flex gap-2">
                         <Select label="Avance versée *" id="supplierAdvance" name="supplierAdvance" selectedTitle="Sélectionner une avance versée" data={data.supplierAdvanceList} ref={selectSupplierAdvance} />
@@ -323,9 +349,14 @@ export default function CreatePurchaseOrder() {
                         </button>
                     </div>
                 }
-                <Select label="Produit *" id="product" name="product" selectedTitle="Sélectionner un produit" data={data?.productList} ref={selectProduct} onChange={(e) => handleChange("product", e.target.value)} />
-                <Input label="Quantité *" type="number" name="quantity" defaultValue={data?.quantity} placeholder="Quantité" className="border border-sky-950" onBlur={(event) => handleBlur("quantity", event.target.value)} ref={inputQuantity} />
-                <Input label="Prix *" type="number" defaultValue={data?.price} name="price" placeholder="Prix" className="border border-sky-950" onBlur={(event) => handleBlur("price", event.target.value)} ref={inputPrice} />
+                <div className="flex gap-2 justify-between">
+                    <Select label="Produit *" id="product" name="product" selectedTitle="Sélectionner un produit" data={data?.productList} ref={selectProduct} onChange={(e) => handleChange("product", e.target.value)} />
+                    <Input label="Prix *" type="number" defaultValue={data?.price} name="price" placeholder="Prix" className="border border-sky-950" onBlur={(event) => handleBlur("price", event.target.value)} ref={inputPrice} />
+
+                </div>
+                <div className="flex justify-center">
+                    <Input label="Quantité *" type="number" name="quantity" defaultValue={data?.quantity} placeholder="Quantité" className="border border-sky-950" onBlur={(event) => handleBlur("quantity", event.target.value)} ref={inputQuantity} />
+                </div>
 
                 <Submit onClick={() => handleAdd("add")}>
                     Ajouter

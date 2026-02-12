@@ -18,7 +18,7 @@ export default function CreateSupplies() {
     const dataItem = useSelector(state => state.note.dataItem)
     const user = JSON.parse(localStorage.getItem("user"));
     const dialog = useRef();
-    const selectEnterprise = useRef();
+    const inputEnterprise = useRef();
     const selectAgency01 = useRef();
     const selectStore01 = useRef();
     const selectProduct = useRef();
@@ -28,7 +28,7 @@ export default function CreateSupplies() {
     const dispatch = useDispatch();
     const [animate] = useAnimate();
     const [data, setData] = useState({
-        enterprises: [],
+        enterprise: "",
         agency01: [],
         store01: [],
         products: [],
@@ -45,18 +45,16 @@ export default function CreateSupplies() {
         if (user.enterprise > 0 && user.agency > 0) {
 
             let tbEl = {
-                tb: [],
                 tb1: [],
                 tb2: []
             }
             async function get(signal) {
 
-                const allEnterprises = await getEnterpriseById({ id: user.enterprise, signal })
+                const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
                 const allAgencies = await getAllAgencies()
                 const allProducts = await getAllProducts({ signal, enterprise: user.enterprise })
-                tbEl.tb.push({ key: allEnterprises.id, name: allEnterprises.name, value: allEnterprises.slug })
                 allAgencies.forEach(a => {
-                    if (a.enterprise == allEnterprises.id || a.slug == allEnterprises.slug) {
+                    if (a.enterprise == enterprise.id || a.slug == enterprise.slug) {
                         tbEl.tb1.push({ key: a.id, name: a.name, value: a.slug })
                     }
                 })
@@ -75,7 +73,7 @@ export default function CreateSupplies() {
                     return {
                         ...prev,
                         agency01: tbEl.tb1,
-                        enterprises: tbEl.tb,
+                        enterprise: enterprise.slug,
                         productList: tbEl.tb2
                     }
                 })
@@ -91,7 +89,7 @@ export default function CreateSupplies() {
         data.products.forEach(p => {
             products.push(p.product + ":" + p.store + ":" + p.quantity + ":" + p.lot)
         })
-        const enterprise = selectEnterprise.current.value
+        const enterprise = inputEnterprise.current.value
         const agency = selectAgency01.current.value
         const suppliesDto = {
             enterprise,
@@ -139,8 +137,8 @@ export default function CreateSupplies() {
         let tb = []
         if (identifier === "agency01") {
             const agency02 = data.agency01
-            if (value == selectEnterprise.current.value) {
-                const enterprise = await getEnterpriseBySlug({ slug: value, signal })
+            if (value == inputEnterprise.current.value) {
+                const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
                 const store01 = await getAllStorePrincipal({ signal, enterprise: enterprise.id, agency: 0 })
                 store01.forEach(s => {
                     tb.push({ key: s.id, name: s.name, value: s.slug })
@@ -154,7 +152,7 @@ export default function CreateSupplies() {
 
             } else {
                 const agency = await getAgencyBySlug({ slug: value, signal })
-                const enterprise = await getEnterpriseBySlug({ slug: selectEnterprise.current.value, signal })
+                const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
                 const store01 = await getAllStores({ signal, enterprise: enterprise.id, agency: agency.id })
                 store01.forEach(s => {
                     tb.push({ key: s.id, name: s.name, value: s.slug })
@@ -184,7 +182,7 @@ export default function CreateSupplies() {
             const agency = await getAgencyBySlug({ slug: selectAgency01.current.value })
             let storePrincipal = null
             let store = null
-            if (selectEnterprise.current.value === selectAgency01.current.value) {
+            if (inputEnterprise.current.value === selectAgency01.current.value) {
                 storePrincipal = await getStorePrincipalBySlug({ slug: selectStore01.current.value, signal })
             } else {
                 store = await getStoreBySlug({ slug: selectStore01.current.value, signal })
@@ -210,11 +208,11 @@ export default function CreateSupplies() {
 
         if (identifier === "lot") {
             const product = await getProductBySlug({ signal, slug: selectProduct.current.value })
-            const enterprise = await getEnterpriseBySlug({ slug: selectEnterprise.current.value, signal })
+            const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
             const agency = await getAgencyBySlug({ slug: selectAgency01.current.value, signal })
             let storePrincipal = null
             let store = null
-            if (selectEnterprise.current.value === selectAgency01.current.value) {
+            if (inputEnterprise.current.value === selectAgency01.current.value) {
                 storePrincipal = await getStorePrincipalBySlug({ slug: selectStore01.current.value, signal })
             } else {
                 store = await getStoreBySlug({ slug: selectStore01.current.value, signal })
@@ -236,10 +234,6 @@ export default function CreateSupplies() {
     function handleAdd(identifier) {
         let errors = []
         if (identifier === "add") {
-            if (selectEnterprise.current.value === "Sélectionner une entreprise") {
-                errors.push("Veuillez sélectionner l'entreprise")
-            }
-
             if (selectAgency01.current.value === "Sélectionner une agence de départ") {
                 errors.push("Veuillez sélectionner l'agence de départ")
             }
@@ -322,7 +316,7 @@ export default function CreateSupplies() {
 
         <div className="flex flex-col overflow-y-auto border border-sky-950 shadow-2xs shadow-sky-950 p-2 rounded mb-4">
             <div className="flex justify-center gap-4">
-                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} disabled={data?.enabled} />
+                <Input label="Entreprise *" name="quantity" defaultValue={data?.enterprise} placeholder="Entreprise" className="border border-sky-950" onBlur={(event) => handleBlur("quantity", event.target.value)} ref={inputQuantity} />
                 <Select label="Agence *" id="agency01" name="agency01" selectedTitle="Sélectionner une agence de départ" data={data?.agency01} ref={selectAgency01} onChange={(e) => handleChange("agency01", e.target.value)} disabled={data?.enabled} />
             </div>
             <div className="flex justify-center gap-4">

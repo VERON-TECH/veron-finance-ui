@@ -44,7 +44,7 @@ export default function ProductPage() {
             {user.role.includes("ROLE_COMPTABL_MATIERE") || user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={handleModal}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data} headers={products.header} emptyMessage="Aucun produit trouvé." globalFilterFields={products.global} sheet="Produit" titleRef="Mise à jour informations d'un produit" size="lg:h-7/12 lg:w-4/15 xl:h-8/12" />
-        <Modal ref={dialog} size="lg:h-7/12 lg:w-4/15 xl:h-8/12" title="Créer un produit">
+        <Modal ref={dialog} size="lg:h-7/12 lg:w-4/15 xl:h-7/12" title="Créer un produit">
             <CreateProduct />
         </Modal>
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}

@@ -11,7 +11,7 @@ import responseHttp from "../../utils/responseHttp.js"
 import Select from "../../layout/Select.jsx";
 
 export default function UpdateSpent() {
-
+    const user = JSON.parse(localStorage.getItem("user"))
     const id = useSelector(state => state.modal.value)
     const inputSpentFamily = useRef();
     const selectSpentFamily = useRef();
@@ -129,9 +129,9 @@ export default function UpdateSpent() {
                 <Select label="Famille *" id="spentFamily" name="spentFamily" selectedTitle="Sélectionner une famille de dépense" data={data?.spentFamilies} ref={selectSpentFamily} />
                 <Input label="Nom *" type="text" defaultValue={data?.spent?.name} name="name" placeholder="Nom de la dépense" className="border border-sky-950" onBlur={(event) => handleBlur("name", event.target.value)} ref={inputName} />
             </div>
-            <Submit>
+            {user.role.includes("ROLE_COMPTABLE") && <Submit>
                 Enregistrer
-            </Submit>
+            </Submit>}
         </form>
 
 

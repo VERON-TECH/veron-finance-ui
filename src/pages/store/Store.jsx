@@ -45,7 +45,7 @@ export default function StorePage() {
             {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit onClick={() => handleModal("store")}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data} headers={stores.header} emptyMessage="Aucun magasin trouvé." globalFilterFields={stores.global} sheet="Magasin" titleRef="Mise à jour informations d'un magasin" size="lg:h-4/12 lg:w-4/15 xl:h-5/12" />
-        <Modal ref={dialog} size="lg:h-4/12 lg:w-4/15 xl:h-5/12" title="Créer un magasin">
+        <Modal ref={dialog} size="lg:h-3/12 lg:w-4/15 xl:h-3/12" title="Créer un magasin">
             <CreateStore />
         </Modal>
 

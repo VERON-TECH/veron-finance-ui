@@ -47,7 +47,7 @@ export default function SafePage() {
             {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={handleModal}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data} headers={safes.header} emptyMessage="Aucun coffre-fort trouvé." globalFilterFields={safes.global} sheet="Coffre_fort" titleRef="Mise à jour informations du coffre-fort" size="lg:h-5/11 lg:w-4/15" />
-        <Modal ref={dialog} size="lg:h-5/11 lg:w-4/15" title="Créer un coffre-fort">
+        <Modal ref={dialog} size="lg:h-3/11 lg:w-4/15" title="Créer un coffre-fort">
             <CreateSafe />
         </Modal>
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}

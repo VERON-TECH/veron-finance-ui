@@ -13,7 +13,6 @@ import { categoryProduct } from "../../data/info.js";
 
 export default function CreateProduct() {
     const user = JSON.parse(localStorage.getItem("user"))
-    const selectEnterprise = useRef();
     const selectCategory = useRef();
     const inputName = useRef();
     const inputSellingPrice = useRef();
@@ -22,20 +21,18 @@ export default function CreateProduct() {
     const dispatch = useDispatch();
     const [scope, animate] = useAnimate();
     const [data, setData] = useState({
-        enterprises: [],
+        enterprise: "",
     })
 
 
     useEffect(() => {
         let tb = []
         async function getAll(signal) {
-            const allEnterprises = await getEnterpriseById({ id: user.enterprise, signal })
-            tb.push({ key: allEnterprises.id, name: allEnterprises.name, value: allEnterprises.slug })
-
+            const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
             setData(prev => {
                 return {
                     ...prev,
-                    enterprises: tb
+                    enterprise: enterprise.slug
                 }
             })
 
@@ -79,12 +76,6 @@ export default function CreateProduct() {
         if (category === null) {
             animate(selectCategory.current, { x: [0, 15, 0] }, { bounce: 0.75 })
             errors.push("Veuillez sélectionner la catégorie.")
-        }
-
-
-        if (enterprise === null) {
-            animate(selectEnterprise.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("Veuillez sélectionner l'entreprise.")
         }
 
 
@@ -167,7 +158,9 @@ export default function CreateProduct() {
 
         <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
             <div className="flex flex-col justify-between gap-2">
-                <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data.enterprises} />
+                <div className="hidden">
+                    <Input label="Entreprise *" type="text" defaultValue={data?.enterprise} name="enterprise" placeholder="Entreprise" className="border border-sky-950" readOnly />
+                </div>
                 <Select label="Catégorie *" id="category" name="category" selectedTitle="Sélectionner une catégorie" data={categoryProduct} ref={selectCategory} />
                 <Input label="Nom *" type="text" defaultValue={formState.enteredValue?.name} name="name" placeholder="Nom de l'article" className="border border-sky-950" onBlur={(event) => handleBlur("name", event.target.value)} ref={inputName} />
                 <Input label="Prix d'achat *" type="number" defaultValue={formState.enteredValue?.price} name="price" placeholder="Prix de l'article" className="border border-sky-950" onBlur={(event) => handleBlur("price", event.target.value)} ref={inputPrice} />

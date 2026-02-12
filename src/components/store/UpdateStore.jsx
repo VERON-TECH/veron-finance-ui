@@ -132,10 +132,10 @@ export default function UpdateStore() {
                 <Input label="Agence *" type="text" defaultValue={data?.agency} name="agency" placeholder="Nom de l'agence" className="border border-sky-950" ref={inputAgency} readOnly />
                 <Input label="Nom *" type="text" defaultValue={data?.store?.name} name="name" placeholder="Nom du magasin" className="border border-sky-950" onBlur={(event) => handleBlur("name", event.target.value)} ref={inputName} />
             </div>
-            <Submit>
+            {data?.store?.name !== "CLIENT" && data?.store?.name !== "REBUTS" ? < Submit >
                 Enregistrer
-            </Submit>
-        </form>
+            </Submit> : undefined}
+        </form >
 
 
     </>

@@ -44,7 +44,7 @@ export default function CashPage() {
             {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={handleModal}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data} headers={cashes.header} emptyMessage="Aucune caisse trouvée." globalFilterFields={cashes.global} sheet="Caisse" titleRef="Mise à jour informations de la caisse" size="lg:h-5/11 lg:w-4/15" />
-        <Modal ref={dialog} size="lg:h-5/11 lg:w-4/15" title="Créer une caisse">
+        <Modal ref={dialog} size="lg:h-3/11 lg:w-4/15" title="Créer une caisse">
             <CreateCash />
         </Modal>
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}

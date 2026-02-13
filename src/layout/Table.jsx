@@ -10,14 +10,33 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Button } from 'primereact/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFolderOpen } from '@fortawesome/free-solid-svg-icons';
+import { faFolderOpen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Modal from './Modal';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { modalActions } from '../store/modalSlice';
-import EditUser from '../components/user/EditUser';
-import EditBeneficiary from '../components/beneficiary/EditBeneficiary';
-import EditProject from '../components/projet/EditProject';
-import GetFinancement from '../components/finance/GetFinancement';
+import UpdateEnterprise from '../components/enterprise/UpdateEnteprise';
+import UpdateAgency from '../components/agency/UpdateAgency';
+import UpdateSafe from '../components/safe/UpdateSafe';
+import UpdateCash from '../components/cash/UpdateCash';
+import UpdateBankAccount from '../components/bankAccount/UpdateBankAccount';
+import UpdateBank from '../components/bankAccount/UpdateBank';
+import UpdateMobileMoney from '../components/mobile_money/UpdateMobileMoney';
+import UpdateOperator from '../components/mobile_money/UpdateOperator';
+import UpdateStorePrincipal from '../components/storePrincipal/UpdateStorePrincipal';
+import ConfirmationDelete from '../components/global/ConfirmationDelete';
+import UpdateTitle from '../components/personal/UpdateTitle';
+import UpdatePersonal from '../components/personal/UpdatePersonal';
+import UpdateUser from '../components/user/UpdateUser';
+import UpdateCategory from '../components/service/UpdateCategory';
+import UpdateService from '../components/service/UpdateService';
+import UpdateProduct from '../components/product/UpdateProduct';
+import UpdateStore from '../components/store/UpdateStore';
+import UpdateSpentFamily from '../components/budget/UpdateFamilySpent';
+import UpdateSpent from '../components/budget/UpdateSpent';
+import UpdateBudget from '../components/budget/UpdateBudget';
+import UpdateSupplier from '../components/supplier/UpdateSupplier';
+import UpdatePurchaseOrder from '../components/purchase/UpdatePurchaseOrder';
+import GetInvoice from '../components/sale/GetInvoice';
 
 
 
@@ -31,10 +50,7 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
   const exportColumns = headers.map((col) => ({ title: col.header, dataKey: col.field }));
   const dialog1 = useRef();
   const dispatch = useDispatch()
-
-
-
-
+  const deletestate = useSelector(state => state.stateTable.delete)
 
   const exportCSV = (selectionOnly) => {
     dt.current.exportCSV({ selectionOnly });
@@ -73,7 +89,7 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
     return [{
       header: "Action",
       title: titleRef,
-      field: data?.map(d => d.id) || [] // Préparer les IDs sans muter un objet
+      field: data && data?.map(d => d?.id) || [] // Préparer les IDs sans muter un objet
     }];
   }, [data]);
 
@@ -116,7 +132,7 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
             sortable
             body={(rowData) => (
               <button onClick={() => handleClick(rowData.id)}>
-                <FontAwesomeIcon icon={faFolderOpen} />
+                {deletestate === true ? <FontAwesomeIcon icon={faTrash} /> : <FontAwesomeIcon icon={faFolderOpen} />}
               </button>
             )}
           />))}
@@ -129,19 +145,118 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
 
     <AnimatePresence>
       <Modal ref={dialog1} title={titleRef} size={size}>
-        {titleRef === "Mise à jour informations de l'utilisateur" &&
-          <EditUser />
+        {titleRef === "Mise à jour informations de l'entreprise" &&
+          <UpdateEnterprise />
         }
-        {titleRef === "Mise à jour informations du bénéficiaire" &&
-          <EditBeneficiary />
-        }
-        {titleRef === "Mise à jour informations d'un segment" &&
-          <EditProject />
+        {titleRef === "Mise à jour informations de l'agence" &&
+          <UpdateAgency />
         }
 
-        {titleRef === "Informations sur un financement" &&
-          <GetFinancement />
+        {titleRef === "Mise à jour informations du coffre-fort" &&
+          <UpdateSafe />
         }
+
+        {titleRef === "Mise à jour informations de la caisse" &&
+          <UpdateCash />
+        }
+
+        {titleRef === "Mise à jour informations d'un compte bancaire" &&
+          <UpdateBankAccount />
+        }
+
+        {titleRef === "Mise à jour informations d'une banque" &&
+          <UpdateBank />
+        }
+
+        {titleRef === "Mise à jour informations d'un compte mobile money" &&
+          <UpdateMobileMoney />
+        }
+
+        {titleRef === "Mise à jour informations d'un opérateur" &&
+          <UpdateOperator />
+        }
+
+        {titleRef === "Mise à jour informations d'un magasin principal" &&
+          <UpdateStorePrincipal />
+        }
+
+        {titleRef === "Supprimer l'autorisation dans un compte bancaire" &&
+          <ConfirmationDelete authorize={"bank"} />
+        }
+
+        {titleRef === "Supprimer l'autorisation dans un compte mobile money" &&
+          <ConfirmationDelete authorize={"mobile"} />
+        }
+
+        {titleRef === "Supprimer l'autorisation dans un coffre-fort" &&
+          <ConfirmationDelete authorize={"safe"} />
+        }
+
+        {titleRef === "Supprimer l'autorisation dans un magasin principal" &&
+          <ConfirmationDelete authorize={"storePrincipal"} />
+        }
+
+        {titleRef === "Mise à jour informations d'une fonction" &&
+          <UpdateTitle />
+        }
+
+        {titleRef === "Mise à jour informations d'un employé" &&
+          <UpdatePersonal />
+        }
+
+        {titleRef === "Mise à jour informations d'un utilisateur" &&
+          <UpdateUser />
+        }
+
+        {titleRef === "Mise à jour informations d'une catégorie de service" &&
+          <UpdateCategory />
+        }
+
+        {titleRef === "Mise à jour informations d'un service" &&
+          <UpdateService />
+        }
+
+        {titleRef === "Mise à jour informations d'un produit" &&
+          <UpdateProduct />
+        }
+
+        {titleRef === "Mise à jour informations d'un magasin" &&
+          <UpdateStore />
+        }
+
+        {titleRef === "Mise à jour informations d'une famille" &&
+          <UpdateSpentFamily />
+        }
+
+        {titleRef === "Mise à jour informations d'une dépense" &&
+          <UpdateSpent />
+        }
+
+        {titleRef === "Mise à jour informations de la prévision" &&
+          <UpdateBudget />
+        }
+
+        {titleRef === "Mise à jour informations d'un fournisseur" &&
+          <UpdateSupplier />
+        }
+
+        {titleRef === "Mise à jour informations d'un bon de commande" &&
+          <UpdatePurchaseOrder />
+        }
+
+        {titleRef === "Visualiser les factures" &&
+          <GetInvoice />
+        }
+
+
+
+
+
+
+
+
+
+
 
 
 

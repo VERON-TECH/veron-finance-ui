@@ -10,7 +10,7 @@ import { useRef } from "react";
 import { authActions } from "../../store/authSlice";
 import { useNavigate, useSubmit } from "react-router";
 import Modal from "../../layout/Modal";
-import { connected, getUser, login, logout, editPassword, getAuthoritiByUsername } from "../../utils/http";
+import { connected, login, logout, editPassword, getAuthoritiByUsername, getPersonalById, getAllCashesByPersonal, getUserLogin, getAllStoresById } from "../../utils/http";
 
 let USERNAME = ""
 
@@ -36,7 +36,7 @@ export default function FormAuth() {
 
   const memo = localStorage.getItem("memo");
 
-  async function handleSubmit(prevState, formData) {
+  async function handleSubmit(prevState, formData, signal) {
     const username = formData.get("username");
     USERNAME = username;
     const password = formData.get("password");
@@ -67,7 +67,8 @@ export default function FormAuth() {
       }
     }
 
-    const user = await getUser(username);
+    const user = await getUserLogin(username);
+
 
 
     if (user.connected) {
@@ -75,11 +76,16 @@ export default function FormAuth() {
       dialog.current.open();
     } else if (user.connexion == 0) {
       dialog1.current.open();
-    } else if (!user.enabled) {
+    } else if (!user.enabled && user !== 401) {
       dispatch(noteActions.show());
       dispatch(noteActions.relaunch());
       dispatch(noteActions.error(true));
       dispatch(noteActions.sendData(["Compte inactif"]))
+    } else if (user === 401) {
+      dispatch(noteActions.show());
+      dispatch(noteActions.relaunch());
+      dispatch(noteActions.error(true));
+      dispatch(noteActions.sendData(["Login & mot de passe incorrect"]))
     } else if (user.connexion == 100) {
       dialog1.current.open();
     } else {
@@ -126,10 +132,42 @@ export default function FormAuth() {
         role.push(auth.name)
       }
 
+      let personal;
+      let tb = [];
+      let tb2 = []
+      if (user.personal !== 0) {
+        personal = await getPersonalById({ id: user.personal, signal })
+        const cashes = await getAllCashesByPersonal(personal.id)
+
+        if (cashes.length > 0) {
+          cashes.forEach(c => {
+            tb.push({ key: c.id, name: c.name, value: c.slug })
+          })
+        }
+
+        if (personal.stores != null && personal.stores.length > 0) {
+
+          const getAllStores = await getAllStoresById(personal.stores)
+          getAllStores.forEach(s => {
+            tb2.push({ key: s.id, name: s.name, value: s.slug })
+          })
+        }
+
+      }
+
+
+
+
       const userInfo = {
         username: user.username,
         role: role,
         personal: user.personal,
+        agency: user.personal !== 0 ? personal.agency : 0,
+        enterprise: user.personal !== 0 ? personal.enterprise : 0,
+        cashes: user.personal !== 0 ? tb : [],
+        stores: user.personal !== 0 ? tb2 : []
+
+
       }
       localStorage.setItem("user", JSON.stringify(userInfo))
 
@@ -190,6 +228,8 @@ export default function FormAuth() {
     dispatch(authActions.logout())
     const user = JSON.parse(localStorage.getItem("user"))
     await logout(user.username);
+    localStorage.removeItem("user")
+    localStorage.removeItem("token")
     dialog.current.close()
     navigate("/")
   }
@@ -282,7 +322,7 @@ export default function FormAuth() {
     </AnimatePresence>
 
     <AnimatePresence>
-      <Modal ref={dialog} title="Déconnexion" size="lg:w-1/6 lg:h-2/8">
+      <Modal ref={dialog} title="Déconnexion" size="lg:w-2/9 lg:h-3/12">
         <p className="p-2 text-center mb-2">Souhaitez-vous vous déconnecter?</p>
         <form className="flex justify-center">
           <div className="flex gap-4">
@@ -293,8 +333,8 @@ export default function FormAuth() {
     </AnimatePresence>
 
     <AnimatePresence>
-      <Modal ref={dialog1} title="Mise à jour du mot de passe" size="lg:w-2/8 lg:h-4/11">
-        <form className="flex justify-center flex-col" action={handleUpdatePassword} ref={scope}>
+      <Modal ref={dialog1} title="Mise à jour du mot de passe" size="lg:w-2/8 lg:h-4/11 xl:h-4/11">
+        <form className="flex justify-center flex-col absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2" action={handleUpdatePassword} ref={scope}>
           <Input label="Mot de passe *" type="password" name="password" placeholder="Mot de passe" className="border border-sky-950" onBlur={(event) => handleBlurPassword("password", event.target.value)} ref={inputPwd} />
           <Input label="Confirmer *" type="password" name="confirmationPassword" placeholder="Confirmer" className="border border-sky-950" onBlur={() => handleBlurPassword("passwordConfirm", event.target.value)} ref={inputPwdConfirm} />
           <Submit>

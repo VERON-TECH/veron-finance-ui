@@ -6,15 +6,10 @@ import getToken from "../../utils/token";
 import MenuBar from "../../components/home/MenuBar";
 import Footer from "../../components/footer/Footer";
 import { Outlet } from "react-router-dom";
-import { useEffect, useState } from "react";
+
 
 export default function HomePage() {
   const token = getToken();
-
-
-
-
-
 
 
   return <>

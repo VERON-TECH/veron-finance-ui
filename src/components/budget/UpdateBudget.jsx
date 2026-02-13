@@ -176,9 +176,9 @@ export default function UpdateBudget() {
                 <Input label="Date de fin *" type="date" defaultValue={data?.budget.endDate} name="endDate" placeholder="Date de fin" className="border border-sky-950" onBlur={(event) => handleBlur("endDate", event.target.value)} ref={inputEndDate} />
                 <Input label="Montant *" type="number" defaultValue={data?.budget.budget} name="budget" placeholder="Montant de la dépense" className="border border-sky-950" onBlur={(event) => handleBlur("budget", event.target.value)} ref={inputBudget} />
             </div>
-            <Submit>
+            {user.role.includes("ROLE_ADMIN") && <Submit>
                 Enregistrer
-            </Submit>
+            </Submit>}
         </form>
         <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2">
             {user.role.includes("ROLE_ADMIN") && data?.budget.statusBudget === "EN_ATTENTE_DE_VALIDATION" ? <Submit onClick={() => handleValidate()}>

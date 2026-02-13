@@ -8,8 +8,8 @@ export const features = [
   { key: 6, menu: "Caisses", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSIER"], path: "mvt-cash" },
   { key: 7, menu: "Magasins & Stocks", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"], path: "stores" },
   { key: 8, menu: "Appro & transferts", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"], path: "mvt-stock" },
-  { key: 8, menu: "Engagements", role: ["ROLE_COMPTABLE", "ROLE_ADMIN"], path: "engagement" },
-  { key: 9, menu: "Autres réglages", role: ["ROLE_ADMIN"], path: "setting" },
+  { key: 9, menu: "Engagements", role: ["ROLE_COMPTABLE", "ROLE_ADMIN"], path: "engagement" },
+  { key: 10, menu: "Autres réglages", role: ["ROLE_ADMIN"], path: "setting" },
   /**{ key: 10, menu: "Base de données", role: ["ROLE_ADMIN"], path: "data" },**/
 ]
 
@@ -24,7 +24,7 @@ export const subFeactures = [
   { key: 7, menu: "Magasins sécondaires", identifier: "store", url: "store", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
   { key: 8, menu: "Fournisseurs", identifier: "store", url: "supplier", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
   { key: 9, menu: "Produits & Services", identifier: "store", url: "product-service", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
-  { key: 10, menu: "Stock", identifier: "store", url: "product-stock", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
+  { key: 10, menu: "Stock", identifier: "store", url: "product-stock", role: ["ROLE_ADMIN", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
   { key: 11, menu: "Bons de commande", identifier: "stock", url: "purchase-order", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
   { key: 12, menu: "Appro & Transferts", identifier: "stock", url: "mvt-stock", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"] },
   { key: 13, menu: "Personnels", identifier: "personal", url: "personal", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH"] },

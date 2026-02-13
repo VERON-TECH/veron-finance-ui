@@ -4022,7 +4022,7 @@ export async function getBudgetByPeriod({ period, signal }) {
 
 
 export async function updateBudget({ period, budgetDto }) {
-  const url = `${BASE_URL}budget/ac/update/${period}/`
+  const url = `${BASE_URL}budget/ad/update/${period}/`
   const token = getToken();
   const response = await fetch(url, {
     method: "PUT",

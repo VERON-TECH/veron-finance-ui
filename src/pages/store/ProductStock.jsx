@@ -53,7 +53,7 @@ export default function ProductStockPage() {
     }, [menu, dispatch])
 
     return <>
-        <div className="flex justify-center gap-4">
+        {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <div className="flex justify-center gap-4">
             <Submit onClick={() => handleClick("supplies")}>
                 Fournitures
             </Submit>
@@ -63,7 +63,7 @@ export default function ProductStockPage() {
             <Submit onClick={() => handleClick("packages")}>
                 Paquets
             </Submit>
-        </div>
+        </div> : undefined}
         <Table data={data} headers={productStocks.header} emptyMessage="Aucun stock trouvé." globalFilterFields={purchasOrders.global} sheet="Stock" titleRef="Visulaiser le stock" size="lg:h-9/12 lg:w-11/15 xl:w-13/15 xl:h-9/12" />
 
         <Modal ref={dialog} size="lg:h-9/12 lg:w-11/15 xl:w-9/15 xl:h-10/12" title="Créer un sortie de founiture">

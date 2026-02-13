@@ -13,9 +13,7 @@ import responseHttp from "../../utils/responseHttp.js";
 import { noteActions } from "../../store/noteSlice.js";
 
 export default function CreateSupplies() {
-    const errorNotification = useSelector(state => state.note.error);
-    const relaunch = useSelector(state => state.note.relaunch);
-    const dataItem = useSelector(state => state.note.dataItem)
+
     const user = JSON.parse(localStorage.getItem("user"));
     const dialog = useRef();
     const inputEnterprise = useRef();
@@ -387,7 +385,5 @@ export default function CreateSupplies() {
             <Submit onClick={() => dialog.current.close()}>Fermer</Submit>
         </Modal>
 
-
-        {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>
 }

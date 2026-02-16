@@ -47,6 +47,11 @@ const CashReportPage = lazy(() => import("../pages/print/PrintCash.jsx"))
 const DashBoardPage = lazy(() => import("../pages/dashboard/Dashboard.jsx"))
 const DashBoardDayPage = lazy(() => import("../pages/dashboard/DashBooardDay.jsx"))
 const PrintPurchaseOrderPage = lazy(() => import("../pages/print/PrintPurchaseOrder.jsx"))
+const PrintSuppliesPage = lazy(() => import("../pages/print/PrintSupplies.jsx"))
+const SettingPage = lazy(() => import("../pages/setting/Setting.jsx"))
+const PrintPage = lazy(() => import("../pages/setting/Print.jsx"))
+const PasswordPage = lazy(() => import("../pages/ressources_human/Password.jsx"))
+
 
 
 
@@ -99,11 +104,15 @@ export const router = createBrowserRouter([
       { path: "surplus", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SurplusPage /></Suspense> },
       { path: "reporting", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><DashBoardPage /></Suspense> },
       { path: "day", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><DashBoardDayPage /></Suspense> },
+      { path: "setting", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SettingPage /></Suspense> },
+      { path: "print", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PrintPage /></Suspense> },
+      { path: "password", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PasswordPage /></Suspense> },
     ]
 
   },
   { path: "/print-sale", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PrintSalePage /></Suspense> },
   { path: "/print-cash", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><CashReportPage /></Suspense> },
   { path: "/print-purchase", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PrintPurchaseOrderPage /></Suspense> },
+  { path: "/print-supplies", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PrintSuppliesPage /></Suspense> },
 
 ])

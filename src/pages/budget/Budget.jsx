@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllBudgets } from "../../utils/http";
+import { getAgencyById, getAllBudgets, getEnterpriseById, getSpentById } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Submit from "../../layout/Submit.jsx"
 import Table from "../../layout/Table.jsx"
 import Modal from "../../layout/Modal.jsx";
@@ -21,14 +21,9 @@ export default function BudgetPage() {
     const dataItem = useSelector(state => state.note.dataItem)
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
-
-
-    const { data } = useQuery({
-        queryKey: ["budgets", { enterprise: user.enterprise, agency: user.agency }],
-        queryFn: ({ signal }) => getAllBudgets({ signal, enterprise: user.enterprise, agency: user.agency }),
-        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")
+    const [data, setData] = useState({
+        budget: []
     })
-
 
     const dialog = useRef()
     const dialog1 = useRef()
@@ -47,6 +42,32 @@ export default function BudgetPage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "budget" }))
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")) {
+            async function get(signal) {
+                const allBudgets = await getAllBudgets({ signal, enterprise: user?.enterprise, agency: user?.agency })
+                let tb = []
+                let enterprise = {}
+                let agency = {}
+                let spent = {}
+                for (let b of allBudgets) {
+                    enterprise = await getEnterpriseById({ id: b.enterprise, signal })
+                    agency = await getAgencyById({ id: b.agency, signal })
+                    spent = await getSpentById({ id: b.spent, signal })
+                    b.enterprise = enterprise.slug
+                    b.agency = agency.slug
+                    b.spent = spent.slug
+                    tb.push(b)
+                }
+                setData(prev => {
+                    return {
+                        ...prev,
+                        budget: tb
+                    }
+                })
+
+            }
+            get()
+        }
     }, [menu, dispatch])
 
     return <>
@@ -55,8 +76,8 @@ export default function BudgetPage() {
             {user.role.includes("ROLE_ADMIN") && data?.length > 0 ? <Submit onClick={() => handleModal("clean")}>Nettoyer tout</Submit> : undefined}
             {user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={() => handleModal("new")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={budgets.header} emptyMessage="Aucun budget trouvée." globalFilterFields={budgets.global} sheet="Budget" titleRef="Mise à jour informations de la prévision" size="lg:h-6/11 lg:w-4/15 xl:h-7/11" />
-        <Modal ref={dialog} size="lg:h-5/11 lg:w-4/15 xl:h-5/11" title="Créer une budget">
+        <Table data={data?.budget} headers={budgets.header} emptyMessage="Aucun budget trouvée." globalFilterFields={budgets.global} sheet="Budget" titleRef="Mise à jour informations de la prévision" size="lg:h-6/11 lg:w-4/15 xl:h-7/11" />
+        <Modal ref={dialog} size="lg:h-5/11 lg:w-4/15 xl:h-6/12" title="Créer une budget">
             <CreateBudget />
         </Modal>
 

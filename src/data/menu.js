@@ -10,6 +10,7 @@ export const features = [
   { key: 8, menu: "Appro & transferts", role: ["ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE"], path: "mvt-stock" },
   { key: 9, menu: "Engagements", role: ["ROLE_COMPTABLE", "ROLE_ADMIN"], path: "engagement" },
   { key: 10, menu: "Autres réglages", role: ["ROLE_ADMIN"], path: "setting" },
+  { key: 11, menu: "Mot de passe", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE", "ROLE_CHEF_CAISSIER", "ROLE_CAISSIER"], path: "password" },
   /**{ key: 10, menu: "Base de données", role: ["ROLE_ADMIN"], path: "data" },**/
 ]
 
@@ -40,7 +41,9 @@ export const subFeactures = [
   { key: 23, menu: "Opération de caisse", identifier: "cash", url: "mvt-cash", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSEIR"] },
   { key: 24, menu: "Manquants", identifier: "cash", url: "missing", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSEIR"] },
   { key: 25, menu: "Excédents", identifier: "cash", url: "surplus", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSEIR"] },
-  { key: 26, menu: "Journalier", identifier: "reporting", url: "day", role: ["ROLE_ADMIN"] },
+  { key: 26, menu: "Imprimantes", identifier: "setting", url: "print", role: ["ROLE_ADMIN"] },
+  { key: 27, menu: "Journalier", identifier: "reporting", url: "day", role: ["ROLE_ADMIN"] },
+  { key: 28, menu: "Modifier le mot de passe", identifier: "password", url: "password", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE", "ROLE_CHEF_CAISSIER", "ROLE_CAISSIER"] },
 ]
 
 

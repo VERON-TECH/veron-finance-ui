@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllSpents } from "../../utils/http";
+import { getAllSpents, getSpentFamilyById } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Submit from "../../layout/Submit.jsx"
 import Table from "../../layout/Table.jsx"
 import Modal from "../../layout/Modal.jsx";
@@ -21,14 +21,9 @@ export default function SpentPage() {
     const dataItem = useSelector(state => state.note.dataItem)
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
-
-
-    const { data } = useQuery({
-        queryKey: ["spents"],
-        queryFn: getAllSpents,
-        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")
+    const [data, setData] = useState({
+        spend: []
     })
-
 
     const dialog = useRef()
     const dialog1 = useRef()
@@ -46,6 +41,28 @@ export default function SpentPage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "budget" }))
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")) {
+            async function get(signal) {
+                const allSpend = await getAllSpents()
+                let tb = []
+                let family = {}
+
+                for (let s of allSpend) {
+                    family = await getSpentFamilyById({ id: s.spentFamily, signal })
+                    s.spentFamily = family.slug
+
+                    tb.push(s)
+                }
+                setData(prev => {
+                    return {
+                        ...prev,
+                        spend: tb
+                    }
+                })
+
+            }
+            get()
+        }
     }, [menu, dispatch])
 
     return <>
@@ -53,7 +70,7 @@ export default function SpentPage() {
             {user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={() => handleModal("family")}>Famille de dépenses</Submit> : undefined}
             {user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={() => handleModal("spent")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={spents.header} emptyMessage="Aucune dépense trouvé." globalFilterFields={spents.global} sheet="Dépense" titleRef="Mise à jour informations d'une dépense" size="lg:h-5/13 lg:w-4/15 xl:h-6/13" />
+        <Table data={data?.spend} headers={spents.header} emptyMessage="Aucune dépense trouvé." globalFilterFields={spents.global} sheet="Dépense" titleRef="Mise à jour informations d'une dépense" size="lg:h-5/13 lg:w-4/15 xl:h-6/13" />
         <Modal ref={dialog} size="lg:h-5/12 lg:w-4/15 xl:h-5/13" title="Créer une dépense">
             <CreateSpent />
         </Modal>

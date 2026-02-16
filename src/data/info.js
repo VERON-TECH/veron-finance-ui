@@ -73,9 +73,9 @@ export const typeCash = [
   { key: 16, name: "AVANCE_CLIENT", value: "AVANCE_CLIENT" },
   { key: 17, name: "AVANCE_VERSEE", value: "AVANCE_VERSEE" },
   { key: 18, name: "REMBOURSEMENT_CLIENT", value: "REMBOURSEMENT_CLIENT" },
-  { key: 19, name:"REMBOURSEMENT_EMPRUNT", value: "REMBOURSEMENT_EMPRUNT" },
+  { key: 19, name: "REMBOURSEMENT_EMPRUNT", value: "REMBOURSEMENT_EMPRUNT" },
   { key: 20, name: "REMBOURSEMENT_PRET", value: "REMBOURSEMENT_PRET" },
-  { key: 21, name:"PRET_ACCORDE", value: "PRET_ACCORDE" },
+  { key: 21, name: "PRET_ACCORDE", value: "PRET_ACCORDE" },
   { key: 22, name: "APPRO_COFFRE_FORT_VIA_CAISSE", value: "APPRO_COFFRE_FORT_VIA_CAISSE" },
   { key: 23, name: "APPRO_CAISSE_VIA_COFFRE_FORT", value: "APPRO_CAISSE_VIA_COFFRE_FORT" },
 ]
@@ -83,6 +83,13 @@ export const typeCash = [
 export const sens = [
   { key: 0, name: "ENCAISSEMENT", value: "ENCAISSEMENT" },
   { key: 1, name: "DECAISSEMENT", value: "DECAISSEMENT" },
+]
+
+
+export const prints = [
+  { key: 0, name: "IMPRIMANTE_LASER", value: "IMPRIMANTE_LASER" },
+  { key: 1, name: "IMPRIMANTE_PAPIER_THERMIQUE", value: "IMPRIMANTE_PAPIER_THERMIQUE" },
+  { key: 2, name: "IMPRIMANTE_MATRICIELLE", value: "IMPRIMANTE_MATRICIELLE" },
 ]
 
 

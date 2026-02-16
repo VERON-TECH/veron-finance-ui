@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllStocks } from "../../utils/http";
+import { getAgencyById, getAllStocks, getEnterpriseById, getLotById, getProductById, getStoreById, getStorePrincipalById } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Table from "../../layout/Table.jsx"
 import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { productStocks, purchasOrders } from "../../data/dataTable.js";
@@ -21,14 +21,9 @@ export default function ProductStockPage() {
     const dataItem = useSelector(state => state.note.dataItem)
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
-
-
-    const { data } = useQuery({
-        queryKey: ["productstocks", { enterprise: user.enterprise, agency: user.agency, storePrincipal: 0, store: 0, product: 0, lot: 0 }],
-        queryFn: ({ signal }) => getAllStocks({ signal, enterprise: user.enterprise, agency: user.agency, storePrincipal: 0, store: 0, product: 0, lot: 0 }),
-        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")
+    const [data, setData] = useState({
+        stock: []
     })
-
 
     const dialog = useRef()
     const dialog1 = useRef()
@@ -50,6 +45,41 @@ export default function ProductStockPage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "store" }))
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")) {
+            async function get(signal) {
+                const allStocks = await getAllStocks({ signal, enterprise: user.enterprise, agency: user.agency, storePrincipal: 0, store: 0, product: 0, lot: 0 })
+                let tb = []
+                let enterprise = {}
+                let agency = {}
+                let storePrincipal = {}
+                let store = {}
+                let product = {}
+                let lot = {}
+                for (let s of allStocks) {
+                    enterprise = await getEnterpriseById({ id: s.enterprise, signal })
+                    agency = await getAgencyById({ id: s.agency, signal })
+                    storePrincipal = s.storePrincipal !== 0 ? await getStorePrincipalById({ id: s.storePrincipal, signal }) : 0
+                    store = s.store !== 0 ? await getStoreById({ id: s.store, signal }) : 0
+                    product = await getProductById({ signal, id: s.product })
+                    lot = await getLotById({ signal, id: s.lot })
+                    s.enterprise = enterprise.slug
+                    s.agency = agency.slug
+                    s.storePrincipal = storePrincipal !== 0 ? storePrincipal.slug : 0
+                    s.store = store !== 0 ? store.slug : 0
+                    s.product = product.slug
+                    s.lot = lot.slug
+                    tb.push(s)
+                }
+                setData(prev => {
+                    return {
+                        ...prev,
+                        stock: tb
+                    }
+                })
+
+            }
+            get()
+        }
     }, [menu, dispatch])
 
     return <>
@@ -64,7 +94,7 @@ export default function ProductStockPage() {
                 Paquets
             </Submit>
         </div> : undefined}
-        <Table data={data} headers={productStocks.header} emptyMessage="Aucun stock trouvé." globalFilterFields={purchasOrders.global} sheet="Stock" titleRef="Visulaiser le stock" size="lg:h-9/12 lg:w-11/15 xl:w-13/15 xl:h-9/12" />
+        <Table data={data?.stock} headers={productStocks.header} emptyMessage="Aucun stock trouvé." globalFilterFields={purchasOrders.global} sheet="Stock" titleRef="Informations sur le stock" size="lg:h-5/12 lg:w-8/15 xl:w-8/15 xl:h-5/12" />
 
         <Modal ref={dialog} size="lg:h-9/12 lg:w-11/15 xl:w-9/15 xl:h-10/12" title="Créer un sortie de founiture">
             <CreateSupplies />

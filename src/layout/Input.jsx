@@ -1,4 +1,4 @@
-export default function Input({ id, label, type, name, placeholder, className, error, ...props }) {
+export default function Input({ id, label, type, name, placeholder, className, bg, error, ...props }) {
   return <div className="flex flex-col mb-2">
     <div className="mb-2 flex">
       <label htmlFor={id} className="w-28 text-sky-950">{label}</label>

@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllMobileMoney } from "../../utils/http";
+import { getAllMobileMoney, getEnterpriseById, getOperatorById } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Submit from "../../layout/Submit.jsx"
 import Table from "../../layout/Table.jsx"
 import Modal from "../../layout/Modal.jsx";
@@ -21,13 +21,10 @@ export default function MobileMoneyPage() {
     const dataItem = useSelector(state => state.note.dataItem)
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
-
-
-    const { data } = useQuery({
-        queryKey: ["mobilemoney", { agency: user.agency }],
-        queryFn: ({ signal }) => getAllMobileMoney({ signal, agency: user.agency }),
-        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")
+    const [data, setData] = useState({
+        mobileMoney: []
     })
+
 
 
     const dialog = useRef()
@@ -47,6 +44,29 @@ export default function MobileMoneyPage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "financial" }))
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")) {
+            async function get(signal) {
+                const allMobileMonies = await getAllMobileMoney({ signal, agency: user?.agency })
+                let tb = []
+                let enterprise = {}
+                let operator = {}
+                for (let m of allMobileMonies) {
+                    enterprise = await getEnterpriseById({ id: m.enterprise, signal })
+                    operator = await getOperatorById({ id: m.operator, signal })
+                    m.enterprise = enterprise.slug
+                    m.operator = operator.slug
+                    tb.push(m)
+                }
+                setData(prev => {
+                    return {
+                        ...prev,
+                        mobileMoney: tb
+                    }
+                })
+
+            }
+            get()
+        }
     }, [menu, dispatch])
 
     return <>
@@ -54,7 +74,7 @@ export default function MobileMoneyPage() {
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("operator")}>Opérateurs</Submit> : undefined}
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("account")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={mobileMonies.header} emptyMessage="Aucun compte mobile money trouvé." globalFilterFields={mobileMonies.global} sheet="Compte mobile money" titleRef="Mise à jour informations d'un compte mobile money" size="lg:h-7/13 lg:w-4/15 xl:h-8/13" />
+        <Table data={data?.mobileMoney} headers={mobileMonies.header} emptyMessage="Aucun compte mobile money trouvé." globalFilterFields={mobileMonies.global} sheet="Compte mobile money" titleRef="Mise à jour informations d'un compte mobile money" size="lg:h-7/13 lg:w-4/15 xl:h-8/13" />
         <Modal ref={dialog} size="lg:h-6/12 lg:w-4/15" title="Créer une compte mobile money">
             <CreateMobileMoney />
         </Modal>

@@ -2,7 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { getAgencyById, getAllMvtCash, getArchiveBalance, getCashBySlug, getEnterpriseById, getPersonalById } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Submit from "../../layout/Submit.jsx"
 import Table from "../../layout/Table.jsx"
 import Modal from "../../layout/Modal.jsx";
@@ -25,19 +25,40 @@ export default function MvtCashPage() {
     const dispatch = useDispatch()
     const navigate = useNavigate()
     const menu = useSelector(state => state.identifier.menu)
-    const cash = user?.cashes[0] || 0
+    const [data, setData] = useState({
+        mvtCash: []
+    })
 
 
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "cash" }))
+        if (user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") || user.role.includes("ROLE_COMPTABLE")) {
+            async function get(signal) {
+                for (let cash of user.cashes) {
+                    const allMvtCash = await getAllMvtCash({ signal, enterprise: user.enterprise, agency: user.agency, cash: cash.key, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
+                    let tb = []
+                    let enterprise = {}
+                    let agency = {}
+                    for (let m of allMvtCash) {
+                        enterprise = await getEnterpriseById({ id: m.enterprise, signal })
+                        agency = await getAgencyById({ id: m.agency, signal })
+                        m.enterprise = enterprise.slug
+                        m.agency = agency.slug
+                        tb.push(m)
+                    }
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            mvtCash: tb
+                        }
+                    })
+                }
+            }
+            get()
+        }
     }, [menu, dispatch])
 
-    const { data } = useQuery({
-        queryKey: ["mvtCashes", { enterprise: user.enterprise, agency: user.agency, cash: cash.key, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() }],
-        queryFn: ({ signal }) => getAllMvtCash({ signal, enterprise: user.enterprise, agency: user.agency, cash: cash.key, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() }),
-        enabled: user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") || user.role.includes("ROLE_COMPTABLE")
-    })
 
 
     const dialog = useRef()
@@ -120,7 +141,7 @@ export default function MvtCashPage() {
             {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <Submit onClick={() => handleModal("new")}>Nouveau</Submit> : undefined}
             {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <Submit onClick={() => handleModal("report")}>Rapport</Submit> : undefined}
         </div>
-        <Table data={data} headers={mvtCashes.header} emptyMessage="Aucune opération trouvée." globalFilterFields={mvtCashes.global} sheet="mvt_caisse" titleRef="Visualiser un mouvement de caisse" size="lg:h-5/11 lg:w-4/15" />
+        <Table data={data?.mvtCash} headers={mvtCashes.header} emptyMessage="Aucune opération trouvée." globalFilterFields={mvtCashes.global} sheet="mvt_caisse" titleRef="Visualiser un mouvement de caisse" size="lg:h-5/11 lg:w-4/15" />
         <Modal ref={dialog} size="lg:h-7/15 lg:w-8/16" title="Créer une opération">
             <CreateMvtCash />
         </Modal>

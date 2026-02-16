@@ -1,7 +1,7 @@
 import { useAnimate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { convert, createSale, getAgencyById, getAgencyBySlug, getAllBankAccount, getAllCustomers, getAllLotById, getAllMobileMoney, getAllProducts, getAllSales, getAllServices, getAllStocks, getCategoryService, getCategoryServiceBySlug, getCustomerById, getCustomerBySlug, getEnterpriseById, getLotBySlug, getProductBySlug, getServiceById, getServiceBySlug, getStock, getStoreBySlug } from "../../utils/http.js";
+import { convert, createSale, getAgencyById, getAgencyBySlug, getAllBankAccount, getAllCustomers, getAllLotById, getAllMobileMoney, getAllPrints, getAllProducts, getAllSalePaymentsByCustomer, getAllSales, getAllServices, getAllStocks, getCategoryService, getCategoryServiceBySlug, getCustomerById, getCustomerBySlug, getEnterpriseById, getLotBySlug, getProductBySlug, getServiceById, getServiceBySlug, getStock, getStoreBySlug } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { noteActions } from "../../store/noteSlice.js";
@@ -9,12 +9,13 @@ import responseHttp from "../../utils/responseHttp.js"
 import Select from "../../layout/Select.jsx";
 import { paymentMethod } from "../../data/info.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faExclamationTriangle, faTrash, faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import { faExclamationTriangle, faPrint, faTrash, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../layout/Modal.jsx";
 import Notification from "../../layout/Notification.jsx";
 import CreateCustomer from "../customer/CreateCustomer.jsx";
 import { printActions } from "../../store/print.js";
 import { useNavigate } from "react-router-dom";
+import { identifierMenuActions } from "../../store/identifierSlice.js";
 
 export default function CreateSale() {
     const errorNotification = useSelector(state => state.note.error);
@@ -24,6 +25,8 @@ export default function CreateSale() {
     const dialog = useRef();
     const dialog1 = useRef();
     const dialog2 = useRef();
+    const dialog3 = useRef();
+    const dialog4 = useRef();
     const selectCategory = useRef();
     const selectService = useRef();
     const selectPaymentReceiver = useRef();
@@ -76,6 +79,8 @@ export default function CreateSale() {
         tax: 0,
         errors: [],
         disabled: false,
+        prints: [],
+        salePayments: []
 
     })
 
@@ -86,20 +91,30 @@ export default function CreateSale() {
             let tbEl = {
                 tb: [],
                 tb1: [],
-                tb2: []
+                tb2: [],
+                tb3: []
             }
             inputCash.current.value = cash
             async function get(signal) {
                 const allCategories = await getCategoryService();
                 const allProducts = await getAllProducts({ signal, enterprise: user.enterprise })
                 const allCustomers = await getAllCustomers({ signal, enterprise: user.enterprise })
+                const allPrints = await getAllPrints({ signal, enterprise: user.enterprise, agency: user.agency })
+
                 allCategories.forEach(c => {
                     tbEl.tb.push({ key: c.id, name: c.name, value: c.slug })
                 })
 
                 allProducts.forEach(p => {
-                    if (p.category === "PRODUITS") {
+                    if (p.category === "PRODUITS" || p.category === "PACQUET") {
                         tbEl.tb1.push({ key: p.id, name: p.name, value: p.slug })
+                    }
+
+                })
+
+                allPrints.forEach(p => {
+                    if (p.status === "ACTIVE") {
+                        tbEl.tb3.push({ key: p.id, name: p.type, value: p.type })
                     }
 
                 })
@@ -114,7 +129,8 @@ export default function CreateSale() {
                         category: tbEl.tb,
                         productList: tbEl.tb1,
                         customers: tbEl.tb2,
-                        stores: user.stores
+                        stores: user.stores,
+                        prints: tbEl.tb3,
                     }
                 })
 
@@ -174,12 +190,12 @@ export default function CreateSale() {
                 const sales = await getAllSales({ signal, enterprise: 0, agency: 0, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
                 const sale = sales[sales.length - 1]
 
+
                 const printSale = {
-                    enterprise: enterprise.name,
-                    date: new Date().toLocaleDateString(),
-                    agency: agency_.name,
+                    enterprise: enterprise_,
+                    agency: agency_,
                     ref: sale.ref,
-                    date: sale.date,
+                    date: new Date().toLocaleDateString(),
                     time: sale.time,
                     customer: customerData.lastName + " " + customerData.firstName,
                     products: data.products,
@@ -199,7 +215,8 @@ export default function CreateSale() {
                     }
 
                 })
-                navigate("/print-sale")
+                dialog4.current.open()
+
             }
             dispatch(noteActions.show());
             dispatch(noteActions.relaunch());
@@ -288,6 +305,19 @@ export default function CreateSale() {
         let tbEl = {
             tb: []
         }
+
+        if (identifier === "customer") {
+            const salePayments = await getAllSalePaymentsByCustomer({ signal, customer: value })
+
+            setData(prev => {
+                return {
+                    ...prev,
+                    salePayments,
+                }
+            })
+        }
+
+
         if (identifier === "category") {
             const category = await getCategoryServiceBySlug({ signal, slug: value })
             const services = await getAllServices({ signal, enterprise: user.enterprise, category: category.id })
@@ -392,7 +422,7 @@ export default function CreateSale() {
                     lots: tbEl.tb,
                 }
             })
-            inputPrice.current.value = product.price || 0
+            inputPrice.current.value = product.sellingPrice || 0
         }
 
 
@@ -437,7 +467,7 @@ export default function CreateSale() {
     }
 
 
-    function handleAdd(identifier) {
+    async function handleAdd(identifier, signal) {
 
         let errors = []
         if (identifier === "add") {
@@ -457,31 +487,46 @@ export default function CreateSale() {
                 errors.push("Veuillez sélectionner un moyen de réception")
             }
 
+            if (selectService.current.value === "ventes") {
+                if (selectProduct.current.value === "Sélectionner un produit") {
+                    errors.push("Veuillez sélectionner un produit")
+                }
 
-            if (selectService.current.value === "ventes" && selectProduct.current.value === "Sélectionner un produit") {
-                errors.push("Veuillez sélectionner un produit")
+                if (selectStore.current.value === "Sélectionner un magasin") {
+                    errors.push("Veuillez sélectionner un magasin")
+                }
+
+                if (selectLot.current.value === "Sélectionner un lot") {
+                    errors.push("Veuillez sélectionner un lot")
+                }
+
+                const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
+                const agency = await getAgencyById({ id: user.agency, signal })
+                const store = await getStoreBySlug({ slug: selectStore.current.value, signal })
+                const lot = await getLotBySlug({ signal, slug: selectLot.current.value })
+                const product = await getProductBySlug({ signal, slug: selectProduct.current.value })
+                const stock = await getStock({ signal, enterprise: enterprise.id, agency: agency.id, storePrincipal: 0, store: store.id, product: product.id, lot: lot.id })
+
+                if (inputQuantity.current.value > Number(stock.stock)) {
+                    errors.push("Le stock de " + selectProduct.current.value + " est insuffisant dans le magasin " + selectStore.current.value)
+                }
+
+
+
+                if (inputQuantity.current.value === "" || inputQuantity.current.value <= 0) {
+                    errors.push("Veuillez renseigner une quantité valida")
+                }
+
+                if (inputPrice.current.value === "" || inputPrice.current.value <= 0) {
+                    errors.push("Veuillez renseigner le prix")
+                }
+
+                if ((Number(product.stock) - Number(inputQuantity.current.value)) <= product.securityStock) {
+                    dialog3.current.open()
+                }
             }
 
-            if (selectService.current.value === "ventes" && selectStore.current.value === "Sélectionner un magasin") {
-                errors.push("Veuillez sélectionner un magasin")
-            }
 
-            if (selectService.current.value === "ventes" && selectLot.current.value === "Sélectionner un lot") {
-                errors.push("Veuillez sélectionner un lot")
-            }
-
-
-            if (selectService.current.value === "ventes" && inputQuantity.current.value > inputStock.current.value) {
-                errors.push("Le stock de " + selectProduct.current.value + " est insuffisant dans le magasin " + selectStore.current.value)
-            }
-
-            if (inputQuantity.current.value === "" || inputQuantity.current.value <= 0) {
-                errors.push("Veuillez renseigner la quantité")
-            }
-
-            if (inputPrice.current.value === "" || inputPrice.current.value <= 0) {
-                errors.push("Veuillez renseigner le prix")
-            }
         }
 
 
@@ -523,7 +568,7 @@ export default function CreateSale() {
         })
 
 
-        if (inputPriceHT.current !== undefined) {
+        if (data.products.length > 0) {
             inputPriceHT.current.value = priceHT || 0
             inputPriceTtc.current.value = priceTTC || 0
             inputRest.current.value = Number(inputPriceTtc.current.value) - Number(inputPayment.current.value)
@@ -591,6 +636,10 @@ export default function CreateSale() {
         }
     }
 
+    function handleSelectionPrint(value) {
+        dispatch(identifierMenuActions.updatePrint({ print: value }))
+        navigate("/print-sale")
+    }
 
 
     return <>
@@ -727,6 +776,7 @@ export default function CreateSale() {
 
 
                 }
+                {data?.salePayments.length > 0 && <h1>Hello</h1>}
             </div>
 
         </div >
@@ -744,6 +794,25 @@ export default function CreateSale() {
         <Modal ref={dialog2} title="Créer un nouveau client" size="lg:h-5/9 lg:w-8/15">
             <CreateCustomer />
         </Modal>
+
+
+        <Modal ref={dialog3} title="Alerte stock" size="h-1/5">
+            <p className="mb-4"><FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />Attention le stock de sécurité est atteint. Veuillez approvisionner votre stock</p>
+            <Submit onClick={() => dialog3.current.close()}>Fermer</Submit>
+        </Modal>
+
+        <Modal ref={dialog4} title="Sélection du format d'impression" size="h-2/5 ">
+            {data.prints.length > 0 ? <div className="flex flex-col items-center justify-center gap-4 mb-4">
+                {data.prints.map(p => <button key={p.id} className="text-sky-50 bg-sky-950 font-bold p-2 border rounded w-full cursor-pointer shadow-sky-950 shadow-md hover:bg-sky-50 hover:text-sky-950" onClick={(e) => handleSelectionPrint(e.target.textContent)}>
+                    <FontAwesomeIcon icon={faPrint} className="me-2"></FontAwesomeIcon>
+                    {p.name}
+                </button>)}
+            </div> : <button className="text-sky-50 bg-sky-950 font-bold p-2 border rounded w-full cursor-pointer shadow-sky-950 shadow-md hover:bg-sky-50 hover:text-sky-950" onClick={(e) => handleSelectionPrint(e.target.textContent)}>
+                IMPRIMANTE_LASER
+            </button>}
+            <Submit onClick={() => dialog4.current.close()}>Fermer</Submit>
+        </Modal>
+
 
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>

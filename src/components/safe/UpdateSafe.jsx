@@ -28,23 +28,26 @@ export default function UpdateSafe() {
     })
     const id = useSelector(state => state.modal.value)
     useEffect(() => {
-        async function get(signal) {
-            if (user.role.includes("ROLE_ADMIN") && id != "" || user.role.includes("ROLE_COMPTABLE") && id != "") {
-                const safe = await getSafeById({ id, signal })
-                const enterprise = await getEnterpriseById({ id: safe.enterprise, signal })
-                const agency = await getAgencyById({ id: safe.agency, signal })
-                setData(prev => {
-                    return {
-                        ...prev,
-                        enterprise: enterprise.slug,
-                        agency: agency.slug,
-                        slug: safe.slug,
-                        name: safe.name,
-                    }
-                })
+        if (id != "") {
+            async function get(signal) {
+                if (user.role.includes("ROLE_ADMIN") && id != "" || user.role.includes("ROLE_COMPTABLE") && id != "") {
+                    const safe = await getSafeById({ id, signal })
+                    const enterprise = await getEnterpriseById({ id: safe.enterprise, signal })
+                    const agency = await getAgencyById({ id: safe.agency, signal })
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            enterprise: enterprise.slug,
+                            agency: agency.slug,
+                            slug: safe.slug,
+                            name: safe.name,
+                        }
+                    })
+                }
             }
+            get()
         }
-        get()
+
 
     }, [id])
 

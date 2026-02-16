@@ -37,6 +37,15 @@ export default function FormAuth() {
   const memo = localStorage.getItem("memo");
 
   async function handleSubmit(prevState, formData, signal) {
+    const userExist = localStorage.getItem("user")
+    const tokenExist = localStorage.getItem("token")
+    if (userExist != null) {
+      localStorage.removeItem('user')
+    }
+
+    if (tokenExist != null) {
+      localStorage.removeItem('token')
+    }
     const username = formData.get("username");
     USERNAME = username;
     const password = formData.get("password");

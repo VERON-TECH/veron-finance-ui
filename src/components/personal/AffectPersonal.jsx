@@ -180,16 +180,16 @@ export default function AffectPersonal({ id }) {
 
 
 
-    return <>
-        <div className="flex justify-center">
+    return <div className="flex flex-col items-center">
+        <div>
             <Select label="Type de transfert *" id="type" name="type" selectedTitle="Sélectionner un type de transfert" data={typeTransfer} onChange={(e) => handleChange("type", e.target.value)} />
 
         </div>
 
-        <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
+        <form action={formAction} className="rounded-lg text-sky-50  flex items-center flex-col" ref={scope}>
             {data?.type === "ENTREPRISE-->ENTREPRISE" && user?.role.includes("ROLE_ADMIN") ? <>
-                <Select label="Entreprise de départ*" id="enterprise01" name="enterprise01" selectedTitle="Sélectionner l'entreprise de départ" data={data?.enterprise01} ref={selectEnterprise01} onChange={(e) => handleChange("enterprise01", e.target.value)} />
-                <Select label="Entreprise d'arrivée*" id="enterprise02" name="enterprise02" selectedTitle="Sélectionner l'entrerpise d'arrivée" data={data?.enterprise02} ref={selectEnterprise02} />
+                <Select label="Départ *" id="enterprise01" name="enterprise01" selectedTitle="Sélectionner l'entreprise de départ" data={data?.enterprise01} ref={selectEnterprise01} onChange={(e) => handleChange("enterprise01", e.target.value)} />
+                <Select label="Arrivée *" id="enterprise02" name="enterprise02" selectedTitle="Sélectionner l'entrerpise d'arrivée" data={data?.enterprise02} ref={selectEnterprise02} />
             </>
                 : undefined}
 
@@ -205,5 +205,5 @@ export default function AffectPersonal({ id }) {
             </Submit> : undefined}
         </form>
 
-    </>
+    </div>
 }

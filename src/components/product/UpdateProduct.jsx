@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createProduct, getEnterpriseById, getProductById, queryClient, updateProduct } from "../../utils/http";
+import { getEnterpriseById, getProductById, queryClient, updateProduct } from "../../utils/http";
 import Select from "../../layout/Select.jsx"
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
@@ -13,6 +13,7 @@ import { categoryProduct } from "../../data/info.js";
 
 export default function UpdateProduct() {
     const id = useSelector(state => state.modal.value)
+    const user = JSON.parse(localStorage.getItem("user"))
     const selectCategory = useRef();
     const inputName = useRef();
     const inputSellingPrice = useRef();
@@ -169,9 +170,9 @@ export default function UpdateProduct() {
 
             </div>
 
-            <Submit>
+            {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit>
                 Enregistrer
-            </Submit>
+            </Submit> : undefined}
         </form>
 
 

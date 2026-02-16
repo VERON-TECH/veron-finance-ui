@@ -2,14 +2,14 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { activateUser, getAuthoritiByUsername, getEnterpriseBySlug, getUserById } from "../../utils/http";
+import { activateUser, getAuthoritiByUsername, getEnterpriseBySlug, getUserById, reinitialize } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
 import Modal from "../../layout/Modal.jsx";
 import AttributeRole from "./AttributeRole.jsx";
-import ReinitialisationUser from "./ReinitilisationUser.jsx";
+import { modalActions } from "../../store/modalSlice.js";
 
 export default function UpdateUser() {
     const id = useSelector(state => state.modal.value)
@@ -33,6 +33,7 @@ export default function UpdateUser() {
         connected: false,
         authorities: [],
         isAttribute: false,
+        enabled: false
     })
 
 
@@ -58,6 +59,7 @@ export default function UpdateUser() {
                         connected,
                         authorities,
                         isAttribute,
+                        enabled: user.enabled
                     }
                 })
             }
@@ -66,9 +68,10 @@ export default function UpdateUser() {
 
     }, [id])
 
-    async function handleClick(identifer, value) {
+    async function handleClick(identifer, value, signal) {
         if (identifer === "enabled") {
-            if (value === "on") {
+
+            if (value === true) {
                 const responseData = await activateUser(data?.user?.username)
                 const state = responseHttp(responseData);
                 if (state) {
@@ -82,7 +85,7 @@ export default function UpdateUser() {
 
             }
 
-            if (value === "off") {
+            if (value === false) {
                 const responseData = await activateUser(data?.user?.username)
                 const state = responseHttp(responseData);
                 if (state) {
@@ -95,6 +98,29 @@ export default function UpdateUser() {
                 dispatch(noteActions.sendData(responseData))
 
             }
+
+            const user = await getUserById({ id, signal })
+            if (user.username === userData.username) {
+                connected = true
+            }
+            const authorities = await getAuthoritiByUsername(user.username)
+            const enterprise = await getEnterpriseBySlug({ slug: user.username, signal })
+            let tb = [enterprise]
+            let isAttribute = false
+            let connected = false
+            if (tb[0].includes("Impossible de recupérer les données")) {
+                isAttribute = true
+            }
+            setData(prev => {
+                return {
+                    ...prev,
+                    user,
+                    connected,
+                    authorities,
+                    isAttribute,
+                    enabled: user.enabled
+                }
+            })
         }
     }
 
@@ -105,6 +131,30 @@ export default function UpdateUser() {
             dialog1.current.open()
         }
 
+    }
+
+    async function handleReinitialize() {
+        async function get() {
+            const responseData = await reinitialize(data?.user.username)
+
+            const state = responseHttp(responseData);
+            if (state) {
+                dispatch(noteActions.error(true))
+            } else {
+                dispatch(noteActions.error(false))
+            }
+            dispatch(noteActions.show());
+            dispatch(noteActions.relaunch());
+            dispatch(noteActions.sendData(responseData))
+            dialog1.current.close()
+
+        }
+        get()
+
+    }
+
+    function handleCloseModal() {
+        dialog1.current.close()
     }
 
 
@@ -127,8 +177,8 @@ export default function UpdateUser() {
             </div>
 
             {!data.connected && <div className="flex justify-between gap-2">
-                <Input label="Actif" id="enabled" type="checkBox" checked={data?.user?.enabled} name="enabled" className="border border-sky-950" onClick={(e) => handleClick("enabled", e.target.value)} ref={inputEnabled} />
-                <Input label="Connecté" id="connected" type="checkBox" checked={data?.user?.connected} name="connected" className="border border-sky-950" onClick={(e) => handleClick("connected", e.target.value)} ref={inputConnected} />
+                <Input label="Actif" id="enabled" type="checkBox" checked={data?.enabled == true ? true : false} name="enabled" className="border border-sky-950" onClick={(e) => handleClick("enabled", e.target.checked)} ref={inputEnabled} />
+                <Input label="Connecté" id="connected" type="checkBox" checked={data?.user?.connected == true ? true : false} name="connected" className="border border-sky-950" onClick={(e) => handleClick("connected", e.target.value)} ref={inputConnected} />
             </div>}
 
             {data.authorities.length > 0 && <div className="border flex justify-center mb-4">
@@ -163,11 +213,21 @@ export default function UpdateUser() {
         </div>
 
         <Modal ref={dialog} size="lg:h-3/11 lg:w-4/15" title="Attribuer un rôle" >
-            <AttributeRole username={data?.user?.username} />
+            <AttributeRole username={data?.user.username} />
         </Modal>
 
         <Modal ref={dialog1} size="lg:h-3/15 lg:w-5/16" title="Réinitialiser le mot de passe" >
-            <ReinitialisationUser username={data?.user?.username} />
+            <p className="text-center">Souhaitez-vous vraiment réinitialiser l'utilisateur {data?.user.username}?</p>
+            <form>
+                <div className="flex justify-center gap-4 mt-4">
+                    <Submit formAction={handleReinitialize}>
+                        Oui
+                    </Submit>
+                    <Submit formAction={handleCloseModal}>
+                        Non
+                    </Submit>
+                </div>
+            </form>
         </Modal>
 
 

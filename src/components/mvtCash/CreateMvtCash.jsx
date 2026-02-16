@@ -157,184 +157,179 @@ export default function CreateMvtCash() {
             })
         }
         if (identifier === "typeCash") {
-            async function get(signal) {
-                if (value === "APPRO_CAISSE_EN_ENTREE") {
-                    const mvtCash = await getAllMvtCashByRef({ signal, enterprise: user.enterprise, agency: user.agency })
-                    mvtCash.forEach(m => {
-                        if (m.type === "APPRO_CAISSE_EN_SORTIE" && m.validated === false) {
-                            tb.push({ key: m.id, name: m.ref, value: m.slug })
-                        }
-                    })
-                    setData(prev => {
-                        return {
-                            ...prev,
-                            motif: tb,
-                            sens: [{ key: 0, name: "ENCAISSEMENT", value: "ENCAISSEMENT" }],
-                            isSelected: true
-                        }
-                    })
-                }
-                if (value === "APPRO_CAISSE_EN_SORTIE") {
-                    const cashes = await getAllCashes({ signal, enterprise: user.enterprise, agency: user.agency })
-                    cashes.forEach(c => {
-                        if (c.slug != selectCash.current.value) {
-                            tb.push({ key: c.id, name: c.name, value: c.slug })
-                        }
+            if (value === "APPRO_CAISSE_EN_ENTREE") {
+                const mvtCash = await getAllMvtCashByRef({ signal, enterprise: user.enterprise, agency: user.agency })
+                mvtCash.forEach(m => {
+                    if (m.type === "APPRO_CAISSE_EN_SORTIE" && m.validated === false) {
+                        tb.push({ key: m.id, name: m.ref, value: m.slug })
+                    }
+                })
+                setData(prev => {
+                    return {
+                        ...prev,
+                        motif: tb,
+                        sens: [{ key: 0, name: "ENCAISSEMENT", value: "ENCAISSEMENT" }],
+                        isSelected: true
+                    }
+                })
+            }
+            if (value === "APPRO_CAISSE_EN_SORTIE") {
+                const cashes = await getAllCashes({ signal, enterprise: user.enterprise, agency: user.agency })
+                cashes.forEach(c => {
+                    if (c.slug != selectCash.current.value) {
+                        tb.push({ key: c.id, name: c.name, value: c.slug })
+                    }
 
-                    })
+                })
 
-                    setData(prev => {
-                        return {
-                            ...prev,
-                            motif: tb,
-                            sens: [{ key: 0, name: "DECAISSEMENT", value: "DECAISSEMENT" }],
-                            isSelected: true
-                        }
-                    })
-                }
-                if (value === "APPRO_CAISSE_VIA_LA_BANQUE") {
-                    const bankAccounts = await getAllBankAccount({ signal, agency: user.agency })
-                    bankAccounts.forEach(b => {
-                        tb.push({ key: b.id, name: b.rib, value: b.slug })
-                    })
+                setData(prev => {
+                    return {
+                        ...prev,
+                        motif: tb,
+                        sens: [{ key: 0, name: "DECAISSEMENT", value: "DECAISSEMENT" }],
+                        isSelected: true
+                    }
+                })
+            }
+            if (value === "APPRO_CAISSE_VIA_LA_BANQUE") {
+                const bankAccounts = await getAllBankAccount({ signal, agency: user.agency })
+                bankAccounts.forEach(b => {
+                    tb.push({ key: b.id, name: b.rib, value: b.slug })
+                })
 
-                    setData(prev => {
-                        return {
-                            ...prev,
-                            motif: tb,
-                            sens: [{ key: 0, name: "ENCAISSEMENT", value: "ENCAISSEMENT" }],
-                            isSelected: true
-                        }
-                    })
-                }
+                setData(prev => {
+                    return {
+                        ...prev,
+                        motif: tb,
+                        sens: [{ key: 0, name: "ENCAISSEMENT", value: "ENCAISSEMENT" }],
+                        isSelected: true
+                    }
+                })
+            }
 
-                if (value === "RETRAIT_POUR_VERSEMENT_BANQUE") {
-                    const bankAccounts = await getAllBankAccount({ signal, agency: user.agency })
-                    bankAccounts.forEach(b => {
-                        tb.push({ key: b.id, name: b.rib, value: b.slug })
-                    })
+            if (value === "RETRAIT_POUR_VERSEMENT_BANQUE") {
+                const bankAccounts = await getAllBankAccount({ signal, agency: user.agency })
+                bankAccounts.forEach(b => {
+                    tb.push({ key: b.id, name: b.rib, value: b.slug })
+                })
 
-                    setData(prev => {
-                        return {
-                            ...prev,
-                            motif: tb,
-                            sens: [{ key: 0, name: "DECAISSEMENT", value: "DECAISSEMENT" }],
-                            isSelected: true
-                        }
-                    })
-                }
-
-
-                if (value === "APPRO_CAISSE_VIA_COMPTE_MOBILE_MONEY") {
-                    const mobileMoney = await getAllMobileMoney({ signal, agency: user.agency })
-                    mobileMoney.forEach(m => {
-                        tb.push({ key: m.id, name: m.phone, value: m.slug })
-                    })
-
-                    setData(prev => {
-                        return {
-                            ...prev,
-                            motif: tb,
-                            sens: [{ key: 0, name: "ENCAISSEMENT", value: "ENCAISSEMENT" }],
-                            isSelected: true
-                        }
-                    })
-                }
-                if (value === "RETRAIT_POUR_APPRO_COMPTE_MOBILE_MONEY") {
-                    const mobileMoney = await getAllMobileMoney({ signal, agency: user.agency })
-                    mobileMoney.forEach(m => {
-                        tb.push({ key: m.id, name: m.phone, value: m.slug })
-                    })
-
-                    setData(prev => {
-                        return {
-                            ...prev,
-                            motif: tb,
-                            sens: [{ key: 0, name: "ENCAISSEMENT", value: "ENCAISSEMENT" }],
-                            isSelected: true
-                        }
-                    })
-                }
-                if (value === "REGLEMENT_BON_DE_COMMANDE") {
-                    const purchaseOrder = await getAllPurchaseOrders({ signal, enterprise: user.enterprise, agency: user.agency })
-                    purchaseOrder.forEach(p => {
-                        if (p.statusPurchase === "CONFIRME") {
-                            tb.push({ key: p.id, name: p.ref, value: p.slug })
-                        }
-
-                    })
-
-                    setData(prev => {
-                        return {
-                            ...prev,
-                            motif: tb,
-                            sens: [{ key: 0, name: "DECAISSEMENT", value: "DECAISSEMENT" }],
-                            isSelected: true
-                        }
-                    })
-                }
-                if (value === "CONSTAT_EXCEDENT") {
-                    setData(prev => {
-                        return {
-                            ...prev,
-                            motif: ["CONSTAT EXCEDENT"],
-                            sens: [{ key: 0, name: "ENCAISSEMENT", value: "ENCAISSEMENT" }],
-                            isSelected: false,
-                            labelPrincipal: "Principal *",
-                            labelFee: "Frais",
-                            disabled: false
-                        }
-                    })
-                }
-                if (value === "CONSTAT_MANQUANT") {
-                    setData(prev => {
-                        return {
-                            ...prev,
-                            motif: ["CONSTAT MANQUANT"],
-                            sens: [{ key: 0, name: "DECAISSEMENT", value: "DECAISSEMENT" }],
-                            isSelected: false,
-                            labelPrincipal: "Principal *",
-                            labelFee: "Frais",
-                            disabled: false
-                        }
-                    })
-                }
-                if (value === "ANNULATION_CONSTAT_EXCEDENT") {
-                    const surplus = await getAllSurplus({ signal, personal: user.personal })
-                    surplus.forEach(s => {
-                        tb.push({ key: s.id, name: s.ref, value: s.slug })
-                    })
-
-                    setData(prev => {
-                        return {
-                            ...prev,
-                            motif: tb,
-                            sens: [{ key: 0, name: "DECAISSEMENT", value: "DECAISSEMENT" }],
-                            isSelected: true
-                        }
-                    })
-                }
-                if (value === "DEPENSES") {
-                    const budgets = await getAllBudgets({ signal, enterprise: user.enterprise, agency: user.agency })
-                    budgets.forEach(b => {
-                        if (b.statusBudget === "ACTIVE") {
-
-                            tb.push({ key: b.id, name: b.period, value: p.period })
-                        }
-                    })
-
-                    setData(prev => {
-                        return {
-                            ...prev,
-                            motif: tb,
-                            sens: [{ key: 0, name: "DECAISSEMENT", value: "DECAISSEMENT" }],
-                            isSelected: true
-                        }
-                    })
-                }
-                get()
+                setData(prev => {
+                    return {
+                        ...prev,
+                        motif: tb,
+                        sens: [{ key: 0, name: "DECAISSEMENT", value: "DECAISSEMENT" }],
+                        isSelected: true
+                    }
+                })
+            }
 
 
+            if (value === "APPRO_CAISSE_VIA_COMPTE_MOBILE_MONEY") {
+                const mobileMoney = await getAllMobileMoney({ signal, agency: user.agency })
+                mobileMoney.forEach(m => {
+                    tb.push({ key: m.id, name: m.phone, value: m.slug })
+                })
+
+                setData(prev => {
+                    return {
+                        ...prev,
+                        motif: tb,
+                        sens: [{ key: 0, name: "ENCAISSEMENT", value: "ENCAISSEMENT" }],
+                        isSelected: true
+                    }
+                })
+            }
+            if (value === "RETRAIT_POUR_APPRO_COMPTE_MOBILE_MONEY") {
+                const mobileMoney = await getAllMobileMoney({ signal, agency: user.agency })
+                mobileMoney.forEach(m => {
+                    tb.push({ key: m.id, name: m.phone, value: m.slug })
+                })
+
+                setData(prev => {
+                    return {
+                        ...prev,
+                        motif: tb,
+                        sens: [{ key: 0, name: "ENCAISSEMENT", value: "ENCAISSEMENT" }],
+                        isSelected: true
+                    }
+                })
+            }
+            if (value === "REGLEMENT_BON_DE_COMMANDE") {
+                const purchaseOrder = await getAllPurchaseOrders({ signal, enterprise: user.enterprise, agency: user.agency })
+                purchaseOrder.forEach(p => {
+                    if (p.statusPurchase === "CONFIRME") {
+                        tb.push({ key: p.id, name: p.ref, value: p.slug })
+                    }
+
+                })
+
+                setData(prev => {
+                    return {
+                        ...prev,
+                        motif: tb,
+                        sens: [{ key: 0, name: "DECAISSEMENT", value: "DECAISSEMENT" }],
+                        isSelected: true
+                    }
+                })
+            }
+            if (value === "CONSTAT_EXCEDENT") {
+                setData(prev => {
+                    return {
+                        ...prev,
+                        motif: ["CONSTAT EXCEDENT"],
+                        sens: [{ key: 0, name: "ENCAISSEMENT", value: "ENCAISSEMENT" }],
+                        isSelected: false,
+                        labelPrincipal: "Principal *",
+                        labelFee: "Frais",
+                        disabled: false
+                    }
+                })
+            }
+            if (value === "CONSTAT_MANQUANT") {
+                setData(prev => {
+                    return {
+                        ...prev,
+                        motif: ["CONSTAT MANQUANT"],
+                        sens: [{ key: 0, name: "DECAISSEMENT", value: "DECAISSEMENT" }],
+                        isSelected: false,
+                        labelPrincipal: "Principal *",
+                        labelFee: "Frais",
+                        disabled: false
+                    }
+                })
+            }
+            if (value === "ANNULATION_CONSTAT_EXCEDENT") {
+                const surplus = await getAllSurplus({ signal, personal: user.personal })
+                surplus.forEach(s => {
+                    tb.push({ key: s.id, name: s.ref, value: s.slug })
+                })
+
+                setData(prev => {
+                    return {
+                        ...prev,
+                        motif: tb,
+                        sens: [{ key: 0, name: "DECAISSEMENT", value: "DECAISSEMENT" }],
+                        isSelected: true
+                    }
+                })
+            }
+            if (value === "DEPENSES") {
+                const budgets = await getAllBudgets({ signal, enterprise: user.enterprise, agency: user.agency })
+                budgets.forEach(b => {
+                    if (b.statusBudget === "ACTIVE") {
+
+                        tb.push({ key: b.id, name: b.period, value: b.period })
+                    }
+                })
+
+                setData(prev => {
+                    return {
+                        ...prev,
+                        motif: tb,
+                        sens: [{ key: 0, name: "DECAISSEMENT", value: "DECAISSEMENT" }],
+                        isSelected: true
+                    }
+                })
 
 
             }
@@ -561,7 +556,7 @@ export default function CreateMvtCash() {
                     }
                 })
             }
-            get()
+
         }
         if (identifier === "motif") {
             async function get(signal) {

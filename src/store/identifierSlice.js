@@ -13,7 +13,7 @@ if (user?.role.includes("ROLE_ADMIN")) {
 
 const identifierSlice = createSlice({
   name: "identifier",
-  initialState: { menu: menu, title: title, customer: {} },
+  initialState: { menu: menu, title: title, customer: {}, print: "" },
   reducers: {
     updateMenu(state, action) {
       state.menu = action.payload.menu;
@@ -24,6 +24,9 @@ const identifierSlice = createSlice({
 
     updateCustomer(state, action) {
       state.customer = action.payload.customer
+    },
+    updatePrint(state, action) {
+      state.print = action.payload.print
     }
 
   }

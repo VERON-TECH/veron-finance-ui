@@ -1133,3 +1133,27 @@ export const sales = {
 }
 
 
+
+export const prints = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Type", field: "type" },
+        { key: 4, header: "Statut", field: "status" },
+
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Type",
+        "Statut",
+    ]
+
+}
+
+

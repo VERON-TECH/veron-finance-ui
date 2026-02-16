@@ -1,7 +1,7 @@
 import { NavLink } from "react-router";
 import Logo from "../../layout/Logo";
 import { features } from "../../data/menu.js";
-import { faArchive, faArrowRightArrowLeft, faCartShopping, faDashboard, faHome, faMoneyBill, faMoneyBillTrendUp, faProjectDiagram, faShop, faStore, faToolbox, faUserGroup, faUserLarge, faWallet } from "@fortawesome/free-solid-svg-icons";
+import { faArchive, faArrowRightArrowLeft, faCartShopping, faDashboard, faHome, faKey, faMoneyBill, faMoneyBillTrendUp, faProjectDiagram, faShop, faStore, faToolbox, faUserGroup, faUserLarge, faWallet } from "@fortawesome/free-solid-svg-icons";
 import { faDatabase } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { motion } from "framer-motion";
@@ -24,7 +24,7 @@ export default function Nav() {
 
   return <motion.nav className="bg-sky-950 text-sky-50 w-2/15 h-screen fixed left-0" layout >
     <Logo size="w-64" position="absolute left-1/2 transform -translate-x-1/2" />
-    <motion.ul className="absolute top-35 p-4 flex flex-col gap-10" variants={{ visible: { opacity: 1, x: 0 }, hidden: { opacity: 0, x: -100 } }} initial="hidden" animate="visible" exit="hidden" transition={{ duration: 3, type: "spring", bounce: 0.5, staggerChildren: 0.05 }}>
+    <motion.ul className="absolute top-35 p-4 flex flex-col gap-8" variants={{ visible: { opacity: 1, x: 0 }, hidden: { opacity: 0, x: -100 } }} initial="hidden" animate="visible" exit="hidden" transition={{ duration: 3, type: "spring", bounce: 0.5, staggerChildren: 0.05 }}>
       {data.map(feature =>
         <motion.li initial="hidden" animate="visible" exit="hidden" key={feature.key}>
           <NavLink
@@ -46,6 +46,7 @@ export default function Nav() {
             {feature.menu === "Gestion Budgétaire" && <FontAwesomeIcon icon={faMoneyBillTrendUp} className="me-2" />}
             {feature.menu === "Engagements" && <FontAwesomeIcon icon={faProjectDiagram} className="me-2" />}
             {feature.menu === "Ventes" && <FontAwesomeIcon icon={faCartShopping} className="me-2" />}
+            {feature.menu === "Mot de passe" && <FontAwesomeIcon icon={faKey} className="me-2" />}
             {feature.menu}
           </NavLink>
 

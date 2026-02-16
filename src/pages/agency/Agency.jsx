@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllAgencies } from "../../utils/http";
+import { getAllAgencies, getEnterpriseById } from "../../utils/http";
 import { agencies } from "../../data/dataTable.js";
 import Notification from "../../layout/Notification.jsx"
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Submit from "../../layout/Submit.jsx"
 import Table from "../../layout/Table.jsx"
 import Modal from "../../layout/Modal.jsx";
@@ -20,12 +20,8 @@ export default function AgencyPage() {
     const dataItem = useSelector(state => state.note.dataItem)
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
-
-
-    const { data } = useQuery({
-        queryKey: ["agencies"],
-        queryFn: getAllAgencies,
-        enabled: user.role.includes("ROLE_ADMIN")
+    const [data, setData] = useState({
+        agency: []
     })
 
 
@@ -37,13 +33,34 @@ export default function AgencyPage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "administration" }))
+        if (user.role.includes("ROLE_ADMIN")) {
+            async function get(signal) {
+                const allAgencies = await getAllAgencies()
+                let tb = []
+                let enterprise = {}
+                for (let a of allAgencies) {
+                    enterprise = await getEnterpriseById({ id: a.enterprise, signal })
+                    a.enterprise = enterprise.slug
+                    tb.push(a)
+                }
+                setData(prev => {
+                    return {
+                        ...prev,
+                        agency: tb
+                    }
+                })
+
+            }
+            get()
+        }
+
     }, [menu, dispatch])
 
     return <>
         <div className="flex justify-center mb-2">
             {user.role.includes("ROLE_ADMIN") && <Submit onClick={handleModal}>Nouveau</Submit>}
         </div>
-        <Table data={data} headers={agencies.header} emptyMessage="Aucune agence trouvée." globalFilterFields={agencies.global} sheet="Agences" titleRef="Mise à jour informations de l'agence" size="lg:h-7/11 lg:w-5/15" />
+        <Table data={data?.agency} headers={agencies.header} emptyMessage="Aucune agence trouvée." globalFilterFields={agencies.global} sheet="Agences" titleRef="Mise à jour informations de l'agence" size="lg:h-7/11 lg:w-5/15" />
         <Modal ref={dialog} size="lg:h-6/10 lg:w-5/15" title="Créer une agence">
             <CreateAgency />
         </Modal>

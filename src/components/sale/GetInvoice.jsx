@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAgencyById, getAllCustomers, getAllSales, getCustomerById, getEnterpriseById, getInvoiceById, getSafeById, getSaleById, queryClient, updateSafe } from "../../utils/http";
+import { getAgencyById, getAllCustomers, getAllSales, getCustomerById, getInvoiceById, getSaleById } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import Modal from "../../layout/Modal.jsx";

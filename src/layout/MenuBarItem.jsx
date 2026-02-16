@@ -2,7 +2,7 @@ import { useDispatch } from "react-redux";
 import { NavLink } from "react-router";
 import { modalActions } from "../store/modalSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowCircleDown, faArrowRightArrowLeft, faBank, faBuilding, faCalendarDay, faCalendarTimes, faCartPlus, faCashRegister, faCoins, faFileInvoice, faGlobe, faHome, faMinus, faMoneyBillTransfer, faPerson, faPersonArrowDownToLine, faPhoneAlt, faSave, faShop, faShoppingBag, faShoppingCart, faSquarePlus, faStore, faStoreAlt, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faArrowCircleDown, faArrowRightArrowLeft, faBank, faBuilding, faCalendarDay, faCalendarTimes, faCartPlus, faCashRegister, faCoins, faFileInvoice, faGlobe, faHome, faKey, faMinus, faMoneyBillTransfer, faPerson, faPersonArrowDownToLine, faPhoneAlt, faSave, faShop, faShoppingBag, faShoppingCart, faSquarePlus, faStore, faStoreAlt, faUser } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -42,6 +42,7 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
     {title === "Manquants" && < FontAwesomeIcon icon={faMinus} className="me-4" />}
     {title === "Excédents" && < FontAwesomeIcon icon={faSquarePlus} className="me-4" />}
     {title === "Journalier" && < FontAwesomeIcon icon={faCalendarDay} className="me-4" />}
+    {title === "Modifier le mot de passe" && < FontAwesomeIcon icon={faKey} className="me-4" />}
     {title}
   </NavLink >
 }

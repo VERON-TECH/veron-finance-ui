@@ -37,6 +37,9 @@ import UpdateBudget from '../components/budget/UpdateBudget';
 import UpdateSupplier from '../components/supplier/UpdateSupplier';
 import UpdatePurchaseOrder from '../components/purchase/UpdatePurchaseOrder';
 import GetInvoice from '../components/sale/GetInvoice';
+import UpdatePrint from '../components/setting/UpdatePrint';
+import GetStock from '../components/stock/GetStock';
+import GetMvtStock from '../components/store/GetMvtStock';
 
 
 
@@ -247,6 +250,23 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
         {titleRef === "Visualiser les factures" &&
           <GetInvoice />
         }
+
+        {titleRef === "Mise à jour informations d'une imprimante" &&
+          <UpdatePrint />
+        }
+
+        {titleRef === "Informations sur le stock" &&
+          <GetStock />
+        }
+
+        {titleRef === "Informations sur un mouvement de stock" &&
+          <GetMvtStock />
+        }
+
+
+
+
+
 
 
 

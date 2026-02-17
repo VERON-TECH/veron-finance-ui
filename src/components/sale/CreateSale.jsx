@@ -1,7 +1,7 @@
 import { useAnimate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { convert, createSale, getAgencyById, getAgencyBySlug, getAllBankAccount, getAllCustomers, getAllLotById, getAllMobileMoney, getAllPrints, getAllProducts, getAllSalePaymentsByCustomer, getAllSales, getAllServices, getAllStocks, getCategoryService, getCategoryServiceBySlug, getCustomerById, getCustomerBySlug, getEnterpriseById, getLotBySlug, getProductBySlug, getServiceById, getServiceBySlug, getStock, getStoreBySlug } from "../../utils/http.js";
+import { convert, createSale, getAgencyById, getAllBankAccount, getAllCustomers, getAllLotById, getAllMobileMoney, getAllPrints, getAllProducts, getAllSalePaymentsByCustomer, getAllSales, getAllServices, getAllStocks, getCategoryService, getCategoryServiceBySlug, getCustomerById, getCustomerBySlug, getEnterpriseById, getLotBySlug, getProductBySlug, getSaleById, getServiceById, getServiceBySlug, getStock, getStoreBySlug } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { noteActions } from "../../store/noteSlice.js";
@@ -40,6 +40,7 @@ export default function CreateSale() {
     const inputPayment_ = useRef()
     const inputDiscount = useRef();
     const inputPriceHT = useRef();
+    const inputPayment__ = useRef()
     const inputRest = useRef();
     const inputPriceTtc = useRef();
     const inputPayment = useRef();
@@ -80,7 +81,9 @@ export default function CreateSale() {
         errors: [],
         disabled: false,
         prints: [],
-        salePayments: []
+        salePayments: [],
+        totalSalePayments: 0,
+        instantAmount: 0
 
     })
 
@@ -144,6 +147,7 @@ export default function CreateSale() {
 
     async function handleSave(signal) {
         let products = []
+        let errors = []
         if (Number(inputPayment.current.value) > 0 && Number(inputPayment.current.value) <= Number(inputPriceTtc.current.value) && selectPaymentMethod.current.value === "ESPECES" || Number(inputPayment.current.value) > 0 && Number(inputPayment.current.value) <= Number(inputPriceTtc.current.value) && selectPaymentMethod.current.value === "VIREMENT" || Number(inputPayment.current.value) > 0 && Number(inputPayment.current.value) <= Number(inputPriceTtc.current.value) && selectPaymentMethod.current.value === "MOBILE_MONEY" || selectPaymentMethod.current.value === "A_CREDIT" || selectPaymentMethod.current.value === "AVANCE_CLIENT") {
             data.products.forEach(p => {
                 products.push(p.category + ":" + p.service + ":" + p.product + ":" + p.store + ":" + p.lot + ":" + p.quantity + ":" + p.price + ":" + p.discount)
@@ -162,6 +166,21 @@ export default function CreateSale() {
             const tax = 0
             const priceTtc = inputPriceTtc.current.value
             const payment = inputPayment.current.value
+
+            if (customerData.lastName === "CLIENT INCONNU" && Number(inputRest.current.value) > 0) {
+                errors.push("Le client inconnu ne peut pas avoir de dette.")
+
+            }
+
+
+            if (errors.length > 0) {
+                dispatch(noteActions.error(true))
+                dispatch(noteActions.show());
+                dispatch(noteActions.relaunch());
+                dispatch(noteActions.sendData(errors))
+                return
+            }
+
 
             const saleDto = {
                 enterprise,
@@ -307,14 +326,22 @@ export default function CreateSale() {
         }
 
         if (identifier === "customer") {
-            const salePayments = await getAllSalePaymentsByCustomer({ signal, customer: value })
-
+            const allSalePayments = await getAllSalePaymentsByCustomer({ signal, customer: value })
+            let tb = []
+            let totalSalePayments = 0
+            for (let s of allSalePayments) {
+                totalSalePayments += s.balance
+                const sale = await getSaleById({ signal, id: s.sale })
+                tb.push({ id: s.id, sale: s.sale, ref: sale.ref, rest: sale.rest, advance: s.advance, balance: s.balance, status: "off" })
+            }
             setData(prev => {
                 return {
                     ...prev,
-                    salePayments,
+                    salePayments: tb,
+                    totalSalePayments
                 }
             })
+
         }
 
 
@@ -460,10 +487,6 @@ export default function CreateSale() {
             inputStock.current.value = stock.stock || 0
         }
 
-
-
-
-
     }
 
 
@@ -486,6 +509,9 @@ export default function CreateSale() {
             if ((selectPaymentMethod.current.value === "ESPECES" || selectPaymentMethod.current.value === "VIREMENT" || selectPaymentMethod.current.value === "MOBILE_MONEY") && selectPaymentReceiver === "Sélectionner un receveur") {
                 errors.push("Veuillez sélectionner un moyen de réception")
             }
+
+
+
 
             if (selectService.current.value === "ventes") {
                 if (selectProduct.current.value === "Sélectionner un produit") {
@@ -617,11 +643,68 @@ export default function CreateSale() {
 
     }
 
-    function handleClick(identifier) {
+    function handleClick(identifier, value) {
         if (identifier == "customer") {
             dialog2.current.open()
         }
+
+
+
+
     }
+
+
+    function handleSelect(identifier, value, id) {
+        const salePayments = [...data.salePayments]
+        let totalSalePayments = 0
+        if (identifier == "all") {
+            if (value == true) {
+                for (let s of salePayments) {
+                    s.status = "on"
+                    totalSalePayments += (data.instantAmount + s.balance)
+                }
+
+            } else if (value == false) {
+                for (let s of salePayments) {
+                    s.status = "off"
+                    totalSalePayments -= (data.instantAmount - s.balance)
+                }
+
+            }
+
+        } else if (identifier == "one") {
+
+            if (value == true) {
+                for (let s of salePayments) {
+                    if (s.id === id) {
+                        s.status = "on"
+                        totalSalePayments += (data.instantAmount + s.balance)
+                    }
+
+                }
+
+            } else if (value == false) {
+                for (let s of salePayments) {
+                    if (s.id === id) {
+                        s.status = "off"
+                        totalSalePayments -= (data.instantAmount - s.balance)
+                    }
+                }
+
+            }
+
+        }
+        setData(prev => {
+            return {
+                ...prev,
+                salePayments,
+                instantAmount: salePayments
+            }
+        })
+        inputPayment__.current.value = totalSalePayments
+    }
+
+
 
     function handleUp(identifier, value) {
         if (identifier === "discount") {
@@ -776,7 +859,62 @@ export default function CreateSale() {
 
 
                 }
-                {data?.salePayments.length > 0 && <h1>Hello</h1>}
+                {data?.salePayments.length > 0 && <div className="flex gap-4 justify-center mt-4"><table className="w-2/3 mb-4">
+                    <thead>
+                        <tr className="bg-sky-950 text-sky-50">
+                            <th className="border">
+                                id
+                            </th>
+                            <th className="border hidden">
+                                sale
+                            </th>
+                            <th className="border">
+                                Réf.
+                            </th>
+                            <th className="border">
+                                Dettes
+                            </th>
+                            <th className="border">
+                                Avance
+                            </th>
+                            <th className="border">
+                                Solde
+                            </th>
+                            <th className="border py-1 flex items-center justify-center">
+                                Action <input type="checkbox" className="ms-2" onClick={(e) => handleSelect("all", e.target.checked)} />
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {data.salePayments.map(s => <tr key={s.id}>
+                            <td className="border border-sky-950 text-center p-1">{s.id}</td>
+                            <td className="border border-sky-950 text-center p-1 hidden">{s.sale}</td>
+                            <td className="border border-sky-950 text-center p-1">{s.ref}</td>
+                            <td className="border border-sky-950 text-center p-1">{Number(s.rest).toLocaleString()}</td>
+                            <td className="border border-sky-950 text-center p-1">{Number(s.advance).toLocaleString()}</td>
+                            <td className="border border-sky-950 text-center p-1">{Number(s.balance).toLocaleString()}</td>
+                            <td className="border border-sky-950 text-center p-1"><input type="checkbox" checked={s.status === "on"} onClick={(e) => handleSelect("one", e.target.checked, s.id)} /></td>
+                        </tr>)}
+                    </tbody>
+                    <tfoot>
+                        <tr className="bg-sky-950 text-sky-50">
+                            <td colSpan="3" className="border text-center p-1"></td>
+                            <td colSpan="2" className="border text-center p-1">Total</td>
+                            <td colSpan="2" className="border text-center p-1">{Number(data?.totalSalePayments).toLocaleString()}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                    <div className="flex flex-col gap-4 items-center">
+                        <div className="flex flex-col">
+                            <label htmlFor="payment_" className="font-medium">Montant versé</label>
+                            <input type="number" id="payment_" placeholder="Montant versé" className="border border-sky-950 rounded text-end shadow-md shadow-sky-950 p-1" ref={inputPayment__} />
+
+                        </div>
+                        <Submit>
+                            Enregistrer
+                        </Submit>
+                    </div>
+                </div>}
             </div>
 
         </div >
@@ -807,7 +945,7 @@ export default function CreateSale() {
                     <FontAwesomeIcon icon={faPrint} className="me-2"></FontAwesomeIcon>
                     {p.name}
                 </button>)}
-            </div> : <button className="text-sky-50 bg-sky-950 font-bold p-2 border rounded w-full cursor-pointer shadow-sky-950 shadow-md hover:bg-sky-50 hover:text-sky-950" onClick={(e) => handleSelectionPrint(e.target.textContent)}>
+            </div> : <button className="text-sky-50 bg-sky-950 font-bold p-2 border rounded w-full cursor-pointer shadow-sky-950 shadow-md hover:bg-sky-50 hover:text-sky-950 mb-4" onClick={(e) => handleSelectionPrint(e.target.textContent)}>
                 IMPRIMANTE_LASER
             </button>}
             <Submit onClick={() => dialog4.current.close()}>Fermer</Submit>

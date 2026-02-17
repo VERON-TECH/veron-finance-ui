@@ -12,6 +12,7 @@ import Notification from "../../layout/Notification.jsx";
 import responseHttp from "../../utils/responseHttp.js";
 import { noteActions } from "../../store/noteSlice.js";
 import { isNotEmpty } from "../../utils/validation.jsx";
+import { modalActions } from "../../store/modalSlice.js";
 
 export default function CreatePackage() {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -133,6 +134,7 @@ export default function CreatePackage() {
             dispatch(noteActions.error(true))
         } else {
             dispatch(noteActions.error(false))
+            dispatch(modalActions.updateClose())
         }
         dispatch(noteActions.show());
         dispatch(noteActions.relaunch());

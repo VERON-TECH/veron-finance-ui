@@ -69,9 +69,9 @@ export default function SalePage() {
     }, [menu, dispatch, cash])
 
     return <>
-        <div className="flex justify-center mb-2">
+        {user.cashes.length > 0 ? <div className="flex justify-center mb-2">
             {user.role.includes("ROLE_CAISSIER") && user.cashes.length > 0 ? <Submit onClick={handleModal}>Nouveau</Submit> : undefined}
-        </div>
+        </div> : <p className="text-red-500 text-center">Aucune caisse rattachée</p>}
         <Table data={data?.sale} headers={sales.header} emptyMessage="Aucun vente trouvée." globalFilterFields={sales.global} sheet="Vente" titleRef="Informations d'une vente" size="lg:h-7/12 lg:w-4/15 xl:h-8/12" />
         <Modal ref={dialog} size="lg:h-11/12 lg:w-15/15 xl:h-11/12" title="Créer une vente">
             <CreateSale />

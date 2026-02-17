@@ -137,10 +137,10 @@ export default function MvtCashPage() {
 
 
     return <>
-        <div className="flex justify-center mb-2">
+        {user.cashes.length > 0 ? <div className="flex justify-center mb-2">
             {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <Submit onClick={() => handleModal("new")}>Nouveau</Submit> : undefined}
             {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <Submit onClick={() => handleModal("report")}>Rapport</Submit> : undefined}
-        </div>
+        </div> : <p className="text-red-500 text-center font-medium">Aucune caisse rattachée</p>}
         <Table data={data?.mvtCash} headers={mvtCashes.header} emptyMessage="Aucune opération trouvée." globalFilterFields={mvtCashes.global} sheet="mvt_caisse" titleRef="Visualiser un mouvement de caisse" size="lg:h-5/11 lg:w-4/15" />
         <Modal ref={dialog} size="lg:h-7/15 lg:w-8/16" title="Créer une opération">
             <CreateMvtCash />

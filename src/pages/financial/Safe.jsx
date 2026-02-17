@@ -9,6 +9,9 @@ import Table from "../../layout/Table.jsx"
 import Modal from "../../layout/Modal.jsx";
 import { identifierMenuActions } from "../../store/identifierSlice.js"
 import CreateSafe from "../../components/safe/CreateSafe.jsx";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -21,7 +24,8 @@ export default function SafePage() {
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
     const [data, setData] = useState({
-        safe: []
+        safe: [],
+        isLoading: false
     })
 
 
@@ -35,6 +39,12 @@ export default function SafePage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "financial" }))
+        setData(prev => {
+            return {
+                ...prev,
+                isLoading: true
+            }
+        })
         if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")) {
             async function get(signal) {
                 const allSafes = await getAllSafes({ signal, enterprise: user?.enterprise, agency: user?.agency })
@@ -51,7 +61,8 @@ export default function SafePage() {
                 setData(prev => {
                     return {
                         ...prev,
-                        safe: tb
+                        safe: tb,
+                        isLoading: false
                     }
                 })
 
@@ -68,6 +79,7 @@ export default function SafePage() {
             {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={handleModal}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data?.safe} headers={safes.header} emptyMessage="Aucun coffre-fort trouvé." globalFilterFields={safes.global} sheet="Coffre_fort" titleRef="Mise à jour informations du coffre-fort" size="lg:h-5/11 lg:w-4/15" />
+        {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-3/11 lg:w-4/15" title="Créer un coffre-fort">
             <CreateSafe />
         </Modal>

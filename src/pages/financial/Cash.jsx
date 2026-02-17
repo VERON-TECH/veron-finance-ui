@@ -9,6 +9,9 @@ import Modal from "../../layout/Modal.jsx";
 import { identifierMenuActions } from "../../store/identifierSlice.js"
 import CreateCash from "../../components/cash/CreateCash.jsx";
 import { cashes } from "../../data/dataTable.js";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -21,7 +24,8 @@ export default function CashPage() {
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
     const [data, setData] = useState({
-        cash: []
+        cash: [],
+        isLoading: false
     })
 
     const dialog = useRef()
@@ -32,6 +36,12 @@ export default function CashPage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "financial" }))
+        setData(prev => {
+            return {
+                ...prev,
+                isLoading: true
+            }
+        })
         if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")) {
             async function get(signal) {
                 const allCashes = await getAllCashes({ signal, enterprise: user.enterprise, agency: user.agency })
@@ -54,7 +64,8 @@ export default function CashPage() {
                 setData(prev => {
                     return {
                         ...prev,
-                        cash: tb
+                        cash: tb,
+                        isLoading: false
                     }
                 })
 
@@ -68,6 +79,7 @@ export default function CashPage() {
             {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={handleModal}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data?.cash} headers={cashes.header} emptyMessage="Aucune caisse trouvée." globalFilterFields={cashes.global} sheet="Caisse" titleRef="Mise à jour informations de la caisse" size="lg:h-5/11 lg:w-4/15" />
+        {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-3/11 lg:w-4/15" title="Créer une caisse">
             <CreateCash />
         </Modal>

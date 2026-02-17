@@ -27,6 +27,7 @@ export default function Header() {
     await logout(user?.username);
     submit(null, { method: "post" }, { action: "/" })
     dispatch(authActions.logout())
+    localStorage.removeItem("user")
   }
 
   function handleExit() {

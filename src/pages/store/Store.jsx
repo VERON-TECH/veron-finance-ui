@@ -9,6 +9,9 @@ import Modal from "../../layout/Modal.jsx";
 import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { stores } from "../../data/dataTable.js";
 import CreateStore from "../../components/store/CreateStore.jsx";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -20,7 +23,8 @@ export default function StorePage() {
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
     const [data, setData] = useState({
-        store: []
+        store: [],
+        isLoading: false
     })
 
     const dialog = useRef()
@@ -33,6 +37,12 @@ export default function StorePage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "store" }))
+        setData(prev => {
+            return {
+                ...prev,
+                isLoading: true
+            }
+        })
         if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")) {
             async function get(signal) {
                 const allStores = await getAllStores({ signal, enterprise: user?.enterprise, agency: user?.agency })
@@ -55,7 +65,8 @@ export default function StorePage() {
                 setData(prev => {
                     return {
                         ...prev,
-                        store: tb
+                        store: tb,
+                        isLoading: false
                     }
                 })
 
@@ -69,6 +80,7 @@ export default function StorePage() {
             {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit onClick={() => handleModal("store")}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data?.store} headers={stores.header} emptyMessage="Aucun magasin trouvé." globalFilterFields={stores.global} sheet="Magasin" titleRef="Mise à jour informations d'un magasin" size="lg:h-4/12 lg:w-4/15 xl:h-5/12" />
+        {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-3/12 lg:w-4/15 xl:h-3/12" title="Créer un magasin">
             <CreateStore />
         </Modal>

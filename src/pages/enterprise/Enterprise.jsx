@@ -9,6 +9,9 @@ import Table from "../../layout/Table.jsx"
 import Modal from "../../layout/Modal.jsx";
 import CreateEnterprise from "../../components/enterprise/CreateEnterprise.jsx";
 import { identifierMenuActions } from "../../store/identifierSlice.js"
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 export default function EnterprisePage() {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -19,7 +22,8 @@ export default function EnterprisePage() {
     const menu = useSelector(state => state.identifier.menu)
 
 
-    const { data } = useQuery({
+
+    const { data, isLoading } = useQuery({
         queryKey: ["enterprise"],
         queryFn: getAllEnterprises,
         enabled: user.role.includes("ROLE_ADMIN")
@@ -42,6 +46,7 @@ export default function EnterprisePage() {
             {user.role.includes("ROLE_ADMIN") && <Submit onClick={handleModal}>Nouveau</Submit>}
         </div>
         <Table data={data} headers={enterprises.header} emptyMessage="Aucune entreprise trouvée." globalFilterFields={enterprises.global} sheet="Entreprises" titleRef="Mise à jour informations de l'entreprise" size="lg:h-6/9 lg:w-8/15" />
+        {isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-6/9 lg:w-8/15" title="Créer une entreprise">
             <CreateEnterprise />
         </Modal>

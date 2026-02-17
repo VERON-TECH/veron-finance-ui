@@ -10,6 +10,9 @@ import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { users } from "../../data/dataTable.js";
 import CreateUser from "../../components/user/CreateUser.jsx";
 import { useState } from "react"
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 export default function UserPage() {
@@ -20,9 +23,11 @@ export default function UserPage() {
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
     const [data, setData] = useState([])
+    const [isLoading, setLoading] = useState(false)
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "personal" }))
+        setLoading(true)
         if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_RESPONSABLE_RH")) {
             let tbEl = {
                 tb: [],
@@ -36,6 +41,7 @@ export default function UserPage() {
 
                 const users = await getAllUsers({ signal, personals: tbEl.tb, enterprise: user.enterprise, agency: user.agency })
                 setData(users)
+                setLoading(false)
 
             }
             get()
@@ -65,7 +71,7 @@ export default function UserPage() {
             {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_RESPONSABLE_RH") ? <Submit onClick={() => handleModal("user")}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data} headers={users?.header} emptyMessage="Aucun utilisateur trouvé." globalFilterFields={users.global} sheet="Utilisateurs" titleRef="Mise à jour informations d'un utilisateur" size="lg:h-5/10 lg:w-8/16 xl:h-6/10" />
-
+        {isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-4/10 lg:w-4/15" title="Créer un utilisateur">
             <CreateUser />
         </Modal>

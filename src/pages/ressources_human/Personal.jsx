@@ -10,6 +10,9 @@ import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { personals } from "../../data/dataTable.js";
 import Title from "../../components/personal/Title.jsx";
 import CreatePersonal from "../../components/personal/CreatePersonal.jsx";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 export default memo(function PersonalPage() {
     const user = JSON.parse(localStorage.getItem("user"));
@@ -19,7 +22,8 @@ export default memo(function PersonalPage() {
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
     const [data, setData] = useState({
-        personal: []
+        personal: [],
+        isLoading: false
     })
 
 
@@ -38,6 +42,13 @@ export default memo(function PersonalPage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "personal" }))
+        setData(prev => {
+            return {
+                ...prev,
+                isLoading: true
+            }
+        })
+
         if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_RESPONSABLE_RH")) {
             async function get(signal) {
                 const allPersonals = await getAllPersonals({ signal, enterprise: user?.enterprise, agency: user?.agency })
@@ -55,7 +66,8 @@ export default memo(function PersonalPage() {
                 setData(prev => {
                     return {
                         ...prev,
-                        personal: tb
+                        personal: tb,
+                        isLoading: false
                     }
                 })
 
@@ -63,7 +75,7 @@ export default memo(function PersonalPage() {
             get()
         }
 
-    }, [menu, dispatch, user])
+    }, [menu, dispatch])
 
 
     return <>
@@ -72,6 +84,7 @@ export default memo(function PersonalPage() {
             {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_RESPONSABLE_RH") ? <Submit onClick={() => handleModal("personal")}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data?.personal} headers={personals.header} emptyMessage="Aucun personnel trouvé." globalFilterFields={personals.global} sheet="Personnel" titleRef="Mise à jour informations d'un employé" size="lg:h-6/9 lg:w-8/15 xl:h-7/9" />
+        {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-6/11 lg:w-12/15 overflow-auto" title="Informations sur les fonctions">
             <Title />
         </Modal>

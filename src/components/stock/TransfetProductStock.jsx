@@ -111,9 +111,10 @@ export default function TransfertProductStock() {
         const state = responseHttp(responseData);
         if (state) {
             dispatch(noteActions.error(true))
-            dispatch(modalActions.updateClose())
+
         } else {
             dispatch(noteActions.error(false))
+            dispatch(modalActions.updateClose())
         }
         dispatch(noteActions.show());
         dispatch(noteActions.relaunch());

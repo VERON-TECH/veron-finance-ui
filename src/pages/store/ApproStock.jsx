@@ -9,6 +9,9 @@ import Modal from "../../layout/Modal.jsx";
 import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { mvtStocks } from "../../data/dataTable.js";
 import TransferProductStock from "../../components/stock/TransfetProductStock.jsx";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -20,7 +23,8 @@ export default function ApproStockPage() {
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
     const [data, setData] = useState({
-        mvtStock: []
+        mvtStock: [],
+        isLoading: false
     })
 
     const dialog = useRef()
@@ -33,6 +37,12 @@ export default function ApproStockPage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "stock" }))
+        setData(prev => {
+            return {
+                ...prev,
+                isLoading: true
+            }
+        })
         if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")) {
             async function get(signal) {
                 const allMvtStocks = await getAllMvtStocks({ signal, enterprise: user.enterprise, agency: user.agency, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
@@ -61,7 +71,8 @@ export default function ApproStockPage() {
                 setData(prev => {
                     return {
                         ...prev,
-                        mvtStock: tb
+                        mvtStock: tb,
+                        isLoading: false
                     }
                 })
 
@@ -75,6 +86,7 @@ export default function ApproStockPage() {
             {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit onClick={() => handleModal("stock")}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data?.mvtStock} headers={mvtStocks.header} emptyMessage="Aucun mouvement trouvé." globalFilterFields={mvtStocks.global} sheet="Mouvement de stock" titleRef="Informations sur un mouvement de stock" size="lg:h-4/12 lg:w-7/15 xl:w-7/15 xl:h-4/12" />
+        {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-9/12 lg:w-11/15 xl:w-15/15 xl:h-8/12" title="Créer une transfert inter-magasins">
             <TransferProductStock />
         </Modal>

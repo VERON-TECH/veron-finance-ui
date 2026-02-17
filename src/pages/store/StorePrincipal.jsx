@@ -9,6 +9,9 @@ import Modal from "../../layout/Modal.jsx";
 import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { storePrincipals } from "../../data/dataTable.js";
 import CreateStorePrincipal from "../../components/storePrincipal/CreateStorePrincipal.jsx";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -21,7 +24,8 @@ export default function StorePincipalPage() {
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
     const [data, setData] = useState({
-        storePrincipal: []
+        storePrincipal: [],
+        isLoading: false
     })
 
 
@@ -36,6 +40,12 @@ export default function StorePincipalPage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "store" }))
+        setData(prev => {
+            return {
+                ...prev,
+                isLoading: true
+            }
+        })
         if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")) {
             async function get(signal) {
                 const allStorePrincipals = await getAllStorePrincipal({ signal, enterprise: user?.enterprise, agency: user?.agency })
@@ -49,7 +59,8 @@ export default function StorePincipalPage() {
                 setData(prev => {
                     return {
                         ...prev,
-                        storePrincipal: tb
+                        storePrincipal: tb,
+                        isLoading: false
                     }
                 })
 
@@ -63,6 +74,7 @@ export default function StorePincipalPage() {
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("storePrincipal")}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data?.storePrincipal} headers={storePrincipals.header} emptyMessage="Aucun magasin principal trouvé." globalFilterFields={storePrincipals.global} sheet="Magasin principal" titleRef="Mise à jour informations d'un magasin principal" size={`${user.role.includes("ROLE_ADMIN") ? "lg:h-5/12 lg:w-6/15 xl:h-5/12" : "lg:h-4/12 lg:w-4/15 xl:h-4/12"}`} />
+        {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-4/12 lg:w-4/15" title="Créer un magasin principal">
             <CreateStorePrincipal />
         </Modal>

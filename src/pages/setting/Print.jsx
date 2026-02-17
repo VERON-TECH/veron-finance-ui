@@ -9,6 +9,9 @@ import Modal from "../../layout/Modal.jsx";
 import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { prints } from "../../data/dataTable.js";
 import CreatePrint from "../../components/setting/CreatePrint.jsx";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -21,7 +24,7 @@ export default function PrintPage() {
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
 
-    const { data } = useQuery({
+    const { data, isLoading } = useQuery({
         queryKey: ["print", { enterprise: user.enterprise, agency: user.agency }],
         queryFn: ({ signal }) => getAllPrints({ signal, enterprise: user.enterprise, agency: user.agency }),
         enabled: user.role.includes("ROLE_ADMIN")
@@ -43,6 +46,7 @@ export default function PrintPage() {
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={handleModal}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data} headers={prints.header} emptyMessage="Aucune imprimante trouvée." globalFilterFields={prints.global} sheet="Imprimante" titleRef="Mise à jour informations d'une imprimante" size="lg:h-5/13 lg:w-4/15 xl:h-5/13" />
+        {isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-5/12 lg:w-4/15 xl:h-5/12" title="Paramétrer une imprimante">
             <CreatePrint />
         </Modal>

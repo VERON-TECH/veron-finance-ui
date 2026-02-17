@@ -1,4 +1,4 @@
-import { useQuery } from "@tanstack/react-query";
+
 import { useDispatch, useSelector } from "react-redux";
 import { getAgencyById, getAllStocks, getEnterpriseById, getLotById, getProductById, getStoreById, getStorePrincipalById } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
@@ -11,6 +11,9 @@ import Modal from "../../layout/Modal.jsx";
 import CreateSupplies from "../../components/stock/CreateSupplies.jsx";
 import CreateRebuts from "../../components/stock/CreateRebuts.jsx";
 import CreatePackage from "../../components/stock/CreatePackage.jsx";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -22,7 +25,8 @@ export default function ProductStockPage() {
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
     const [data, setData] = useState({
-        stock: []
+        stock: [],
+        isLoading: false
     })
 
     const dialog = useRef()
@@ -45,6 +49,12 @@ export default function ProductStockPage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "store" }))
+        setData(prev => {
+            return {
+                ...prev,
+                isLoading: true
+            }
+        })
         if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")) {
             async function get(signal) {
                 const allStocks = await getAllStocks({ signal, enterprise: user.enterprise, agency: user.agency, storePrincipal: 0, store: 0, product: 0, lot: 0 })
@@ -73,7 +83,8 @@ export default function ProductStockPage() {
                 setData(prev => {
                     return {
                         ...prev,
-                        stock: tb
+                        stock: tb,
+                        isLoading: false
                     }
                 })
 
@@ -94,8 +105,9 @@ export default function ProductStockPage() {
                 Paquets
             </Submit>
         </div> : undefined}
-        <Table data={data?.stock} headers={productStocks.header} emptyMessage="Aucun stock trouvé." globalFilterFields={purchasOrders.global} sheet="Stock" titleRef="Informations sur le stock" size="lg:h-5/12 lg:w-8/15 xl:w-8/15 xl:h-5/12" />
 
+        <Table data={data?.stock} headers={productStocks.header} emptyMessage="Aucun stock trouvé." globalFilterFields={purchasOrders.global} sheet="Stock" titleRef="Informations sur le stock" size="lg:h-5/12 lg:w-8/15 xl:w-8/15 xl:h-5/12" />
+        {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-9/12 lg:w-11/15 xl:w-9/15 xl:h-10/12" title="Créer un sortie de founiture">
             <CreateSupplies />
         </Modal>

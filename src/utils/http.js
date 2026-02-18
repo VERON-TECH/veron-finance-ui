@@ -4650,6 +4650,40 @@ export async function createSale(saleDto) {
 }
 
 
+export async function createSalePayment(salePaymentsDto) {
+  const url = `${BASE_URL}sale-payment/ca/create-multiple/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(salePaymentsDto)
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+
+
 export async function convert(amount) {
   const url = `${BASE_URL}convert-api/?amount=${amount}`
   const token = getToken();

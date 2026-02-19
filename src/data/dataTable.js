@@ -1134,6 +1134,8 @@ export const sales = {
 
 
 
+
+
 export const prints = {
     header: [
         { key: 0, header: "Id", field: "id" },
@@ -1152,6 +1154,63 @@ export const prints = {
         "Agence",
         "Type",
         "Statut",
+    ]
+
+}
+
+
+
+export const customers = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "ID", field: "ref" },
+        { key: 3, header: "Nom", field: "lastName" },
+        { key: 4, header: "Prénom", field: "firstName" },
+        { key: 5, header: "Genre", field: "gender" },
+        { key: 6, header: "Addresse", field: "address" },
+        { key: 7, header: "Tél.", field: "phone" },
+        { key: 8, header: "Tél2.", field: "phone2" },
+        { key: 9, header: "Date de naissance", field: "dateBirth" },
+        { key: 10, header: "Lieu de naissance", field: "placeBirth" },
+        { key: 11, header: "Email", field: "email" },
+        { key: 12, header: "Dépot", field: "depot" },
+        { key: 13, header: "Rétrait", field: "withdrawal" },
+        { key: 14, header: "Solde", field: "balance" },
+        { key: 15, header: "Prêt", field: "moneyLoan" },
+        { key: 16, header: "Emprunt", field: "borrowMoney" },
+        { key: 17, header: "Factures", field: "invoice" },
+        { key: 18, header: "Créée le", field: "dateCreated" },
+        { key: 19, header: "Par", field: "userCreated" },
+        { key: 20, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 21, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "ID",
+        "Nom",
+        "Prénom",
+        "Genre",
+        "Addresse",
+        "Tél.",
+        "Tél2.",
+        "Date de naissance",
+        "Lieu de naissance",
+        "Email",
+        "Dépot",
+        "Rétrait",
+        "Solde",
+        "Prêt",
+        "Emprunt",
+        "Factures",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
     ]
 
 }

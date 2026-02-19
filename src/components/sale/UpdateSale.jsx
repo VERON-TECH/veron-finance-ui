@@ -120,6 +120,7 @@ export default function UpdateSale() {
 
     function handleSelectionPrint(value) {
         dispatch(identifierMenuActions.updatePrint({ print: value }))
+        dispatch(identifierMenuActions.updateDuplicata({ duplicata: true }))
         if (data?.typePrint === "sale") {
             navigate("/print-sale")
         } else if (data?.typePrint === "salePayement") {

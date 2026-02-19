@@ -2302,6 +2302,39 @@ export async function createCustomer(customerDto) {
   }
 }
 
+export async function updateCustomer({ slug, customerDto }) {
+  const url = `${BASE_URL}customer/ca/update/${slug}/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(customerDto)
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+
 
 export async function getAllPersonals({ signal, enterprise, agency }) {
   const url = `${BASE_URL}personal/ad-rh/?enterprise=${enterprise}&agency=${agency}`
@@ -5650,8 +5683,73 @@ export async function getInvoiceById({ signal, id }) {
   }
 }
 
-export async function getAllSales({ signal, enterprise, agency, startDate, endDate }) {
-  const url = `${BASE_URL}sale/ad-ac-cc-ca/?enterprise=${enterprise}&agency=${agency}&startDate=${startDate}&endDate=${endDate}`
+export async function getAllSales({ signal, enterprise, agency, startDate, endDate, cashes, customer }) {
+  const url = `${BASE_URL}sale/ad-ac-cc-ca/?enterprise=${enterprise}&agency=${agency}&startDate=${startDate}&endDate=${endDate}&cashes=${cashes}&customer=${customer}`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    signal
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+
+export async function getAllSalesByCustomer({ signal, customer }) {
+  const url = `${BASE_URL}sale/ad-ac-cc-ca/get-customer/${customer}/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+    signal
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
+export async function getAllInvoiceByCustomer({ signal, customer }) {
+  const url = `${BASE_URL}invoice/ad-ac-cc-ca/get-customer/${customer}/`
   const token = getToken();
   const response = await fetch(url, {
     method: "GET",

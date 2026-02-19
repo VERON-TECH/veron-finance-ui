@@ -37,13 +37,14 @@ export const subFeactures = [
   { key: 19, menu: "Factures fournisseurs", identifier: "engagement", url: "invoice-supplier", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
   { key: 20, menu: "Avances versées", identifier: "engagement", url: "advance-paid", role: ["ROLE_ADMIN", "ROLE_COMPTABLE"] },
   { key: 21, menu: "Ventes", identifier: "sale", url: "sale", role: ["ROLE_CAISSIER"] },
-  { key: 22, menu: "Factures", identifier: "sale", url: "invoice", role: ["ROLE_CAISSIER"] },
-  { key: 23, menu: "Opération de caisse", identifier: "cash", url: "mvt-cash", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSEIR"] },
-  { key: 24, menu: "Manquants", identifier: "cash", url: "missing", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSEIR"] },
-  { key: 25, menu: "Excédents", identifier: "cash", url: "surplus", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSEIR"] },
-  { key: 26, menu: "Imprimantes", identifier: "setting", url: "print", role: ["ROLE_ADMIN"] },
-  { key: 27, menu: "Journalier", identifier: "reporting", url: "day", role: ["ROLE_ADMIN"] },
-  { key: 28, menu: "Modifier le mot de passe", identifier: "password", url: "password", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE", "ROLE_CHEF_CAISSIER", "ROLE_CAISSIER"] },
+  { key: 22, menu: "Clients", identifier: "sale", url: "customer", role: ["ROLE_CAISSIER"] },
+  { key: 23, menu: "Factures", identifier: "sale", url: "invoice", role: ["ROLE_CAISSIER"] },
+  { key: 24, menu: "Opération de caisse", identifier: "cash", url: "mvt-cash", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSEIR"] },
+  { key: 25, menu: "Manquants", identifier: "cash", url: "missing", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSEIR"] },
+  { key: 26, menu: "Excédents", identifier: "cash", url: "surplus", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSEIR"] },
+  { key: 27, menu: "Imprimantes", identifier: "setting", url: "print", role: ["ROLE_ADMIN"] },
+  { key: 28, menu: "Journalier", identifier: "reporting", url: "day", role: ["ROLE_ADMIN"] },
+  { key: 29, menu: "Modifier le mot de passe", identifier: "password", url: "password", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE", "ROLE_CHEF_CAISSIER", "ROLE_CAISSIER"] },
 ]
 
 

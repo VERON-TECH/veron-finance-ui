@@ -52,7 +52,7 @@ const PrintSalePayment = lazy(() => import("../pages/print/PrintSalePayment.jsx"
 const SettingPage = lazy(() => import("../pages/setting/Setting.jsx"))
 const PrintPage = lazy(() => import("../pages/setting/Print.jsx"))
 const PasswordPage = lazy(() => import("../pages/ressources_human/Password.jsx"))
-
+const CustomerPage = lazy(() => import("../pages/sale/Customer.jsx"))
 
 
 
@@ -108,6 +108,7 @@ export const router = createBrowserRouter([
       { path: "setting", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SettingPage /></Suspense> },
       { path: "print", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PrintPage /></Suspense> },
       { path: "password", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PasswordPage /></Suspense> },
+      { path: "customer", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><CustomerPage /></Suspense> },
     ]
 
   },

@@ -2,7 +2,7 @@ import { useDispatch } from "react-redux";
 import { NavLink } from "react-router";
 import { modalActions } from "../store/modalSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowCircleDown, faArrowRightArrowLeft, faBank, faBuilding, faCalendarDay, faCalendarTimes, faCartPlus, faCashRegister, faCoins, faFileInvoice, faGlobe, faHome, faKey, faMinus, faMoneyBillTransfer, faPerson, faPersonArrowDownToLine, faPhoneAlt, faSave, faShop, faShoppingBag, faShoppingCart, faSquarePlus, faStore, faStoreAlt, faUser } from "@fortawesome/free-solid-svg-icons";
+import { faArrowCircleDown, faArrowRightArrowLeft, faBank, faBuilding, faCalendarDay, faCalendarTimes, faCartPlus, faCashRegister, faCoins, faFileInvoice, faGlobe, faHome, faKey, faMinus, faMoneyBillTransfer, faPerson, faPersonArrowDownToLine, faPhoneAlt, faSave, faShop, faShoppingBag, faShoppingCart, faSquarePlus, faStore, faStoreAlt, faUser, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -34,6 +34,7 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
     {title === "Stock" && < FontAwesomeIcon icon={faSave} className="me-4" />}
     {title === "Emprunts & prêts" && < FontAwesomeIcon icon={faCoins} className="me-4" />}
     {title === "Ventes" && < FontAwesomeIcon icon={faShoppingBag} className="me-4" />}
+    {title === "Clients" && < FontAwesomeIcon icon={faUserGroup} className="me-4" />}
     {title === "Factures" && < FontAwesomeIcon icon={faFileInvoice} className="me-4" />}
     {title === "Factures clients" && < FontAwesomeIcon icon={faFileInvoice} className="me-4" />}
     {title === "Factures fournisseurs" && < FontAwesomeIcon icon={faFileInvoice} className="me-4" />}

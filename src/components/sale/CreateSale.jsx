@@ -188,7 +188,7 @@ export default function CreateSale() {
                 agency,
                 cash,
                 paymentMethod,
-                paymentReceiver,
+                paymentReceiver: selectPaymentMethod.current.value !== "A_CREDIT" ? paymentReceiver : "A_CREDIT",
                 products,
                 discount,
                 priceHt,
@@ -821,6 +821,7 @@ export default function CreateSale() {
 
     function handleSelectionPrint(value) {
         dispatch(identifierMenuActions.updatePrint({ print: value }))
+        dispatch(identifierMenuActions.updateDuplicata({ duplicata: false }))
         if (data?.typePrint === "sale") {
             navigate("/print-sale")
         } else if (data?.typePrint === "salePayement") {

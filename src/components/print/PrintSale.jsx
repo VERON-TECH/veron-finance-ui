@@ -4,6 +4,7 @@ import Logo from "../../layout/LogoDark"
 export default function PrintSale() {
     const print = useSelector(state => state.print);
     const printType = useSelector(state => state.identifier.print)
+    const duplicata = useSelector(state => state.identifier.duplicata)
 
     const format = (value) =>
         Number(value || 0).toLocaleString();
@@ -43,7 +44,7 @@ export default function PrintSale() {
             <div className="mb-2">
                 <p><strong>Client :</strong> {print.customer}</p>
                 <p><strong>Agence :</strong> {print.agency?.name}</p>
-                <p><strong>Facture N° :</strong> {print.ref}</p>
+                <p><strong>Facture N° :</strong> {print.ref} {duplicata && "(DUPLICATA)"} </p>
             </div>
 
             <hr className="my-2 border-dashed" />
@@ -126,9 +127,10 @@ ${print.enterprise?.phone || ""}
 ${print.agency?.name}
 ${line}
 
-FACTURE N° : ${print.ref}
+
+FACTURE N° : ${print.ref} ${duplicata && "(DUPLICATA)"}
 DATE       : ${print.date} ${print.time}
-CLIENT     : ${print.customer || "CLIENT COMPTOIR"}
+CLIENT     : ${print.customer || "CLIENT INCONNU"}
 CAISSIER   : ${print.cash || ""}
 
 ${dash}
@@ -182,7 +184,7 @@ ${line}
                     <h1 className="text-2xl font-bold uppercase">
                         Reçu de Vente
                     </h1>
-                    <p><strong>Facture N° :</strong> {print.ref}</p>
+                    <p><strong>Facture N° :</strong> {print.ref} {duplicata && "(DUPLICATA)"}</p>
                     <p><strong>Date :</strong> {print.date}</p>
                     <p><strong>Heure :</strong> {print.time}</p>
                     <p><strong>Caissier :</strong> {print.cash}</p>

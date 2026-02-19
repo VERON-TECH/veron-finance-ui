@@ -41,6 +41,7 @@ import UpdatePrint from '../components/setting/UpdatePrint';
 import GetStock from '../components/stock/GetStock';
 import GetMvtStock from '../components/store/GetMvtStock';
 import UpdateSale from '../components/sale/UpdateSale';
+import UpdateCustomer from '../components/customer/UpdateCustomer';
 
 
 
@@ -248,7 +249,7 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
           <UpdatePurchaseOrder />
         }
 
-        {titleRef === "Visualiser les factures" &&
+        {titleRef === "Informations sur une facture" &&
           <GetInvoice />
         }
 
@@ -267,6 +268,12 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
         {titleRef === "Informations sur une vente" &&
           <UpdateSale />
         }
+
+        {titleRef === "Informations sur un client" &&
+          <UpdateCustomer />
+        }
+
+
 
 
 

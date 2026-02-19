@@ -40,6 +40,7 @@ import GetInvoice from '../components/sale/GetInvoice';
 import UpdatePrint from '../components/setting/UpdatePrint';
 import GetStock from '../components/stock/GetStock';
 import GetMvtStock from '../components/store/GetMvtStock';
+import UpdateSale from '../components/sale/UpdateSale';
 
 
 
@@ -262,6 +263,11 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
         {titleRef === "Informations sur un mouvement de stock" &&
           <GetMvtStock />
         }
+
+        {titleRef === "Informations sur une vente" &&
+          <UpdateSale />
+        }
+
 
 
 

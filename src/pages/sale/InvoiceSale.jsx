@@ -6,6 +6,9 @@ import { useEffect } from "react";
 import Table from "../../layout/Table.jsx"
 import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { invoices } from "../../data/dataTable.js";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 export default function InvoiceSalePage() {
@@ -17,7 +20,7 @@ export default function InvoiceSalePage() {
     const menu = useSelector(state => state.identifier.menu)
 
 
-    const { data } = useQuery({
+    const { data, isLoading } = useQuery({
         queryKey: ["invoice", { enterprise: user.enterprise, agency: user.agency, invoiceType: "EMISE" }],
         queryFn: ({ signal }) => getAllInvoices({ signal, enterprise: user.enterprise, agency: user.agency, invoiceType: "EMISE" }),
         enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_CAISSIER")
@@ -31,7 +34,7 @@ export default function InvoiceSalePage() {
 
     return <>
         <Table data={data} headers={invoices.header} emptyMessage="Aucune facture trouvée." globalFilterFields={invoices.global} sheet="Facture" titleRef="Visualiser les factures" size="lg:h-9/12 lg:w-8/15 xl:w-9/15 xl:h-8/12" />
-
+        {isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>
 }

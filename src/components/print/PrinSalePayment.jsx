@@ -59,7 +59,6 @@ export default function PrintSalePayment() {
                 </thead>
                 <tbody>
                     {print.salePayments?.map((s, i) => {
-                        const total = s.amount;
                         return (
                             <tr key={i} className="border-b">
                                 <td>{s.ref}</td>
@@ -119,7 +118,7 @@ ${print.salePayments?.map(s =>
                         s.ref,
                         s.rest,
                         s.advance,
-                        s.rest
+                        s.balance
                     )
                 ).join("\n")}
 ${dash}
@@ -180,7 +179,7 @@ ${line}
                     </tr>
                 </thead>
                 <tbody>
-                    {print.products?.map((p, i) => {
+                    {print.salePayments?.map((s, i) => {
                         return (
                             <tr key={i}>
                                 <td className="border p-2">{s.ref}</td>

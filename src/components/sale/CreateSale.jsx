@@ -55,7 +55,7 @@ export default function CreateSale() {
 
 
     const dispatch = useDispatch();
-    const [scope, animate] = useAnimate();
+    const [animate] = useAnimate();
     const [data, setData] = useState({
         category: [],
         services: [],
@@ -83,7 +83,8 @@ export default function CreateSale() {
         prints: [],
         salePayments: [],
         totalSalePayments: 0,
-        instantAmount: 0
+        instantAmount: 0,
+        typePrint: "sale"
 
     })
 
@@ -230,10 +231,12 @@ export default function CreateSale() {
                 setData(prev => {
                     return {
                         ...prev,
-                        products: []
+                        products: [],
+                        typePrint: "sale"
                     }
 
                 })
+
                 dialog4.current.open()
 
             }
@@ -281,13 +284,13 @@ export default function CreateSale() {
             if (s.status === "on") {
                 if (amount > s.balance) {
                     salePaymentDto.amount = s.balance
-                    salePaymentDto.advance += s.balance
+                    salePaymentDto.advance = s.advance + s.balance
                     salePaymentDto.balance = 0
                     amount -= s.balance
 
                 } else if (amount > 0 && amount <= s.balance) {
                     salePaymentDto.amount = amount
-                    salePaymentDto.advance += amount
+                    salePaymentDto.advance = s.advance + amount
                     salePaymentDto.balance = s.balance - amount
                     amount = 0
                 }
@@ -327,7 +330,8 @@ export default function CreateSale() {
                 setData(prev => {
                     return {
                         ...prev,
-                        salePayments: []
+                        salePayments: [],
+                        typePrint: "salePayement"
                     }
 
                 })
@@ -740,9 +744,6 @@ export default function CreateSale() {
             dialog2.current.open()
         }
 
-
-
-
     }
 
 
@@ -820,7 +821,12 @@ export default function CreateSale() {
 
     function handleSelectionPrint(value) {
         dispatch(identifierMenuActions.updatePrint({ print: value }))
-        navigate("/print-sale")
+        if (data?.typePrint === "sale") {
+            navigate("/print-sale")
+        } else if (data?.typePrint === "salePayement") {
+            navigate("/print-sale-payment")
+        }
+
     }
 
 

@@ -43,6 +43,7 @@ export default function Submit({ children, disabled = false, className, ...props
       {children === "Régler" && < FontAwesomeIcon icon={faCoins} className="me-2" />}
       {children === "Rapport" && < FontAwesomeIcon icon={faDiagramPredecessor} className="me-2" />}
       {children === "Appliquer" && < FontAwesomeIcon icon={faCheckSquare} className="me-2" />}
+      {children === "Duplicata" && < FontAwesomeIcon icon={faPrint} className="me-2" />}
 
       {pending ? <div className="flex gap-2">
         <FontAwesomeIcon icon={faSpinner} className="animate-spin" />

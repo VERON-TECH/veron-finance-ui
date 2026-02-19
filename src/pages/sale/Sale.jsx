@@ -9,6 +9,9 @@ import Modal from "../../layout/Modal.jsx";
 import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { sales } from "../../data/dataTable.js";
 import CreateSale from "../../components/sale/CreateSale.jsx";
+import Logo from "../../layout/LogoDark.jsx";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 
 
@@ -22,7 +25,8 @@ export default function SalePage() {
     const menu = useSelector(state => state.identifier.menu)
     const cash = useSelector(state => state.cash)
     const [data, setData] = useState({
-        sale: []
+        sale: [],
+        isLoading: false
     })
 
 
@@ -34,6 +38,12 @@ export default function SalePage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "sale" }))
+        setData(prev => {
+            return {
+                ...prev,
+                isLoading: true
+            }
+        })
         if (user.role.includes("ROLE_CAISSIER")) {
             async function get(signal) {
                 const allSales = await getAllSales({ signal, enterprise: user.enterprise, agency: user.agency, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
@@ -59,7 +69,8 @@ export default function SalePage() {
                 setData(prev => {
                     return {
                         ...prev,
-                        sale: tb
+                        sale: tb,
+                        isLoading: false
                     }
                 })
 
@@ -72,10 +83,11 @@ export default function SalePage() {
         {user.cashes.length > 0 ? <div className="flex justify-center mb-2">
             {user.role.includes("ROLE_CAISSIER") && user.cashes.length > 0 ? <Submit onClick={handleModal}>Nouveau</Submit> : undefined}
         </div> : <p className="text-red-500 text-center">Aucune caisse rattachée</p>}
-        <Table data={data?.sale} headers={sales.header} emptyMessage="Aucun vente trouvée." globalFilterFields={sales.global} sheet="Vente" titleRef="Informations d'une vente" size="lg:h-7/12 lg:w-4/15 xl:h-8/12" />
+        <Table data={data?.sale} headers={sales.header} emptyMessage="Aucun vente trouvée." globalFilterFields={sales.global} sheet="Vente" titleRef="Informations sur une vente" size="lg:h-7/12 lg:w-8/15 xl:h-7/12" />
         <Modal ref={dialog} size="lg:h-11/12 lg:w-15/15 xl:h-11/12" title="Créer une vente">
             <CreateSale />
         </Modal>
+        {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>
 }

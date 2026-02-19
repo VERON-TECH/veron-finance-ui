@@ -13,6 +13,9 @@ import Select from "../../layout/Select.jsx";
 import { printActions } from "../../store/print.js";
 import { useNavigate } from "react-router-dom";
 import Input from "../../layout/Input.jsx";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -26,13 +29,20 @@ export default function MvtCashPage() {
     const navigate = useNavigate()
     const menu = useSelector(state => state.identifier.menu)
     const [data, setData] = useState({
-        mvtCash: []
+        mvtCash: [],
+        isLoading: false
     })
 
 
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "cash" }))
+        setData(prev => {
+            return {
+                ...prev,
+                isLoading: true
+            }
+        })
         if (user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") || user.role.includes("ROLE_COMPTABLE")) {
             async function get(signal) {
                 for (let cash of user.cashes) {
@@ -50,7 +60,8 @@ export default function MvtCashPage() {
                     setData(prev => {
                         return {
                             ...prev,
-                            mvtCash: tb
+                            mvtCash: tb,
+                            isLoading: false
                         }
                     })
                 }
@@ -142,6 +153,7 @@ export default function MvtCashPage() {
             {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <Submit onClick={() => handleModal("report")}>Rapport</Submit> : undefined}
         </div> : <p className="text-red-500 text-center font-medium">Aucune caisse rattachée</p>}
         <Table data={data?.mvtCash} headers={mvtCashes.header} emptyMessage="Aucune opération trouvée." globalFilterFields={mvtCashes.global} sheet="mvt_caisse" titleRef="Visualiser un mouvement de caisse" size="lg:h-5/11 lg:w-4/15" />
+        {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-7/15 lg:w-8/16" title="Créer une opération">
             <CreateMvtCash />
         </Modal>

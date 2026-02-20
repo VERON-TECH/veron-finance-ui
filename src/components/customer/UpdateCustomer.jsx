@@ -3,7 +3,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { convert, createSalePayment, getAgencyById, getAllBankAccount, getAllEngagementsByCustomer, getAllInvoiceByCustomer, getAllMobileMoney, getAllPrints, getAllSalePaymentsByCustomer, getAllSalesByCustomer, getCashById, getCashBySlug, getCustomerById, getEnterpriseById, getSaleById, queryClient, updateCustomer } from "../../utils/http";
+import { convert, createSalePayment, getAgencyById, getAllBankAccount, getAllEngagementsByCustomer, getAllInvoiceByCustomer, getAllMobileMoney, getAllMvtCashByCustomerAndAdvance, getAllPrints, getAllSalePaymentsByCustomer, getAllSalesByCustomer, getCashById, getCashBySlug, getCustomerById, getEnterpriseById, getSaleById, queryClient, updateCustomer } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
@@ -59,6 +59,7 @@ export default function UpdateCustomer() {
         salePayments: [],
         borrow: [],
         loan: [],
+        advances: [],
         totalSalePayments: 0,
         typePrint: "sale",
         paymentMethod: "",
@@ -74,12 +75,14 @@ export default function UpdateCustomer() {
                 let tb3 = []
                 let tb4 = []
                 let tb5 = []
+                let tb6 = []
                 let totalSalePayments = 0
                 const customer_ = await getCustomerById({ signal, id })
                 const allSales = await getAllSalesByCustomer({ signal, customer: id });
                 const allInvoices = await getAllInvoiceByCustomer({ signal, customer: id })
                 const allSalePayments = await getAllSalePaymentsByCustomer({ signal, customer: customer_.slug })
                 const allEngagements = await getAllEngagementsByCustomer({ signal, tiers: customer_.ref })
+                const allMvtCashes = await getAllMvtCashByCustomerAndAdvance({ signal, customer: customer_.slug })
                 const enterprise_ = await getEnterpriseById({ id: user.enterprise, signal })
                 allSales.forEach(s => {
                     tb.push({ id: s.id, dateTransaction: s.dateTransaction, ref: s.ref, priceHt: s.priceHt, discount: s.discount, priceTtc: s.priceTtc, payment: s.payment, rest: s.rest })
@@ -116,8 +119,13 @@ export default function UpdateCustomer() {
 
                 })
 
+                allMvtCashes.forEach(s => {
+                    tb6.push({ id: s.id, dateTransaction: s.dateTransaction, ref: s.ref, amount: s.amount })
+
+                })
+
                 setData(prev => {
-                    return { ...prev, enterprise: enterprise_.slug, customer: customer_, sales: tb, prints: tb1, invoices: tb2, salePayments: tb3, totalSalePayments, borrow: tb4, loan: tb5 }
+                    return { ...prev, enterprise: enterprise_.slug, customer: customer_, sales: tb, prints: tb1, invoices: tb2, salePayments: tb3, totalSalePayments, borrow: tb4, loan: tb5, advances: tb6 }
                 })
             }
             get()
@@ -832,7 +840,30 @@ export default function UpdateCustomer() {
                     </div>
 
                 </>}
-                {data.selection === "Avances versées" && <h1>Hello Avance</h1>}
+                {data.selection === "Avances versées" && <>
+
+                    <div className="flex justify-center">
+                        <table className="w-4/5">
+                            <thead>
+                                <tr className="bg-sky-950 text-sky-50">
+                                    <th className="px-5 border">Id</th>
+                                    <th className="px-5 border">Date</th>
+                                    <th className="px-5 border">Réf.</th>
+                                    <th className="px-5 border">Montant</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.advances.length > 0 && data.advances.map(s => <tr key={s.id}>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{s.id}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{s.dateTransaction}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{s.ref}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.amount).toLocaleString()}</td>
+                                </tr>)}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </>}
             </div>
             {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
 

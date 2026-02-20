@@ -46,6 +46,12 @@ export const paymentMethod = [
   { key: 4, name: "AVANCE_CLIENT", value: "AVANCE_CLIENT" },
 ]
 
+export const paymentMethodPayement = [
+  { key: 0, name: "ESPECES", value: "ESPECES" },
+  { key: 1, name: "VIREMENT", value: "VIREMENT" },
+  { key: 2, name: "MOBILE_MONEY", value: "MOBILE_MONEY" },
+]
+
 
 export const paymentMethodPayment = [
   { key: 0, name: "ESPECES", value: "ESPECES" },

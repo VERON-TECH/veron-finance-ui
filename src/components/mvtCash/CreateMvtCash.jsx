@@ -518,7 +518,7 @@ export default function CreateMvtCash() {
                     return {
                         ...prev,
                         motif: tb,
-                        sens: [{ key: 0, name: "ENCAISSEMENT", value: "ENCAISSEMENT" }],
+                        sens: [{ key: 0, name: "DECAISSEMENT", value: "DECAISSEMENT" }],
                         isSelected: true
                     }
                 })

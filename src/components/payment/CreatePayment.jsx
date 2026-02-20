@@ -31,7 +31,6 @@ export default function CreatePayment() {
 
 
     useEffect(() => {
-        let tb = []
         if (user.role.includes("ROLE_CAISSIER") && id != "") {
             async function get(signal) {
                 inputCash.current.value = cash
@@ -42,6 +41,8 @@ export default function CreatePayment() {
                         invoice
                     }
                 })
+
+
             }
             get()
         }

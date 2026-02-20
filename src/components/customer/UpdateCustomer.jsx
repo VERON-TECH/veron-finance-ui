@@ -3,14 +3,14 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { convert, getAgencyById, getAllInvoiceByCustomer, getAllPrints, getAllSalePaymentsByCustomer, getAllSalesByCustomer, getCashById, getCustomerById, getEnterpriseById, getSaleById, queryClient, updateCustomer } from "../../utils/http";
+import { convert, createSalePayment, getAgencyById, getAllBankAccount, getAllEngagementsByCustomer, getAllInvoiceByCustomer, getAllMobileMoney, getAllPrints, getAllSalePaymentsByCustomer, getAllSalesByCustomer, getCashById, getCashBySlug, getCustomerById, getEnterpriseById, getSaleById, queryClient, updateCustomer } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
 import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
 import Select from "../../layout/Select.jsx";
-import { genders } from "../../data/info.js";
+import { genders, paymentMethodPayement } from "../../data/info.js";
 import Modal from "../../layout/Modal.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCoins, faPrint } from "@fortawesome/free-solid-svg-icons";
@@ -43,6 +43,9 @@ export default function UpdateCustomer() {
     const inputPlaceBirth = useRef();
     const inputEnterprise = useRef();
     const selectGender = useRef()
+    const inputPayment__ = useRef()
+    const selectPaymentMethod = useRef()
+    const selectPaymentReceiver = useRef()
 
     const dispatch = useDispatch();
     const [scope, animate] = useAnimate();
@@ -54,7 +57,12 @@ export default function UpdateCustomer() {
         prints: [],
         invoices: [],
         salePayments: [],
-        typePrint: "sale"
+        borrow: [],
+        loan: [],
+        totalSalePayments: 0,
+        typePrint: "sale",
+        paymentMethod: "",
+        paymentReceiver: []
     })
 
     useEffect(() => {
@@ -63,10 +71,15 @@ export default function UpdateCustomer() {
                 let tb = []
                 let tb1 = []
                 let tb2 = []
-                const customer = await getCustomerById({ signal, id })
+                let tb3 = []
+                let tb4 = []
+                let tb5 = []
+                let totalSalePayments = 0
+                const customer_ = await getCustomerById({ signal, id })
                 const allSales = await getAllSalesByCustomer({ signal, customer: id });
                 const allInvoices = await getAllInvoiceByCustomer({ signal, customer: id })
-                const allSalePayments = await getAllSalePaymentsByCustomer({ signal, customer: id })
+                const allSalePayments = await getAllSalePaymentsByCustomer({ signal, customer: customer_.slug })
+                const allEngagements = await getAllEngagementsByCustomer({ signal, tiers: customer_.ref })
                 const enterprise_ = await getEnterpriseById({ id: user.enterprise, signal })
                 allSales.forEach(s => {
                     tb.push({ id: s.id, dateTransaction: s.dateTransaction, ref: s.ref, priceHt: s.priceHt, discount: s.discount, priceTtc: s.priceTtc, payment: s.payment, rest: s.rest })
@@ -76,9 +89,15 @@ export default function UpdateCustomer() {
                     tb2.push({ id: s.id, dateTransaction: s.dateTransaction, ref: s.ref, amount: s.amount, advance: s.advance, balance: s.balance, status: s.statusInvoice })
                 })
 
-                allSalePayments.forEach(s => {
-                    tb2.push({ id: s.id, sale: s.sale, ref: s.ref, amount: s.amount, advance: s.advance, balance: s.balance, status: s.statusInvoice })
-                })
+
+
+                for (let s of allSalePayments) {
+                    if (s.balance > 0) {
+                        totalSalePayments += s.balance
+                        const sale = await getSaleById({ signal, id: s.sale })
+                        tb3.push({ id: s.id, sale: s.sale, ref: sale.ref, rest: sale.rest, advance: s.advance, balance: s.balance, status: "off" })
+                    }
+                }
                 const allPrints = await getAllPrints({ signal, enterprise: user.enterprise, agency: user.agency })
 
                 allPrints.forEach(p => {
@@ -87,8 +106,18 @@ export default function UpdateCustomer() {
                     }
                 })
 
+
+                allEngagements.forEach(s => {
+                    if (s.typeEngagement === "EMPRUNT") {
+                        tb4.push({ id: s.id, ref: s.ref, amount: s.amount, advance: s.advance, balance: s.balance })
+                    } else if (s.typeEngagement === "PRET") {
+                        tb5.push({ id: s.id, ref: s.ref, amount: s.amount, advance: s.advance, balance: s.balance })
+                    }
+
+                })
+
                 setData(prev => {
-                    return { ...prev, enterprise: enterprise_.slug, customer, sales: tb, prints: tb1, invoices: tb2 }
+                    return { ...prev, enterprise: enterprise_.slug, customer: customer_, sales: tb, prints: tb1, invoices: tb2, salePayments: tb3, totalSalePayments, borrow: tb4, loan: tb5 }
                 })
             }
             get()
@@ -105,7 +134,6 @@ export default function UpdateCustomer() {
         const email = formData.get("email")
         const phone = formData.get("phone")
         const address = formData.get("address")
-        const phone2 = formData.get("phone2")
         const gender = formData.get("gender")
         const dateBirth = formData.get("dateBirth")
         const placeBirth = formData.get("placeBirth")
@@ -260,6 +288,9 @@ export default function UpdateCustomer() {
     }
 
     async function handleChange(identifier, value, signal) {
+        let tbEl = {
+            tb: []
+        }
         if (identifier === "search") {
             const sales = await getAllSalesByCustomer({ signal, customer: id })
             let tb = value !== "" ? sales.filter(s => s.id === Number(value)) : sales
@@ -292,6 +323,52 @@ export default function UpdateCustomer() {
                     invoices: tb
                 }
             })
+        }
+
+        if (identifier === "paymentMethod") {
+
+            if (value === "ESPECES") {
+                setData(prev => {
+                    return {
+                        ...prev,
+                        paymentReceiver: user.cashes
+                    }
+                })
+            }
+
+            if (value === "VIREMENT") {
+                const bankAccounts = await getAllBankAccount({ signal, agency: user.agency })
+                bankAccounts.forEach(b => {
+                    tbEl.tb.push({ key: b.id, name: b.rib, value: b.slug })
+                })
+                setData(prev => {
+                    return {
+                        ...prev,
+                        paymentReceiver: tbEl.tb
+                    }
+                })
+            }
+
+            if (value === "MOBILE_MONEY") {
+                const mobileMoney = await getAllMobileMoney({ signal, agency: user.agency })
+                mobileMoney.forEach(m => {
+                    tbEl.tb.push({ key: m.id, name: m.phone, value: m.slug })
+                })
+                setData(prev => {
+                    return {
+                        ...prev,
+                        paymentReceiver: tbEl.tb
+                    }
+                })
+            }
+
+            setData(prev => {
+                return {
+                    ...prev,
+                    paymentMethod: value
+                }
+            })
+
         }
     }
 
@@ -338,6 +415,8 @@ export default function UpdateCustomer() {
         dispatch(identifierMenuActions.updatePrint({ print: value }))
         if (data?.typePrint === "sale") {
             navigate("/print-sale")
+        } else if (data?.typePrint === "salePayement") {
+            navigate("/print-sale-payment")
         }
 
     }
@@ -345,6 +424,160 @@ export default function UpdateCustomer() {
     function handleOpenPayment(value) {
         dispatch(modalActions.updateValue(value))
         dialog2.current.open()
+    }
+
+    function handleSelect(identifier, value, id) {
+        const salePayments = [...data.salePayments]
+        let totalSalePayments = 0
+        let instantAmount = data?.instantAmount
+        if (identifier == "all") {
+            if (value == true) {
+                for (let s of salePayments) {
+                    s.status = "on"
+                    totalSalePayments += s.balance
+                    instantAmount = totalSalePayments
+                }
+
+            } else if (value == false) {
+                for (let s of salePayments) {
+                    s.status = "off"
+                    totalSalePayments = 0
+                    instantAmount = 0
+
+                }
+
+            }
+
+        } else if (identifier == "one") {
+            totalSalePayments = data?.instantAmount
+            if (value == true) {
+                for (let s of salePayments) {
+                    if (s.id === id) {
+                        s.status = "on"
+                        totalSalePayments += s.balance
+                        instantAmount += s.balance
+                    }
+
+                }
+
+            } else if (value == false) {
+                for (let s of salePayments) {
+
+                    if (s.id === id) {
+                        s.status = "off"
+                        totalSalePayments -= s.balance
+                        instantAmount -= s.balance
+                    }
+                }
+
+            }
+
+        }
+        setData(prev => {
+            return {
+                ...prev,
+                salePayments,
+                instantAmount,
+            }
+        })
+        inputPayment__.current.value = totalSalePayments
+    }
+
+    async function handlePayment() {
+        const controller = new AbortController();
+        const signal = controller.signal;
+        let errors = []
+        if (selectPaymentMethod.current.value === "Sélectionner un moyen de paiement") {
+            errors.push("Veuillez sélectionner un moyen de paiement.")
+        }
+
+        if (selectPaymentReceiver.current.value === "Sélectionner un moyen de réception") {
+            errors.push("Veuillez sélectionner un moyen de réception.")
+        }
+
+        if (!isNotEmpty(cash)) {
+            errors.push("Veuillez sélectionner une caisse.")
+        }
+
+        if (errors.length > 0) {
+            dispatch(noteActions.error(true))
+            dispatch(noteActions.show());
+            dispatch(noteActions.relaunch());
+            dispatch(noteActions.sendData(errors))
+            return
+        }
+
+        let salePaymentDto = {}
+        const salePaymentDtos = []
+        const customer = await getCustomerById({ signal, id })
+        const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
+        const agency = await getAgencyById({ id: user.agency, signal })
+        const cash_ = await getCashBySlug({ slug: cash, signal })
+        let amount = Number(inputPayment__.current.value)
+        for (let s of data.salePayments) {
+            salePaymentDto = {}
+            if (s.status === "on") {
+                if (amount > s.balance) {
+                    salePaymentDto.amount = s.balance
+                    salePaymentDto.advance = s.advance + s.balance
+                    salePaymentDto.balance = 0
+                    amount -= s.balance
+
+                } else if (amount > 0 && amount <= s.balance) {
+                    salePaymentDto.amount = amount
+                    salePaymentDto.advance = s.advance + amount
+                    salePaymentDto.balance = s.balance - amount
+                    amount = 0
+                }
+                salePaymentDto.sale = s.sale
+                salePaymentDto.paymentMethod = selectPaymentMethod.current.value
+                salePaymentDto.paymentReceiver = selectPaymentReceiver.current.value
+                salePaymentDto.cash = cash
+                salePaymentDto.rest = s.rest
+                salePaymentDto.ref = s.ref
+                salePaymentDtos.push(salePaymentDto)
+
+            }
+        }
+
+        if (salePaymentDtos.length > 0) {
+            const responseData = await createSalePayment(salePaymentDtos)
+            const amountLetter = await convert(Number(inputPayment__.current.value))
+
+            const state = responseHttp(responseData);
+            if (state) {
+                dispatch(noteActions.error(true))
+            } else {
+
+                dispatch(noteActions.error(false))
+                const printSalePayment = {
+                    enterprise,
+                    agency,
+                    date: new Date().toLocaleDateString(),
+                    time: new Date().getTime().toLocaleString(),
+                    customer: customer.lastName + " " + customer.firstName,
+                    salePayments: salePaymentDtos,
+                    payment: inputPayment__.current.value,
+                    cash: cash_,
+                    amountLetter,
+                }
+                dispatch(printActions.getPrint(printSalePayment))
+                setData(prev => {
+                    return {
+                        ...prev,
+                        salePayments: [],
+                        typePrint: "salePayement"
+                    }
+
+                })
+                dialog1.current.open()
+
+            }
+            dispatch(noteActions.show());
+            dispatch(noteActions.relaunch());
+            dispatch(noteActions.sendData(responseData))
+        }
+
     }
 
 
@@ -384,11 +617,11 @@ export default function UpdateCustomer() {
                 Enregistrer
             </Submit>}
         </form>
-        <div className="absolute bottom-5 right-5">
+        {data.customer.lastName !== "CLIENT INCONNU" && <div className="absolute bottom-5 right-5">
             <Submit onClick={handleModal}>
                 Listing des opérations
             </Submit>
-        </div>
+        </div>}
 
         <Modal ref={dialog} title="Historique des opérations" size="h-5/5 w-full">
             <div className="flex gap-4 p-2 bg-sky-950 text-sky-50 rounded">
@@ -437,11 +670,11 @@ export default function UpdateCustomer() {
                                     <td className="px-5 border text-center border-sky-950 py-1">{s.id}</td>
                                     <td className="px-5 border text-center border-sky-950 py-1">{s.dateTransaction}</td>
                                     <td className="px-5 border text-center border-sky-950 py-1">{s.ref}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{s.priceHt}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{s.discount}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{s.priceTtc}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{s.payment}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{s.rest}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.priceHt).toLocaleString()}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.discount).toLocaleString()}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.priceTtc).toLocaleString()}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.payment).toLocaleString()}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.rest).toLocaleString()}</td>
                                     <td className="px-5 border text-center border-sky-950 py-1"><FontAwesomeIcon icon={faPrint} className="cursor-pointer" onClick={() => handlePrint("sale", s.id)} /></td>
                                 </tr>)}
                             </tbody>
@@ -472,9 +705,9 @@ export default function UpdateCustomer() {
                                     <td className="px-5 border text-center border-sky-950 py-1">{s.id}</td>
                                     <td className="px-5 border text-center border-sky-950 py-1">{s.dateTransaction}</td>
                                     <td className="px-5 border text-center border-sky-950 py-1">{s.ref}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{s.amount}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{s.advance}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{s.balance}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.amount).toLocaleString()}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.advance).toLocaleString()}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.balance).toLocaleString()}</td>
                                     <td className="px-5 border text-center border-sky-950 py-1">{s.status}</td>
                                     <td className="px-5 border text-center border-sky-950 py-1">{cash != "" && s.status === "EN_INSTANCE" ? <FontAwesomeIcon icon={faCoins} className="cursor-pointer" onClick={() => handleOpenPayment(s.id)} /> : "Aucune action dispo."}</td>
                                 </tr>)}
@@ -483,53 +716,60 @@ export default function UpdateCustomer() {
                     </div>
 
                 </>}
-                {data.selection === "Dettes issues des ventes" && data?.salePayments.length > 0 && <div className="flex gap-4 justify-center mt-4"><table className="w-2/3 mb-4">
-                    <thead>
-                        <tr className="bg-sky-950 text-sky-50">
-                            <th className="border">
-                                id
-                            </th>
-                            <th className="border hidden">
-                                sale
-                            </th>
-                            <th className="border">
-                                Réf.
-                            </th>
-                            <th className="border">
-                                Dettes
-                            </th>
-                            <th className="border">
-                                Avance
-                            </th>
-                            <th className="border">
-                                Solde
-                            </th>
-                            <th className="border py-1 flex items-center justify-center">
-                                Action <input type="checkbox" className="ms-2" onClick={(e) => handleSelect("all", e.target.checked)} />
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {data.salePayments.map(s => <tr key={s.id}>
-                            <td className="border border-sky-950 text-center p-1">{s.id}</td>
-                            <td className="border border-sky-950 text-center p-1 hidden">{s.sale}</td>
-                            <td className="border border-sky-950 text-center p-1">{s.ref}</td>
-                            <td className="border border-sky-950 text-center p-1">{Number(s.rest).toLocaleString()}</td>
-                            <td className="border border-sky-950 text-center p-1">{Number(s.advance).toLocaleString()}</td>
-                            <td className="border border-sky-950 text-center p-1">{Number(s.balance).toLocaleString()}</td>
-                            <td className="border border-sky-950 text-center p-1"><input type="checkbox" checked={s.status === "on"} onClick={(e) => handleSelect("one", e.target.checked, s.id)} /></td>
-                        </tr>)}
-                    </tbody>
-                    <tfoot>
-                        <tr className="bg-sky-950 text-sky-50">
-                            <td colSpan="3" className="border text-center p-1"></td>
-                            <td colSpan="2" className="border text-center p-1">Total</td>
-                            <td colSpan="2" className="border text-center p-1">{Number(data?.totalSalePayments).toLocaleString()}</td>
-                        </tr>
-                    </tfoot>
-                </table>
-                    <div className="flex flex-col gap-4 items-center">
+                {data.selection === "Dettes issues des ventes" && data?.salePayments.length > 0 && <div className="w-full flex gap-4 justify-center mt-4">
+                    <div className="w-2/3">
+                        <table className="mb-4 w-full">
+                            <thead>
+                                <tr className="bg-sky-950 text-sky-50">
+                                    <th className="border">
+                                        id
+                                    </th>
+                                    <th className="border hidden">
+                                        sale
+                                    </th>
+                                    <th className="border">
+                                        Réf.
+                                    </th>
+                                    <th className="border">
+                                        Dettes
+                                    </th>
+                                    <th className="border">
+                                        Avance
+                                    </th>
+                                    <th className="border">
+                                        Solde
+                                    </th>
+                                    <th className="border py-1 flex items-center justify-center">
+                                        Action <input type="checkbox" className="ms-2" onClick={(e) => handleSelect("all", e.target.checked)} />
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.salePayments.map(s => <tr key={s.id}>
+                                    <td className="border border-sky-950 text-center p-1">{s.id}</td>
+                                    <td className="border border-sky-950 text-center p-1 hidden">{s.sale}</td>
+                                    <td className="border border-sky-950 text-center p-1">{s.ref}</td>
+                                    <td className="border border-sky-950 text-center p-1">{Number(s.rest).toLocaleString()}</td>
+                                    <td className="border border-sky-950 text-center p-1">{Number(s.advance).toLocaleString()}</td>
+                                    <td className="border border-sky-950 text-center p-1">{Number(s.balance).toLocaleString()}</td>
+                                    <td className="border border-sky-950 text-center p-1"><input type="checkbox" checked={s.status === "on"} onClick={(e) => handleSelect("one", e.target.checked, s.id)} /></td>
+                                </tr>)}
+                            </tbody>
+                            <tfoot>
+                                <tr className="bg-sky-950 text-sky-50">
+                                    <td colSpan="3" className="border text-center p-1"></td>
+                                    <td colSpan="2" className="border text-center p-1">Total</td>
+                                    <td colSpan="2" className="border text-center p-1">{Number(data?.totalSalePayments).toLocaleString()}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                    <div className="w-1/3 flex flex-col gap-2 items-center border p-2 rounded">
+                        <Select label="Moyen paiement *" id="paymentMethod" name="paymentMethod" selectedTitle="Sélectionner un moyen de paiement" data={paymentMethodPayement} ref={selectPaymentMethod} onChange={(e) => handleChange("paymentMethod", e.target.value)} disabled={data?.disabled} />
+                        <Select label="Moyen réception *" id="paymentReceiver" name="paymentReceiver" selectedTitle="Sélectionner un moyen de réception" data={data?.paymentReceiver} ref={selectPaymentReceiver} disabled={data?.paymentMethod === "A_CREDIT" || data?.paymentMethod === "AVANCE_CLIENT" || data?.disabled} />
+
                         <div className="flex flex-col">
+
                             <label htmlFor="payment_" className="font-medium">Montant versé</label>
                             <input type="number" id="payment_" placeholder="Montant versé" className="border border-sky-950 rounded text-end shadow-md shadow-sky-950 p-1" ref={inputPayment__} />
 
@@ -537,10 +777,61 @@ export default function UpdateCustomer() {
                         <Submit onClick={handlePayment}>
                             Enregistrer
                         </Submit>
+
                     </div>
                 </div>}
-                {data.selection === "Emprunts" && <h1>Hello Emprunt</h1>}
-                {data.selection === "Prêts" && <h1>Hello Prêt</h1>}
+                {data.selection === "Emprunts" && <>
+
+                    <div className="flex justify-center">
+                        <table className="w-4/5">
+                            <thead>
+                                <tr className="bg-sky-950 text-sky-50">
+                                    <th className="px-5 border">Id</th>
+                                    <th className="px-5 border">Réf.</th>
+                                    <th className="px-5 border">Montant</th>
+                                    <th className="px-5 border">Avance</th>
+                                    <th className="px-5 border">Solde</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.borrow.length > 0 && data.borrow.map(s => <tr key={s.id}>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{s.id}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{s.ref}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.amount).toLocaleString()}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.advance).toLocaleString()}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.balance).toLocaleString()}</td>
+                                </tr>)}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </>}
+                {data.selection === "Prêts" && <>
+
+                    <div className="flex justify-center">
+                        <table className="w-4/5">
+                            <thead>
+                                <tr className="bg-sky-950 text-sky-50">
+                                    <th className="px-5 border">Id</th>
+                                    <th className="px-5 border">Réf.</th>
+                                    <th className="px-5 border">Montant</th>
+                                    <th className="px-5 border">Avance</th>
+                                    <th className="px-5 border">Solde</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.loan.length > 0 && data.loan.map(s => <tr key={s.id}>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{s.id}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{s.ref}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.amount).toLocaleString()}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.advance).toLocaleString()}</td>
+                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.balance).toLocaleString()}</td>
+                                </tr>)}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </>}
                 {data.selection === "Avances versées" && <h1>Hello Avance</h1>}
             </div>
             {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}

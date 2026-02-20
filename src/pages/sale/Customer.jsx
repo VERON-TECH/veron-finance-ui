@@ -1,13 +1,12 @@
 import { useDispatch, useSelector } from "react-redux";
-import { getAgencyById, getAllCustomers, getAllSales, getCashById, getCustomerById, getEnterpriseById, getInvoiceById } from "../../utils/http";
+import { getAllCustomers, getEnterpriseById } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
 import { useEffect, useRef, useState } from "react";
 import Submit from "../../layout/Submit.jsx"
 import Table from "../../layout/Table.jsx"
 import Modal from "../../layout/Modal.jsx";
 import { identifierMenuActions } from "../../store/identifierSlice.js"
-import { customers, sales } from "../../data/dataTable.js";
-import CreateSale from "../../components/sale/CreateSale.jsx";
+import { customers } from "../../data/dataTable.js";
 import Logo from "../../layout/LogoDark.jsx";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";

@@ -63,7 +63,22 @@ export default function UpdateCustomer() {
         totalSalePayments: 0,
         typePrint: "sale",
         paymentMethod: "",
-        paymentReceiver: []
+        paymentReceiver: [],
+        totalPriceSale: {
+            priceHT: 0,
+            discount: 0,
+            priceTTC: 0,
+            payment: 0,
+            rest: 0
+        },
+        totalInvoice: {
+            amount: 0,
+            advance: 0,
+            balance: 0,
+        },
+        totalAdvance: {
+            amount: 0
+        }
     })
 
     useEffect(() => {
@@ -84,11 +99,34 @@ export default function UpdateCustomer() {
                 const allEngagements = await getAllEngagementsByCustomer({ signal, tiers: customer_.ref })
                 const allMvtCashes = await getAllMvtCashByCustomerAndAdvance({ signal, customer: customer_.slug })
                 const enterprise_ = await getEnterpriseById({ id: user.enterprise, signal })
+                let totalPriceSale = {
+                    priceHT: 0,
+                    discount: 0,
+                    priceTTC: 0,
+                    payment: 0,
+                    rest: 0
+                }
+                let totalInvoice = {
+                    amount: 0,
+                    advance: 0,
+                    balance: 0,
+                }
+                let totalAdvance = {
+                    amount: 0
+                }
                 allSales.forEach(s => {
+                    totalPriceSale.priceHT += s.priceHt
+                    totalPriceSale.discount += s.discount
+                    totalPriceSale.priceTTC += s.priceTtc
+                    totalPriceSale.payment += s.payment
+                    totalPriceSale.rest += s.rest
                     tb.push({ id: s.id, dateTransaction: s.dateTransaction, ref: s.ref, priceHt: s.priceHt, discount: s.discount, priceTtc: s.priceTtc, payment: s.payment, rest: s.rest })
                 })
 
                 allInvoices.forEach(s => {
+                    totalInvoice.amount += s.amount
+                    totalInvoice.advance = +s.advance
+                    totalInvoice.balance += s.balance
                     tb2.push({ id: s.id, dateTransaction: s.dateTransaction, ref: s.ref, amount: s.amount, advance: s.advance, balance: s.balance, status: s.statusInvoice })
                 })
 
@@ -120,12 +158,13 @@ export default function UpdateCustomer() {
                 })
 
                 allMvtCashes.forEach(s => {
+                    totalAdvance.amount += s.amount
                     tb6.push({ id: s.id, dateTransaction: s.dateTransaction, ref: s.ref, amount: s.amount })
 
                 })
 
                 setData(prev => {
-                    return { ...prev, enterprise: enterprise_.slug, customer: customer_, sales: tb, prints: tb1, invoices: tb2, salePayments: tb3, totalSalePayments, borrow: tb4, loan: tb5, advances: tb6 }
+                    return { ...prev, enterprise: enterprise_.slug, customer: customer_, sales: tb, prints: tb1, invoices: tb2, salePayments: tb3, totalSalePayments, borrow: tb4, loan: tb5, advances: tb6, totalPriceSale, totalInvoice, totalAdvance }
                 })
             }
             get()
@@ -659,22 +698,22 @@ export default function UpdateCustomer() {
                         <input type="text" placeholder="Rechercher les mots clés" className="p-1 border border-sky-950 w-72" onChange={(e) => handleChange("search", e.target.value)} />
                     </div>
                     <div className="flex justify-center">
-                        <table className="w-4/5">
+                        {data.sales.length > 0 ? <table className="w-4/5">
                             <thead>
                                 <tr className="bg-sky-950 text-sky-50">
-                                    <th className="px-5 border">Id</th>
-                                    <th className="px-5 border">Date</th>
-                                    <th className="px-5 border">Réf.</th>
-                                    <th className="px-5 border">Prix H.T</th>
-                                    <th className="px-5 border">Rémise</th>
-                                    <th className="px-5 border">Prix T.T.C.</th>
-                                    <th className="px-5 border">Acompte</th>
-                                    <th className="px-5 border">Reste</th>
-                                    <th className="px-5 border">Action</th>
+                                    <th className="px-5 border py-1">Id</th>
+                                    <th className="px-5 border py-1">Date</th>
+                                    <th className="px-5 border py-1">Réf.</th>
+                                    <th className="px-5 border py-1">Prix H.T</th>
+                                    <th className="px-5 border py-1">Rémise</th>
+                                    <th className="px-5 border py-1">Prix T.T.C.</th>
+                                    <th className="px-5 border py-1">Acompte</th>
+                                    <th className="px-5 border py-1">Reste</th>
+                                    <th className="px-5 border py-1">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {data.sales.length > 0 && data.sales.map(s => <tr key={s.id}>
+                                {data.sales.map(s => <tr key={s.id}>
                                     <td className="px-5 border text-center border-sky-950 py-1">{s.id}</td>
                                     <td className="px-5 border text-center border-sky-950 py-1">{s.dateTransaction}</td>
                                     <td className="px-5 border text-center border-sky-950 py-1">{s.ref}</td>
@@ -686,45 +725,67 @@ export default function UpdateCustomer() {
                                     <td className="px-5 border text-center border-sky-950 py-1"><FontAwesomeIcon icon={faPrint} className="cursor-pointer" onClick={() => handlePrint("sale", s.id)} /></td>
                                 </tr>)}
                             </tbody>
-                        </table>
+                            <tfoot>
+                                <tr className="bg-sky-950 text-sky-50">
+                                    <td className="px-5 border py-1 text-center" colSpan="3">TOTAUX</td>
+                                    <td className="px-5 border py-1 text-center" >{Number(data?.totalPriceSale.priceHT).toLocaleString()}</td>
+                                    <td className="px-5 border py-1 text-center" >{Number(data?.totalPriceSale.discount).toLocaleString()}</td>
+                                    <td className="px-5 border py-1 text-center" >{Number(data?.totalPriceSale.priceTTC).toLocaleString()}</td>
+                                    <td className="px-5 border py-1 text-center" >{Number(data?.totalPriceSale.payment).toLocaleString()}</td>
+                                    <td className="px-5 border py-1 text-center" >{Number(data?.totalPriceSale.rest).toLocaleString()}</td>
+                                    <td className="px-5 border py-1 text-center" ></td>
+                                </tr>
+                            </tfoot>
+                        </table> : <p className="text-red-500 font-medium text-center">Aucun achat enregistré</p>}
                     </div>
 
                 </>}
                 {data.selection === "Factures" && <>
-                    <div className="p-1 m-1 flex justify-end">
+                    {data.invoices.length > 0 ? <><div className="p-1 m-1 flex justify-end">
                         <input type="text" placeholder="Rechercher les mots clés" className="p-1 border border-sky-950 w-72" onChange={(e) => handleChange("search_invoice", e.target.value)} />
                     </div>
-                    <div className="flex justify-center">
-                        <table className="w-4/5">
-                            <thead>
-                                <tr className="bg-sky-950 text-sky-50">
-                                    <th className="px-5 border">Id</th>
-                                    <th className="px-5 border">Date</th>
-                                    <th className="px-5 border">Réf.</th>
-                                    <th className="px-5 border">Montant</th>
-                                    <th className="px-5 border">Avance</th>
-                                    <th className="px-5 border">Solde</th>
-                                    <th className="px-5 border">Statut</th>
-                                    <th className="px-5 border">Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {data.invoices.length > 0 && data.invoices.map(s => <tr key={s.id}>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{s.id}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{s.dateTransaction}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{s.ref}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.amount).toLocaleString()}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.advance).toLocaleString()}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{Number(s.balance).toLocaleString()}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{s.status}</td>
-                                    <td className="px-5 border text-center border-sky-950 py-1">{cash != "" && s.status === "EN_INSTANCE" ? <FontAwesomeIcon icon={faCoins} className="cursor-pointer" onClick={() => handleOpenPayment(s.id)} /> : "Aucune action dispo."}</td>
-                                </tr>)}
-                            </tbody>
-                        </table>
-                    </div>
+                        <div className="flex justify-center">
+                            <table className="w-4/5">
+                                <thead>
+                                    <tr className="bg-sky-950 text-sky-50">
+                                        <th className="px-5 border">Id</th>
+                                        <th className="px-5 border">Date</th>
+                                        <th className="px-5 border">Réf.</th>
+                                        <th className="px-5 border">Montant</th>
+                                        <th className="px-5 border">Avance</th>
+                                        <th className="px-5 border">Solde</th>
+                                        <th className="px-5 border">Statut</th>
+                                        <th className="px-5 border">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {data.invoices.map(s => <tr key={s.id}>
+                                        <td className="px-5 border text-center border-sky-950 py-1">{s.id}</td>
+                                        <td className="px-5 border text-center border-sky-950 py-1">{s.dateTransaction}</td>
+                                        <td className="px-5 border text-center border-sky-950 py-1">{s.ref}</td>
+                                        <td className="px-5 border text-center border-sky-950 py-1">{Number(s.amount).toLocaleString()}</td>
+                                        <td className="px-5 border text-center border-sky-950 py-1">{Number(s.advance).toLocaleString()}</td>
+                                        <td className="px-5 border text-center border-sky-950 py-1">{Number(s.balance).toLocaleString()}</td>
+                                        <td className="px-5 border text-center border-sky-950 py-1">{s.status}</td>
+                                        <td className="px-5 border text-center border-sky-950 py-1">{cash != "" && s.status === "EN_INSTANCE" ? <FontAwesomeIcon icon={faCoins} className="cursor-pointer" onClick={() => handleOpenPayment(s.id)} /> : "Aucune action dispo."}</td>
+                                    </tr>)}
+                                </tbody>
+                                <tfoot>
+                                    <tr className="bg-sky-950 text-sky-50">
+                                        <td className="px-5 border py-1 text-center" colSpan="3">TOTAUX</td>
+                                        <td className="px-5 border py-1 text-center" >{Number(data?.totalInvoice.amount).toLocaleString()}</td>
+                                        <td className="px-5 border py-1 text-center" >{Number(data?.totalInvoice.advance).toLocaleString()}</td>
+                                        <td className="px-5 border py-1 text-center" >{Number(data?.totalInvoice.balance).toLocaleString()}</td>
+                                        <td colspan="3" className="px-5 border py-1 text-center" ></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+                    </> : <p className="text-red-500 font-medium text-center">Aucune facture enregistrée</p>}
 
-                </>}
-                {data.selection === "Dettes issues des ventes" && data?.salePayments.length > 0 && <div className="w-full flex gap-4 justify-center mt-4">
+                </>
+                }
+                {data.selection === "Dettes issues des ventes" && <>{data?.salePayments.length > 0 ? <div className="w-full flex gap-4 justify-center mt-4">
                     <div className="w-2/3">
                         <table className="mb-4 w-full">
                             <thead>
@@ -787,10 +848,11 @@ export default function UpdateCustomer() {
                         </Submit>
 
                     </div>
-                </div>}
+                </div> : <p className="text-red-500 font-medium text-center">Aucune dette issue des ventes enregistrée</p>}
+                </>
+                }
                 {data.selection === "Emprunts" && <>
-
-                    <div className="flex justify-center">
+                    {data.borrow.length > 0 ? <div className="flex justify-center">
                         <table className="w-4/5">
                             <thead>
                                 <tr className="bg-sky-950 text-sky-50">
@@ -810,13 +872,13 @@ export default function UpdateCustomer() {
                                     <td className="px-5 border text-center border-sky-950 py-1">{Number(s.balance).toLocaleString()}</td>
                                 </tr>)}
                             </tbody>
+
                         </table>
-                    </div>
+                    </div> : <p className="text-red-500 font-medium text-center">Aucune emprunt enregistré</p>}
 
                 </>}
                 {data.selection === "Prêts" && <>
-
-                    <div className="flex justify-center">
+                    {data.loan.length > 0 ? <div className="flex justify-center">
                         <table className="w-4/5">
                             <thead>
                                 <tr className="bg-sky-950 text-sky-50">
@@ -837,12 +899,12 @@ export default function UpdateCustomer() {
                                 </tr>)}
                             </tbody>
                         </table>
-                    </div>
+                    </div> : <p className="text-red-500 font-medium text-center">Aucun prêt enregistré</p>}
 
                 </>}
                 {data.selection === "Avances versées" && <>
+                    {data.advances.length > 0 ? <div className="flex justify-center">
 
-                    <div className="flex justify-center">
                         <table className="w-4/5">
                             <thead>
                                 <tr className="bg-sky-950 text-sky-50">
@@ -860,14 +922,22 @@ export default function UpdateCustomer() {
                                     <td className="px-5 border text-center border-sky-950 py-1">{Number(s.amount).toLocaleString()}</td>
                                 </tr>)}
                             </tbody>
+                            <tfoot>
+                                <tr className="bg-sky-950 text-sky-50">
+                                    <td className="px-5 border py-1 text-center" colSpan="3">TOTAUX</td>
+
+                                    <td className="px-5 border py-1 text-center" >{Number(data?.totalAdvance.amount).toLocaleString()}</td>
+                                </tr>
+                            </tfoot>
                         </table>
                     </div>
+                        : <p className="text-red-500 font-medium text-center">Aucune avance enregistrée</p>}
 
                 </>}
             </div>
             {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
 
-        </Modal>
+        </Modal >
         <Modal ref={dialog1} title="Sélection du format d'impression" size="h-2/5 ">
             {data.prints.length > 0 ? <div className="flex flex-col items-center justify-center gap-4 mb-4">
                 {data.prints.map(p => <button key={p.id} className="text-sky-50 bg-sky-950 font-bold p-2 border rounded w-full cursor-pointer shadow-sky-950 shadow-md hover:bg-sky-50 hover:text-sky-950" onClick={(e) => handleSelectionPrint(e.target.textContent)}>

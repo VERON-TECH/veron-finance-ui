@@ -15,7 +15,7 @@ export default function HomePage() {
   return <>
     <Header />
     <Nav />
-    <main className="absolute left-2/15 top-10 p-2  lg:w-13/15 lg:h-23/25">
+    <main className="absolute left-3/17 top-10 p-2  lg:w-12/15 lg:h-23/25">
       <MenuBar features={subFeactures} />
       {token ? <Outlet /> : <div className="text-sky-950 text-2xl text-shadow-2xl text-shadow-sky-950 font-bold">
         Bien vouloir vous reconnecter

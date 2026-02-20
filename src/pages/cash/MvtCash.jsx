@@ -15,7 +15,7 @@ import { useNavigate } from "react-router-dom";
 import Input from "../../layout/Input.jsx";
 import Logo from "../../layout/LogoDark.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { faCoins, faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -30,6 +30,7 @@ export default function MvtCashPage() {
     const menu = useSelector(state => state.identifier.menu)
     const [data, setData] = useState({
         mvtCash: [],
+        cashes: [],
         isLoading: false
     })
 
@@ -45,8 +46,11 @@ export default function MvtCashPage() {
         })
         if (user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") || user.role.includes("ROLE_COMPTABLE")) {
             async function get(signal) {
+                let cashes = []
                 for (let cash of user.cashes) {
                     const allMvtCash = await getAllMvtCash({ signal, enterprise: user.enterprise, agency: user.agency, cash: cash.key, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
+                    const cash_ = await getCashBySlug({ slug: cash.value, signal })
+                    cashes.push({ key: cash_.id, name: cash_.name, value: cash_.slug, balance: cash_.balance })
                     let tb = []
                     let enterprise = {}
                     let agency = {}
@@ -61,10 +65,17 @@ export default function MvtCashPage() {
                         return {
                             ...prev,
                             mvtCash: tb,
-                            isLoading: false
+                            isLoading: false,
+
                         }
                     })
                 }
+                setData(prev => {
+                    return {
+                        ...prev,
+                        cashes
+                    }
+                })
             }
             get()
         }
@@ -148,10 +159,25 @@ export default function MvtCashPage() {
 
 
     return <>
-        {user.cashes.length > 0 ? <div className="flex justify-center mb-2">
-            {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <Submit onClick={() => handleModal("new")}>Nouveau</Submit> : undefined}
-            {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <Submit onClick={() => handleModal("report")}>Rapport</Submit> : undefined}
-        </div> : <p className="text-red-500 text-center font-medium">Aucune caisse rattachée</p>}
+        {user.cashes.length > 0 ? <>
+            <div className="flex gap-2 w-full shadow-xl shadow-sky-50 p-2">
+                <div className="w-2/3 h-26 bg-sky-950 rounded flex flex-wrap p-2 gap-2 rounded">
+                    {data?.cashes.map(c => <div className="flex flex-col bg-sky-50 text-sky-950 font-medium rounded p-2 w-35 gap-2" key={c.key}>
+                        <span className="bg-sky-950 text-sky-50 font-medium border border rounded px-1 shadow-sky-950 shadow-md text-center"><FontAwesomeIcon icon={faCoins} className="me-1" />{c.value.toUpperCase()}</span>
+                        <div className="flex flex-col bg-sky-950 rounded p-1 gap-1 shadow-sky-950 shadow-md">
+                            <span className="bg-sky-950 text-sky-50">Solde disponible:</span>
+                            <span className="bg-sky-950 text-sky-50 text-end">{Number(c.balance).toLocaleString()} FCFA</span>
+                        </div>
+                    </div>)}
+                </div>
+
+                <div className="flex justify-center mb-2">
+                    {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <Submit onClick={() => handleModal("new")}>Nouveau</Submit> : undefined}
+                    {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <Submit onClick={() => handleModal("report")}>Rapport</Submit> : undefined}
+                </div>
+            </div>
+
+        </> : <p className="text-red-500 text-center font-medium">Aucune caisse rattachée</p>}
         <Table data={data?.mvtCash} headers={mvtCashes.header} emptyMessage="Aucune opération trouvée." globalFilterFields={mvtCashes.global} sheet="mvt_caisse" titleRef="Visualiser un mouvement de caisse" size="lg:h-5/11 lg:w-4/15" />
         {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-7/15 lg:w-8/16" title="Créer une opération">

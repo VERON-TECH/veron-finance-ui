@@ -2,7 +2,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { createMvtCash, getAgencyById, getAllBankAccount, getAllBudgets, getAllCashes, getAllCustomers, getAllEngagements, getAllMissing, getAllMobileMoney, getAllMvtCash, getAllMvtCashByRef, getAllPurchaseOrders, getAllSafes, getAllSuppliers, getAllSurplus, getBankAccountbySlug, getBudgetById, getBudgetByPeriod, getCashBySlug, getEngagementBySlug, getEnterpriseById, getMissingBySlug, getMvtCashBySlug, getPersonalById, getProductBySlug, getPurchaseOrderById, getPurchaseOrderBySlug, getSpentById, getSurplusBuSlug, queryClient } from "../../utils/http";
+import { createMvtCash, getAgencyById, getAllBankAccount, getAllBudgets, getAllCashes, getAllCustomers, getAllEngagements, getAllMissing, getAllMobileMoney, getAllMvtCash, getAllMvtCashByRef, getAllPurchaseOrders, getAllSafes, getAllSuppliers, getAllSurplus, getBankAccountbySlug, getBudgetById, getBudgetByPeriod, getCashBySlug, getCustomerBySlug, getEngagementBySlug, getEnterpriseById, getMissingBySlug, getMvtCashBySlug, getPersonalById, getProductBySlug, getPurchaseOrderById, getPurchaseOrderBySlug, getSpentById, getSurplusBuSlug, queryClient } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
@@ -157,6 +157,7 @@ export default function CreateMvtCash() {
             })
         }
         if (identifier === "typeCash") {
+            inputRefExt.current.readOnly = false
             if (value === "APPRO_CAISSE_EN_ENTREE") {
                 const mvtCash = await getAllMvtCashByRef({ signal, enterprise: user.enterprise, agency: user.agency })
                 mvtCash.forEach(m => {
@@ -424,6 +425,7 @@ export default function CreateMvtCash() {
                         disabled: false
                     }
                 })
+
 
             }
             if (value === "AVANCE_VERSEE") {
@@ -725,6 +727,14 @@ export default function CreateMvtCash() {
                     })
 
                 }
+
+                if (selectTypeCash.current.value === "AVANCE_CLIENT") {
+                    const customer = await getCustomerBySlug({ signal, slug: value })
+                    inputRefExt.current.value = customer.slug
+                    inputRefExt.current.readOnly = true
+                }
+
+
             }
             get()
         }

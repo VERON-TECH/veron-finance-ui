@@ -97,7 +97,6 @@ export default function Header() {
   return <>
 
     <header className="flex gap-4 absolute right-0 top-0 h-2/25 p-4">
-      {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <span className="flex items-center justify-center font-bold italic text-sky-50 bg-sky-950 shadow-md shadow-sky-950 rounded border text-center px-5"><FontAwesomeIcon icon={faMoneyBillWave} className="me-2" />Solde global: {user?.balance.toLocaleString()}</span> : undefined}
       <span className="font-bold italic"><FontAwesomeIcon icon={faBuilding} className="me-2" />{user?.enterprise}</span>
       <span className="font-bold italic"><FontAwesomeIcon icon={faHome} className="me-2" />{user?.agency}</span>
       <span className="font-bold italic"> <span className="font-bold italic"><FontAwesomeIcon icon={faUser} className="me-2" /></span>{user.username}</span>

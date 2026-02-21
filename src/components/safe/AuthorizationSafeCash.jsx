@@ -57,7 +57,7 @@ export default function AuthorizationSafeCash() {
         <div className="flex justify-center gap-2 mb-2">
             {user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={() => handleModal("authorization")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data?.cash} headers={cashes.header} emptyMessage="Aucune caisse autorisée trouvée." globalFilterFields={cashes.global} sheet="Caisses autorisées" titleRef="Supprimer l'autorisation dans un coffre-fort" size="lg:h-2/12 lg:w-4/15" />
+        <Table data={data?.cash} headers={cashes.header} emptyMessage="Aucune caisse autorisée trouvée." globalFilterFields={cashes.global} sheet="Caisses autorisées" titleRef="Supprimer l'autorisation dans un coffre-fort" size="lg:h-3/13 lg:w-4/15" />
         <Modal ref={dialog} size="lg:h-4/11 lg:w-4/15 xl:h-5/11" title="Autoriser une caisse">
             <AuhtorizeAgency type="safe" id={id} />
         </Modal>

@@ -50,7 +50,8 @@ const DashBoardWeekPage = lazy(() => import("../pages/dashboard/DashboardWeek.js
 const DashBoardMonthPage = lazy(() => import("../pages/dashboard/DashboardMonth.jsx"))
 const PrintPurchaseOrderPage = lazy(() => import("../pages/print/PrintPurchaseOrder.jsx"))
 const PrintSuppliesPage = lazy(() => import("../pages/print/PrintSupplies.jsx"))
-const PrintSalePayment = lazy(() => import("../pages/print/PrintSalePayment.jsx"))
+const PrintSalePaymentPage = lazy(() => import("../pages/print/PrintSalePayment.jsx"))
+const PrintPaymentPage = lazy(() => import("../pages/print/PrintPayment.jsx"))
 const SettingPage = lazy(() => import("../pages/setting/Setting.jsx"))
 const PrintPage = lazy(() => import("../pages/setting/Print.jsx"))
 const PasswordPage = lazy(() => import("../pages/ressources_human/Password.jsx"))
@@ -120,7 +121,8 @@ export const router = createBrowserRouter([
   { path: "/print-cash", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><CashReportPage /></Suspense> },
   { path: "/print-purchase", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PrintPurchaseOrderPage /></Suspense> },
   { path: "/print-supplies", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PrintSuppliesPage /></Suspense> },
-  { path: "/print-sale-payment", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PrintSalePayment /></Suspense> },
+  { path: "/print-sale-payment", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PrintSalePaymentPage /></Suspense> },
+  { path: "/print-payment", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PrintPaymentPage /></Suspense> },
 
 
 ])

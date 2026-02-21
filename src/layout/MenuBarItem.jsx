@@ -177,7 +177,7 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
     get()
 
   }, [])
-  const className = `cursor-pointer flex justify-center items-center font-medium ${size} w-50 hover:border-b-4 focus:border-b-4 active:border-b-4 hover:pb-1`
+  const className = `cursor-pointer flex justify-center items-center font-medium ${size} w-60 hover:border-b-4 focus:border-b-4 active:border-b-4 hover:pb-1`
   return <NavLink to={url} className={`({isActive})=>isActive ? ${className} : undefined`} onClick={handleClick}>
     {title === "Entreprise" && < FontAwesomeIcon icon={faBuilding} className="me-4" />}
     {title === "Agences" && < FontAwesomeIcon icon={faHome} className="me-4" />}
@@ -186,7 +186,7 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
     {title.includes("Banques") && < FontAwesomeIcon icon={faBank} className="me-4" />}
     {title === "Mobile Money" && < FontAwesomeIcon icon={faPhoneAlt} className="me-4" />}
     {title.includes("Magasins principaux") && < FontAwesomeIcon icon={faStoreAlt} className="me-4" />}
-    {title.includes("Magasins sécondaires") && < FontAwesomeIcon icon={faStore} className="me-4" />}
+    {title.includes("Magasins sécondaires") && < FontAwesomeIcon icon={faStore} className="me-2" />}
     {title.includes("Bons de commande") && < FontAwesomeIcon icon={faShoppingCart} className="me-4" />}
     {title.includes("Personnels") && < FontAwesomeIcon icon={faPerson} className="me-4" />}
     {title.includes("Utilisateurs") && < FontAwesomeIcon icon={faUser} className="me-4" />}
@@ -218,8 +218,8 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
                   title.includes("Mobile Money") ? <><span className="me-4">Mobile Money</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.balance.mobileMoney).toLocaleString()}</span></> :
                     title.includes("Personnels") ? <><span className="me-4">Personnels</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.personals).toLocaleString()}</span></> :
                       title.includes("Utilisateurs") ? <><span className="me-4">Utilisateurs</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.users).toLocaleString()}</span></> :
-                        title.includes("Magasins principaux") ? <><span className="me-4">Magasins principaux</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.storePrincipal).toLocaleString()}</span></> :
-                          title.includes("Magasins sécondaires") ? <><span className="me-4">Magasins sécondaires</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.store).toLocaleString()}</span></> :
+                        title.includes("Magasins principaux") ? <><span className="me-2">Magasins principaux</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.storePrincipal).toLocaleString()}</span></> :
+                          title.includes("Magasins sécondaires") ? <><span className="me-1">Magasins sécondaires</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.store).toLocaleString()}</span></> :
                             title.includes("Fournisseurs") ? <><span className="me-4">Fournisseurs</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.suppliers).toLocaleString()}</span></> :
                               title.includes("Produits & Services") ? <><span className="me-4">Produits & Services</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.products).toLocaleString()}</span></> :
                                 title.includes("Stock") ? <><span className="me-4">Stock</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.productStocks).toLocaleString()}</span></> :

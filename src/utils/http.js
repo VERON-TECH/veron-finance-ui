@@ -1512,7 +1512,7 @@ export async function updateMobileMoney({ slug, mobileMoneyDto }) {
 
 
 export async function getAllStorePrincipal({ signal, enterprise, agency }) {
-  const url = `${BASE_URL}store-principal/ad-ac-ma/?enterprise=${enterprise}&agency=${agency}`
+  const url = `${BASE_URL}store-principal/ad-ac-ma-cc-ca/?enterprise=${enterprise}&agency=${agency}`
   const token = getToken();
   const response = await fetch(url, {
     method: "GET",
@@ -2337,7 +2337,7 @@ export async function updateCustomer({ slug, customerDto }) {
 
 
 export async function getAllPersonals({ signal, enterprise, agency }) {
-  const url = `${BASE_URL}personal/ad-rh/?enterprise=${enterprise}&agency=${agency}`
+  const url = `${BASE_URL}personal/ad-rh-cc-ca/?enterprise=${enterprise}&agency=${agency}`
   const token = getToken();
   const response = await fetch(url, {
     method: "GET",
@@ -2469,7 +2469,7 @@ export async function updatePersonal({ slug, personalDto }) {
 
 
 export async function getAllUsers({ signal, personals, enterprise, agency }) {
-  const url = `${BASE_URL}users/ad-rh/?personals=${personals}&enterprise=${enterprise}&agency=${agency}`
+  const url = `${BASE_URL}users/ad-rh-cc-ca/?personals=${personals}&enterprise=${enterprise}&agency=${agency}`
   const token = getToken();
   const response = await fetch(url, {
     method: "GET",
@@ -5015,7 +5015,7 @@ export async function getMvtStock({ signal, id }) {
 
 
 export async function getAllProductStock() {
-  const url = `${BASE_URL}product-stock/ad-ac-ma/`
+  const url = `${BASE_URL}product-stock/ad-ac-ma-cc-ca/`
   const token = getToken();
   const response = await fetch(url, {
     method: "GET",
@@ -5616,7 +5616,7 @@ export async function getAllMvtCash({ signal, enterprise, agency, cash, startDat
 
 
 export async function getAllMvtCashByCustomerAndAdvance({ signal, customer }) {
-  const url = `${BASE_URL}mvt-cash/ad-ac-cc-ca/${customer}/`
+  const url = `${BASE_URL}mvt-cash/ad-ac-cc-ca/get-advance/${customer}/`
   const token = getToken();
   const response = await fetch(url, {
     method: "GET",
@@ -5781,6 +5781,38 @@ export async function getAllSales({ signal, enterprise, agency, startDate, endDa
     return data;
   }
 }
+
+export async function getAllSales_() {
+  const url = `${BASE_URL}sale/ad-ac-cc-ca/get-all/`
+  const token = getToken();
+  const response = await fetch(url, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+    },
+  });
+  if (response.status === 401) {
+    return ["Utilisateur non authentifié"];
+  }
+
+  if (response.status === 403) {
+    return ["Vous n'êtes pas autorisé à effectuer cette opération"];
+  }
+  if (response.status === 404) {
+    return ["Impossible de recupérer les données"];
+  }
+
+  if (!response.ok) {
+    return ["Votre requête n'a pas pas abouti"];
+  }
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  }
+}
+
 
 
 export async function getAllSalesByCustomer({ signal, customer }) {

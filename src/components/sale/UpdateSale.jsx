@@ -126,7 +126,6 @@ export default function UpdateSale() {
         } else if (data?.typePrint === "salePayement") {
             navigate("/print-sale-payment")
         }
-
     }
 
 

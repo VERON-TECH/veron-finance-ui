@@ -6,8 +6,6 @@ import CardDashboard from "../../components/dashboard/cardDashboard"
 
 
 
-
-
 export default function DashBoardMonthPage() {
     const dispatch = useDispatch()
     const [data, setData] = useState({
@@ -25,10 +23,18 @@ export default function DashBoardMonthPage() {
     })
     const user = JSON.parse(localStorage.getItem("user"))
     const menu = useSelector(state => state.identifier.menu)
+    let startDate = new Date(new Date().getFullYear(),
+        new Date().getMonth(),
+        1).toLocaleDateString()
+
+
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "reporting" }))
+
+
+
         async function get(signal) {
-            const sales = await getAllSales({ signal, enterprise: user.enterprise, agency: user.agency, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString(), cashes: [] })
+            const sales = await getAllSales({ signal, enterprise: user.enterprise, agency: user.agency, startDate, endDate: new Date().toLocaleDateString(), cashes: [] })
             const profits = await getAllProfits({ signal, enterprise: user.enterprise, agency: user.agency })
             const mvtCash = await getAllMvtCash({ signal, enterprise: user.enterprise, agency: user.agency, cash: 0, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
             const bankAccounts = await getAllBankAccount({ signal, agency: user.agency })

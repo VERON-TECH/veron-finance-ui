@@ -1,7 +1,7 @@
 import { useAnimate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { convert, createSale, createSalePayment, getAgencyById, getAllBankAccount, getAllCustomers, getAllLotById, getAllMobileMoney, getAllPrints, getAllProducts, getAllSalePaymentsByCustomer, getAllSales, getAllServices, getAllStocks, getCashBySlug, getCategoryService, getCategoryServiceBySlug, getCustomerById, getCustomerBySlug, getEnterpriseById, getLotBySlug, getProductBySlug, getSaleById, getServiceById, getServiceBySlug, getStock, getStoreBySlug } from "../../utils/http.js";
+import { convert, createSale, createSalePayment, getAgencyById, getAllBankAccount, getAllCustomers, getAllLotById, getAllMobileMoney, getAllPrints, getAllProducts, getAllSalePaymentsByCustomer, getAllSales, getAllSales_, getAllServices, getAllStocks, getCashBySlug, getCategoryService, getCategoryServiceBySlug, getCustomerById, getCustomerBySlug, getEnterpriseById, getLotBySlug, getProductBySlug, getSaleById, getServiceById, getServiceBySlug, getStock, getStoreBySlug } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { noteActions } from "../../store/noteSlice.js";
@@ -205,39 +205,40 @@ export default function CreateSale() {
             if (state) {
                 dispatch(noteActions.error(true))
             } else {
-
                 dispatch(noteActions.error(false))
-                const sales = await getAllSales({ signal, enterprise: 0, agency: 0, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
-                const sale = sales[sales.length - 1]
+                if (responseData[0].includes("avec succès")) {
+                    const sales = await getAllSales_()
+                    const sale = sales[sales.length - 1]
 
 
-                const printSale = {
-                    enterprise: enterprise_,
-                    agency: agency_,
-                    ref: sale.ref,
-                    date: new Date().toLocaleDateString(),
-                    time: sale.time,
-                    customer: customerData.lastName + " " + customerData.firstName,
-                    products: data.products,
-                    priceHT: priceHt,
-                    remise: discount,
-                    priceTTC: priceTtc,
-                    payment: payment,
-                    rest: priceTtc - Number(payment),
-                    cash: cash,
-                    amountLetter,
-                }
-                dispatch(printActions.getPrint(printSale))
-                setData(prev => {
-                    return {
-                        ...prev,
-                        products: [],
-                        typePrint: "sale"
+                    const printSale = {
+                        enterprise: enterprise_,
+                        agency: agency_,
+                        ref: sale.ref,
+                        date: new Date().toLocaleDateString(),
+                        time: sale.time,
+                        customer: customerData.lastName + " " + customerData.firstName,
+                        products: data.products,
+                        priceHT: priceHt,
+                        remise: discount,
+                        priceTTC: priceTtc,
+                        payment: payment,
+                        rest: priceTtc - Number(payment),
+                        cash: cash,
+                        amountLetter,
                     }
+                    dispatch(printActions.getPrint(printSale))
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            products: [],
+                            typePrint: "sale"
+                        }
 
-                })
+                    })
+                    dialog4.current.open()
+                }
 
-                dialog4.current.open()
 
             }
             dispatch(noteActions.show());

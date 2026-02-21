@@ -5,7 +5,21 @@ import { getAllBankAccount, getAllCashes, getAllEngagements, getAllInvoices, get
 import CardDashboard from "../../components/dashboard/cardDashboard"
 
 
+function subtractDays(date, days) {
+    let result = date
+    result.setDate(date.getDate() - days);
+    return result;
+}
 
+const days = [
+    "Dimanche",
+    "Lundi",
+    "Mardi",
+    "Mercredi",
+    "Jeudi",
+    "Vendredi",
+    "Samedi"
+];
 
 
 export default function DashBoardWeekPage() {
@@ -25,10 +39,43 @@ export default function DashBoardWeekPage() {
     })
     const user = JSON.parse(localStorage.getItem("user"))
     const menu = useSelector(state => state.identifier.menu)
+    let startDate = new Date()
+
+
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "reporting" }))
+        const date = new Date()
+
+        const dayIndex = date.getDay();
+
+        switch (dayIndex) {
+            case 0:
+                startDate = subtractDays(date, 6).toLocaleDateString();
+                break
+            case 6:
+                startDate = subtractDays(date, 5).toLocaleDateString();
+                break
+            case 5:
+                startDate = subtractDays(date, 4).toLocaleDateString();
+                break
+            case 4:
+                startDate = subtractDays(date, 3).toLocaleDateString();
+                break
+            case 3:
+                startDate = subtractDays(date, 2).toLocaleDateString();
+                break
+            case 2:
+                startDate = subtractDays(date, 1).toLocaleDateString();
+                break
+            default:
+                startDate = new Date().toLocaleDateString()
+
+
+        }
+
+
         async function get(signal) {
-            const sales = await getAllSales({ signal, enterprise: user.enterprise, agency: user.agency, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString(), cashes: [] })
+            const sales = await getAllSales({ signal, enterprise: user.enterprise, agency: user.agency, startDate, endDate: new Date().toLocaleDateString(), cashes: [] })
             const profits = await getAllProfits({ signal, enterprise: user.enterprise, agency: user.agency })
             const mvtCash = await getAllMvtCash({ signal, enterprise: user.enterprise, agency: user.agency, cash: 0, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
             const bankAccounts = await getAllBankAccount({ signal, agency: user.agency })

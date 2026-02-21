@@ -461,6 +461,7 @@ export default function UpdateCustomer() {
     function handleSelectionPrint(value) {
         dispatch(identifierMenuActions.updatePrint({ print: value }))
         if (data?.typePrint === "sale") {
+            dispatch(identifierMenuActions.updateDuplicata({ duplicata: true }))
             navigate("/print-sale")
         } else if (data?.typePrint === "salePayement") {
             navigate("/print-sale-payment")
@@ -940,7 +941,7 @@ export default function UpdateCustomer() {
         </Modal >
         <Modal ref={dialog1} title="Sélection du format d'impression" size="h-2/5 ">
             {data.prints.length > 0 ? <div className="flex flex-col items-center justify-center gap-4 mb-4">
-                {data.prints.map(p => <button key={p.id} className="text-sky-50 bg-sky-950 font-bold p-2 border rounded w-full cursor-pointer shadow-sky-950 shadow-md hover:bg-sky-50 hover:text-sky-950" onClick={(e) => handleSelectionPrint(e.target.textContent)}>
+                {data.prints.map(p => <button key={p.key} className="text-sky-50 bg-sky-950 font-bold p-2 border rounded w-full cursor-pointer shadow-sky-950 shadow-md hover:bg-sky-50 hover:text-sky-950" onClick={(e) => handleSelectionPrint(e.target.textContent)}>
                     <FontAwesomeIcon icon={faPrint} className="me-2"></FontAwesomeIcon>
                     {p.name}
                 </button>)}

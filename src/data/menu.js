@@ -44,7 +44,9 @@ export const subFeactures = [
   { key: 26, menu: "Excédents", identifier: "cash", url: "surplus", role: ["ROLE_CAISSIER", "ROLE_CHEF_CAISSEIR"] },
   { key: 27, menu: "Imprimantes", identifier: "setting", url: "print", role: ["ROLE_ADMIN"] },
   { key: 28, menu: "Journalier", identifier: "reporting", url: "day", role: ["ROLE_ADMIN"] },
-  { key: 29, menu: "Modifier le mot de passe", identifier: "password", url: "password", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE", "ROLE_CHEF_CAISSIER", "ROLE_CAISSIER"] },
+  { key: 29, menu: "Hebdomadaire", identifier: "reporting", url: "week", role: ["ROLE_ADMIN"] },
+  { key: 30, menu: "Mensuel", identifier: "reporting", url: "month", role: ["ROLE_ADMIN"] },
+  { key: 31, menu: "Modifier le mot de passe", identifier: "password", url: "password", role: ["ROLE_ADMIN", "ROLE_RESPONSABLE_RH", "ROLE_COMPTABLE", "ROLE_COMPTABLE_MATIERE", "ROLE_CHEF_CAISSIER", "ROLE_CAISSIER"] },
 ]
 
 

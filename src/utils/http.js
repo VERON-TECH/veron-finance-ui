@@ -5616,7 +5616,7 @@ export async function getAllMvtCash({ signal, enterprise, agency, cash, startDat
 
 
 export async function getAllMvtCashByCustomerAndAdvance({ signal, customer }) {
-  const url = `${BASE_URL}mvt-cash/ad-ac-cc-ca/get-advance/${customer}/`
+  const url = `${BASE_URL}mvt-cash/ad-ac-cc-ca/${customer}/`
   const token = getToken();
   const response = await fetch(url, {
     method: "GET",

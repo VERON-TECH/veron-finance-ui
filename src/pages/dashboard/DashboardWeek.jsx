@@ -8,7 +8,7 @@ import CardDashboard from "../../components/dashboard/cardDashboard"
 
 
 
-export default function DashBoardDayPage() {
+export default function DashBoardWeekPage() {
     const dispatch = useDispatch()
     const [data, setData] = useState({
         sales: { nb: 0, amount: 0 },

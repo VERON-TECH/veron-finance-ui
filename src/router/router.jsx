@@ -46,6 +46,8 @@ const PrintSalePage = lazy(() => import("../pages/print/PrintSale.jsx"))
 const CashReportPage = lazy(() => import("../pages/print/PrintCash.jsx"))
 const DashBoardPage = lazy(() => import("../pages/dashboard/Dashboard.jsx"))
 const DashBoardDayPage = lazy(() => import("../pages/dashboard/DashBooardDay.jsx"))
+const DashBoardWeekPage = lazy(() => import("../pages/dashboard/DashboardWeek.jsx"))
+const DashBoardMonthPage = lazy(() => import("../pages/dashboard/DashboardMonth.jsx"))
 const PrintPurchaseOrderPage = lazy(() => import("../pages/print/PrintPurchaseOrder.jsx"))
 const PrintSuppliesPage = lazy(() => import("../pages/print/PrintSupplies.jsx"))
 const PrintSalePayment = lazy(() => import("../pages/print/PrintSalePayment.jsx"))
@@ -105,6 +107,8 @@ export const router = createBrowserRouter([
       { path: "surplus", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SurplusPage /></Suspense> },
       { path: "reporting", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><DashBoardPage /></Suspense> },
       { path: "day", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><DashBoardDayPage /></Suspense> },
+      { path: "week", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><DashBoardWeekPage /></Suspense> },
+      { path: "month", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><DashBoardMonthPage /></Suspense> },
       { path: "setting", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><SettingPage /></Suspense> },
       { path: "print", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PrintPage /></Suspense> },
       { path: "password", element: <Suspense fallback={<div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}><PasswordPage /></Suspense> },

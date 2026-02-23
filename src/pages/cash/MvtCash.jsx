@@ -1,4 +1,3 @@
-import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
 import { getAgencyById, getAllMvtCash, getArchiveBalance, getCashBySlug, getEnterpriseById, getPersonalById } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
@@ -161,9 +160,9 @@ export default function MvtCashPage() {
     return <>
         {user.cashes.length > 0 ? <>
             <div className="flex gap-2 w-full shadow-xl shadow-sky-50 p-2">
-                <div className="w-2/3 h-26 bg-sky-950 rounded flex flex-wrap p-2 gap-2 rounded">
+                <div className="w-2/3 h-26 bg-sky-950  flex flex-wrap p-2 gap-2 rounded shadow-2xs shadow-sky-950">
                     {data?.cashes.map(c => <div className="flex flex-col bg-sky-50 text-sky-950 font-medium rounded p-2 w-35 gap-2" key={c.key}>
-                        <span className="bg-sky-950 text-sky-50 font-medium border border rounded px-1 shadow-sky-950 shadow-md text-center"><FontAwesomeIcon icon={faCoins} className="me-1" />{c.value.toUpperCase()}</span>
+                        <span className="bg-sky-950 text-sky-50 font-medium  border rounded px-1 shadow-sky-950 shadow-md text-center"><FontAwesomeIcon icon={faCoins} className="me-1" />{c.value.toUpperCase()}</span>
                         <div className="flex flex-col bg-sky-950 rounded p-1 gap-1 shadow-sky-950 shadow-md">
                             <span className="bg-sky-950 text-sky-50">Solde disponible:</span>
                             <span className="bg-sky-950 text-sky-50 text-end">{Number(c.balance).toLocaleString()} FCFA</span>

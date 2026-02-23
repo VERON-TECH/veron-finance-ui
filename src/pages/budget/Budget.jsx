@@ -83,8 +83,8 @@ export default function BudgetPage() {
 
     return <>
         <div className="flex justify-center mb-2">
-            {user.role.includes("ROLE_ADMIN") && data?.length > 0 ? <Submit onClick={() => handleModal("validate")}>Valider tout</Submit> : undefined}
-            {user.role.includes("ROLE_ADMIN") && data?.length > 0 ? <Submit onClick={() => handleModal("clean")}>Nettoyer tout</Submit> : undefined}
+            {user.role.includes("ROLE_ADMIN") && data?.budget.length > 0 ? <Submit onClick={() => handleModal("validate")}>Valider tout</Submit> : undefined}
+            {user.role.includes("ROLE_ADMIN") && data?.budget.length > 0 ? <Submit onClick={() => handleModal("clean")}>Nettoyer tout</Submit> : undefined}
             {user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={() => handleModal("new")}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data?.budget} headers={budgets.header} emptyMessage="Aucun budget trouvée." globalFilterFields={budgets.global} sheet="Budget" titleRef="Mise à jour informations de la prévision" size="lg:h-6/11 lg:w-4/15 xl:h-7/11" />

@@ -834,7 +834,7 @@ export default function UpdateCustomer() {
                             </tfoot>
                         </table>
                     </div>
-                    <div className="w-1/3 flex flex-col gap-2 items-center border p-2 rounded">
+                    {cash !== "" && <div className="w-1/3 flex flex-col gap-2 items-center border p-2 rounded">
                         <Select label="Moyen paiement *" id="paymentMethod" name="paymentMethod" selectedTitle="Sélectionner un moyen de paiement" data={paymentMethodPayement} ref={selectPaymentMethod} onChange={(e) => handleChange("paymentMethod", e.target.value)} disabled={data?.disabled} />
                         <Select label="Moyen réception *" id="paymentReceiver" name="paymentReceiver" selectedTitle="Sélectionner un moyen de réception" data={data?.paymentReceiver} ref={selectPaymentReceiver} disabled={data?.paymentMethod === "A_CREDIT" || data?.paymentMethod === "AVANCE_CLIENT" || data?.disabled} />
 
@@ -848,7 +848,7 @@ export default function UpdateCustomer() {
                             Enregistrer
                         </Submit>
 
-                    </div>
+                    </div>}
                 </div> : <p className="text-red-500 font-medium text-center">Aucune dette issue des ventes enregistrée</p>}
                 </>
                 }

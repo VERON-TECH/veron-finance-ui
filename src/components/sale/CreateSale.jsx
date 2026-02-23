@@ -478,7 +478,7 @@ export default function CreateSale() {
         }
 
         if (identifier === "paymentMethod") {
-
+            inputPayment.current.readOnly = false
             if (value === "ESPECES") {
                 setData(prev => {
                     return {
@@ -486,6 +486,10 @@ export default function CreateSale() {
                         paymentReceiver: user.cashes
                     }
                 })
+            }
+
+            if (value === "A_CREDIT") {
+                inputPayment.current.readOnly = true
             }
 
             if (value === "VIREMENT") {

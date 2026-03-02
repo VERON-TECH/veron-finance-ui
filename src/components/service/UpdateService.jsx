@@ -28,7 +28,7 @@ export default function UpdateService() {
     })
 
     useEffect(() => {
-        if (id !== "" && id !== undefined && user.role.includes("ROLE_COMPTABLE") || id !== "" && id !== undefined && user.role.includes("ROLE_COMPTABLE_MATIERE")) {
+        if (id !== "" && id !== undefined && user.role.includes("ROLE_COMPTABLE") || id !== "" && id !== undefined && user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK")) {
             let tbEl = {
                 tb: [],
             }

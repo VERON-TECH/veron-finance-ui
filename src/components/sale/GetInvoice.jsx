@@ -1,8 +1,7 @@
-import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
-import { useActionState, useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { getAgencyById, getAllCustomers, getAllSales, getCustomerById, getEnterpriseById, getInvoiceById, getSafeById, getSaleById, queryClient, updateSafe } from "../../utils/http";
+import { useEffect, useRef, useState } from "react";
+import { useSelector } from "react-redux";
+import { getCustomerById, getInvoiceById, getSaleById } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import Modal from "../../layout/Modal.jsx";
@@ -13,6 +12,7 @@ export default function GetInvoice() {
     const dialog = useRef()
     const [scope] = useAnimate();
     const user = JSON.parse(localStorage.getItem("user"))
+    const cash = useSelector(state => state.cash)
     const [data, setData] = useState({
         invoice: {},
         customer: {},
@@ -78,9 +78,9 @@ export default function GetInvoice() {
             <Input label="Statut *" type="text" defaultValue={data?.invoice.statusInvoice} name="statusInvoice" placeholder="Statut" className="border border-sky-950" readOnly />
         </div>
 
-        {data.invoice.statusInvoice === "EN_INSTANCE" && <Submit onClick={handleClick}>
+        {data.invoice.statusInvoice === "EN_INSTANCE" && cash !== "" ? <Submit onClick={handleClick}>
             Régler
-        </Submit>}
+        </Submit> : <p className="text-center text-red-500">Facture soldée ou caisse non rattachée</p>}
     </div>
         <div className="w-2/3 flex justify-center absolute left-1/2 transform -translate-x-1/2 bottom-20">
             <table className="w-full" >

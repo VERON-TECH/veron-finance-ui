@@ -15,7 +15,6 @@ import { useDispatch, useSelector } from "react-redux";
 export default function AuthorizationSupplierEnterprise() {
     const user = JSON.parse(localStorage.getItem("user"));
     const id = useSelector(state => state.modal.value)
-    const dispatch = useDispatch()
 
     const { data } = useQuery({
         queryKey: ["enterprisesupllier", { id }],

@@ -28,22 +28,25 @@ export default function UpdateBankAccount() {
     })
     const id = useSelector(state => state.modal.value)
     useEffect(() => {
-        async function get(signal) {
-            if (user.role.includes("ROLE_ADMIN") && id != "" || user.role.includes("ROLE_COMPTABLE") && id != "") {
-                const bankAccount = await getBankAccountById({ id, signal })
-                const enterprise = await getEnterpriseById({ id: bankAccount.enterprise, signal })
-                const bank = await getBankById({ id: bankAccount.bank, signal })
-                setData(prev => {
-                    return {
-                        ...prev,
-                        enterprise: enterprise.slug,
-                        bank: bank.slug,
-                        rib: bankAccount.rib,
-                    }
-                })
+        if (id !== "") {
+            async function get(signal) {
+                if (user.role.includes("ROLE_ADMIN") && id != "" || user.role.includes("ROLE_COMPTABLE") && id != "") {
+                    const bankAccount = await getBankAccountById({ id, signal })
+                    const enterprise = await getEnterpriseById({ id: bankAccount.enterprise, signal })
+                    const bank = await getBankById({ id: bankAccount.bank, signal })
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            enterprise: enterprise.slug,
+                            bank: bank.slug,
+                            rib: bankAccount.rib,
+                        }
+                    })
+                }
             }
+            get()
         }
-        get()
+
 
     }, [id])
 

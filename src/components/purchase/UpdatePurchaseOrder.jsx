@@ -12,9 +12,12 @@ import { paymentMethodPurchase } from "../../data/info.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faExclamationTriangle, faPlusCircle, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../layout/Modal.jsx";
+import Notification from "../../layout/Notification.jsx";
 
 export default function UpdatePurchaseOrder() {
-
+    const errorNotification = useSelector(state => state.note.error);
+    const relaunch = useSelector(state => state.note.relaunch);
+    const dataItem = useSelector(state => state.note.dataItem)
     const id = useSelector(state => state.modal.value)
     const dialog = useRef();
     const dialog1 = useRef();
@@ -53,7 +56,9 @@ export default function UpdatePurchaseOrder() {
         errors: [],
         purchaseOrder: {},
         disabled: false,
-        storePrincipals: []
+        storePrincipals: [],
+        cancelled: false,
+        validated: false,
 
     })
 
@@ -330,6 +335,13 @@ export default function UpdatePurchaseOrder() {
             dispatch(noteActions.error(true))
         } else {
             dispatch(noteActions.error(false))
+            setData(prev => {
+                return {
+                    ...prev,
+                    cancelled: true
+                }
+            })
+            dialog2.current.close()
         }
         dispatch(noteActions.show());
         dispatch(noteActions.relaunch());
@@ -337,7 +349,7 @@ export default function UpdatePurchaseOrder() {
         setData(prev => {
             return {
                 ...prev,
-                disabled: true
+                disabled: true,
             }
         })
     }
@@ -470,6 +482,14 @@ export default function UpdatePurchaseOrder() {
             dispatch(noteActions.error(true))
         } else {
             dispatch(noteActions.error(false))
+            setData(prev => {
+                return {
+                    ...prev,
+                    validated: true
+                }
+            })
+
+            dialog3.current.close()
         }
         dispatch(noteActions.show());
         dispatch(noteActions.relaunch());
@@ -518,9 +538,9 @@ export default function UpdatePurchaseOrder() {
                 <Input label="Quantité *" type="number" name="quantity" defaultValue={data?.quantity} placeholder="Quantité" className="border border-sky-950" ref={inputQuantity} disabled={data?.purchaseOrder.statusPurchase === "ANNULE" ? true : false} />
                 <Input label="Prix *" type="number" defaultValue={data?.price} name="price" placeholder="Prix" className="border border-sky-950" ref={inputPrice} disabled={data?.purchaseOrder.statusPurchase === "ANNULE" ? true : false} />
 
-                {data?.purchaseOrder.statusPurchase === "EN_INSTANCE" && <Submit onClick={() => handleAdd("add")} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
+                {data?.purchaseOrder.statusPurchase === "EN_INSTANCE" && data?.cancelled == false && data?.validated == false ? <Submit onClick={() => handleAdd("add")} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
                     Ajouter
-                </Submit>}
+                </Submit> : undefined}
                 {data?.errors.length > 0 && <ul>
                     {data.errors.map(e => <li key={e} className="text-red-500">{e}</li>)}
                 </ul>}
@@ -569,18 +589,17 @@ export default function UpdatePurchaseOrder() {
                         <div className="border px-12 flex justify-center items-center italic font-bold rounded shadow-xl shadow-sky-950">
                             {data?.purchaseOrder.statusPurchase}
                         </div>
-                        {data?.purchaseOrder.statusPurchase === "EN_INSTANCE" && <Submit onClick={() => handleOpenAnnulation()} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
+                        {data?.purchaseOrder.statusPurchase === "EN_INSTANCE" && data?.cancelled == false && data?.validated == false ? <Submit onClick={() => handleOpenAnnulation()} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
                             Annuler
-                        </Submit>}
-                        {data.purchaseOrder.statusPurchase === "EN_INSTANCE" && <Submit onClick={() => handleSave()} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
+                        </Submit> : undefined}
+                        {data.purchaseOrder.statusPurchase === "EN_INSTANCE" && data?.cancelled == false && data?.validated == false ? <Submit onClick={() => handleSave()} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
                             Enregistrer
-                        </Submit>}
+                        </Submit> : undefined}
                     </div>
                     <div className="flex gap-4 mt-8 justify-center">
-                        {data?.purchaseOrder.statusPurchase === "EN_INSTANCE" && <Submit onClick={() => handleOpenValidation()} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
+                        {data?.purchaseOrder.statusPurchase === "EN_INSTANCE" && data?.cancelled == false && data?.validated == false ? <Submit onClick={() => handleOpenValidation()} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
                             Valider
-                        </Submit>
-                        }
+                        </Submit> : undefined}
                     </div>
 
                     {data.supplierAdvances.length > 0 && <table className="w-full">
@@ -627,6 +646,7 @@ export default function UpdatePurchaseOrder() {
                     </Submit>
                 </div>
             </form>
+
         </Modal>
 
         <Modal ref={dialog3} title={`Validation du bon commande ${data?.purchaseOrder.ref}`} size="h-4/5 w-4/5">
@@ -668,8 +688,8 @@ export default function UpdatePurchaseOrder() {
                     {data?.products.length > 0 && data.products.map(p => <tr key={p.product}>
                         <td className="border border-sky-950 text-center p-1">{p.id}</td>
                         <td className="border border-sky-950 text-center p-1">{p.product}</td>
-                        <td className="border border-sky-950 text-center p-1"><input type="number" className="w-full text-end" defaultValue={p.quantity} onChange={(e) => handleChanges("quantity", e.value.target, p.id)} /></td>
-                        <td className="border border-sky-950 text-center p-1"><input type="number" className="w-full text-end" defaultValue={p.price} onChange={(e) => handleChanges("price", e.target.value, p.id)} /></td>
+                        <td className="border border-sky-950 text-center p-1"><input type="number" className="w-full text-end" defaultValue={Number(p.quantity).toLocaleString()} onChange={(e) => handleChanges("quantity", e.target.value, p.id)} /></td>
+                        <td className="border border-sky-950 text-center p-1"><input type="number" className="w-full text-end" defaultValue={Number(p.price).toLocaleString()} onChange={(e) => handleChanges("price", e.target.value, p.id)} /></td>
                         <td className="border border-sky-950 text-center p-1"><input type="text" placeholder="numéro du lot" onChange={(e) => handleChanges("lot", e.target.value, p.id)} /></td>
                         <td className="border border-sky-950 text-center p-1"><input type="date" onChange={(e) => handleChanges("date", e.target.value, p.id)} /></td>
                         <td className="border border-sky-950 text-center p-1"><input type="checkbox" checked={p.status === "on"} onClick={(e) => handleClick("one", e.target.checked, p.id)} /></td>
@@ -678,17 +698,19 @@ export default function UpdatePurchaseOrder() {
                 {data.products.length > 0 && <tfoot>
                     <tr className="bg-sky-950 text-sky-50">
                         <td className="border text-center" colSpan={4}>Prix H.T.</td>
-                        <td className="border text-center">{data?.priceHT}</td>
+                        <td className="border text-center">{Number(data?.priceHT).toLocaleString()}</td>
                         <td className="border text-center p-1"><input type="number" name="discount" id="discount" defaultValue={data?.purchaseOrder.discount} placeholder="Rémise" className="bg-sky-50 text-sky-950 text-center w-16" ref={inputDiscount} onChange={(e) => handleChange("discount", e.target.value)} /></td>
-                        <td className="border text-center">{data.priceTTC}</td>
+                        <td className="border text-center">{Number(data.priceTTC).toLocaleString()}</td>
                     </tr>
                 </tfoot>}
             </table>
             <div className="flex justify-end">
-                <Submit onClick={handleValidate} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
+                {data?.validated == false ? <Submit onClick={handleValidate} className={`${data?.disabled == true} && "hidden"`} disabled={data?.disabled}>
                     Enregistrer
-                </Submit>
+                </Submit> : undefined}
             </div>
+            {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
         </Modal>
+        {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>
 }

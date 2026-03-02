@@ -7,6 +7,9 @@ import Submit from "../../layout/Submit.jsx"
 import Table from "../../layout/Table.jsx"
 import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { missings, mvtCashes } from "../../data/dataTable.js";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -26,7 +29,7 @@ export default function MissingPage() {
         dispatch(identifierMenuActions.updateMenu({ menu: "cash" }))
     }, [menu, dispatch])
 
-    const { data } = useQuery({
+    const { data,isLoading } = useQuery({
         queryKey: ["missings", { enterprise: user.enterprise, agency: user.agency, cash: cash.key, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() }],
         queryFn: ({ signal }) => getAllMissing({ signal, personal: user.personal }),
         enabled: user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") || user.role.includes("ROLE_COMPTABLE")
@@ -36,7 +39,7 @@ export default function MissingPage() {
 
     return <>
         <Table data={data} headers={missings.header} emptyMessage="Aucun manquant trouvé." globalFilterFields={missings.global} sheet="missing" titleRef="Visualiser un manquant" size="lg:h-5/11 lg:w-4/15" />
-
+    {isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>
 }

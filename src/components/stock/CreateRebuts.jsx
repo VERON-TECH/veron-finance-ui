@@ -1,7 +1,7 @@
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { createRebut, getAgencyBySlug, getAllAgencies, getAllLotById, getAllProducts, getAllStocks, getAllStorePrincipal, getAllStores, getEnterpriseById, getEnterpriseBySlug, getLotById, getLotBySlug, getProductBySlug, getStock, getStoreBySlug, getStorePrincipalBySlug, suppliesStock } from "../../utils/http.js";
+import { createRebut, getAgencyById, getAgencyBySlug, getAllAgencies, getAllLotById, getAllProducts, getAllStocks, getAllStorePrincipal, getAllStores, getEnterpriseById, getEnterpriseBySlug, getLotById, getLotBySlug, getProductBySlug, getStock, getStoreBySlug, getStorePrincipalBySlug, suppliesStock } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import Select from "../../layout/Select.jsx";
@@ -12,8 +12,8 @@ import { isNotEmpty } from "../../utils/validation.jsx";
 
 export default function CreateRebuts() {
     const user = JSON.parse(localStorage.getItem("user"));
-    const selectEnterprise = useRef();
-    const selectAgency01 = useRef();
+    const inputEnterprise = useRef();
+    const inputAgency01 = useRef();
     const selectStore01 = useRef();
     const selectProduct = useRef();
     const selectLot = useRef();
@@ -23,8 +23,8 @@ export default function CreateRebuts() {
     const dispatch = useDispatch();
     const [scope, animate] = useAnimate();
     const [data, setData] = useState({
-        enterprises: [],
-        agency01: [],
+        enterprises: "",
+        agency: "",
         store01: [],
         products: [],
         productList: [],
@@ -39,33 +39,49 @@ export default function CreateRebuts() {
 
             let tbEl = {
                 tb: [],
-                tb1: [],
                 tb2: []
             }
             async function get(signal) {
 
-                const allEnterprises = await getEnterpriseById({ id: user.enterprise, signal })
-                const allAgencies = await getAllAgencies()
+                const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
+                const agency = await getAgencyById({ id: user.agency, signal })
                 const allProducts = await getAllProducts({ signal, enterprise: user.enterprise })
-                tbEl.tb.push({ key: allEnterprises.id, name: allEnterprises.name, value: allEnterprises.slug })
-                allAgencies.forEach(a => {
-                    if (a.enterprise == allEnterprises.id || a.slug == allEnterprises.slug) {
-                        tbEl.tb1.push({ key: a.id, name: a.name, value: a.slug })
-                    }
-                })
 
                 allProducts.forEach(p => {
                     tbEl.tb2.push({ key: p.id, name: p.name, value: p.slug })
                 })
 
+                if (enterprise.slug === agency.slug) {
+                    const store01 = await getAllStorePrincipal({ signal, enterprise: enterprise.id, agency: 0 })
+                    store01.forEach(s => {
+                        tbEl.tb.push({ key: s.id, name: s.name, value: s.slug })
+                    })
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            store01: tbEl.tb,
+                        }
+                    })
 
+                } else {
+                    const store01 = await getAllStores({ signal, enterprise: enterprise.id, agency: agency.id })
+                    store01.forEach(s => {
+                        tbEl.tb.push({ key: s.id, name: s.name, value: s.slug })
+                    })
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            store01: tbEl.tb,
+                        }
+                    })
 
+                }
 
                 setData(prev => {
                     return {
                         ...prev,
-                        agency01: tbEl.tb1,
-                        enterprises: tbEl.tb,
+                        agency: agency.slug,
+                        enterprise: enterprise.slug,
                         productList: tbEl.tb2
                     }
                 })
@@ -86,15 +102,7 @@ export default function CreateRebuts() {
 
         let errors = [];
 
-        if (enterprise == null) {
-            animate(selectEnterprise.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("Veuillez sélectionner l'entreprise.")
-        }
 
-        if (agency01 == null) {
-            animate(selectAgency01.current, { x: [0, 15, 0] }, { bounce: 0.75 })
-            errors.push("Veuillez sélectionner l'agence.")
-        }
         if (store01 == null) {
             animate(selectStore01.current, { x: [0, 15, 0] }, { bounce: 0.75 })
             errors.push("Veuillez sélectionner le magasin.")
@@ -191,54 +199,14 @@ export default function CreateRebuts() {
 
     async function handleChange(identifier, value, signal) {
         let tb = []
-        if (identifier === "agency01") {
-            const agency02 = data.agency01
-            if (value == selectEnterprise.current.value) {
-                const enterprise = await getEnterpriseBySlug({ slug: value, signal })
-                const store01 = await getAllStorePrincipal({ signal, enterprise: enterprise.id, agency: 0 })
-                store01.forEach(s => {
-                    tb.push({ key: s.id, name: s.name, value: s.slug })
-                })
-                setData(prev => {
-                    return {
-                        ...prev,
-                        store01: tb,
-                    }
-                })
-
-            } else {
-                const agency = await getAgencyBySlug({ slug: value, signal })
-                const enterprise = await getEnterpriseBySlug({ slug: selectEnterprise.current.value, signal })
-                const store01 = await getAllStores({ signal, enterprise: enterprise.id, agency: agency.id })
-                store01.forEach(s => {
-                    tb.push({ key: s.id, name: s.name, value: s.slug })
-                })
-                setData(prev => {
-                    return {
-                        ...prev,
-                        store01: tb,
-                    }
-                })
-
-            }
-
-            setData(prev => {
-                return {
-                    ...prev,
-                    agency02,
-                }
-            })
-        }
-
-
 
         if (identifier === "product") {
             let tb1 = []
             const product = await getProductBySlug({ signal, slug: value })
-            const agency = await getAgencyBySlug({ slug: selectAgency01.current.value })
+            const agency = await getAgencyBySlug({ slug: inputAgency01.current.value })
             let storePrincipal = null
             let store = null
-            if (selectEnterprise.current.value === selectAgency01.current.value) {
+            if (inputEnterprise.current.value === inputAgency01.current.value) {
                 storePrincipal = await getStorePrincipalBySlug({ slug: selectStore01.current.value, signal })
             } else {
                 store = await getStoreBySlug({ slug: selectStore01.current.value, signal })
@@ -250,7 +218,7 @@ export default function CreateRebuts() {
 
             const allLots = await getAllLotById(tb1)
             allLots.forEach(l => {
-                tb.push({ key: 0, name: "Sélectionner un lot", value: "Sélectionner un lot" },
+                tb.push(
                     { key: l.id, name: l.name, value: l.slug })
             })
 
@@ -264,11 +232,11 @@ export default function CreateRebuts() {
 
         if (identifier === "lot") {
             const product = await getProductBySlug({ signal, slug: selectProduct.current.value })
-            const enterprise = await getEnterpriseBySlug({ slug: selectEnterprise.current.value, signal })
-            const agency = await getAgencyBySlug({ slug: selectAgency01.current.value, signal })
+            const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
+            const agency = await getAgencyBySlug({ slug: inputAgency01.current.value, signal })
             let storePrincipal = null
             let store = null
-            if (selectEnterprise.current.value === selectAgency01.current.value) {
+            if (inputEnterprise.current.value === inputAgency01.current.value) {
                 storePrincipal = await getStorePrincipalBySlug({ slug: selectStore01.current.value, signal })
             } else {
                 store = await getStoreBySlug({ slug: selectStore01.current.value, signal })
@@ -289,9 +257,9 @@ export default function CreateRebuts() {
     const [formState, formAction] = useActionState(handleSubmit, { errors: null })
 
     return <form action={formAction} className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 rounded-lg text-sky-50 p-4" ref={scope}>
-        <div className="flex justify-center gap-4">
-            <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} disabled={data?.enabled} />
-            <Select label="Agence *" id="agency01" name="agency01" selectedTitle="Sélectionner une agence de départ" data={data?.agency01} ref={selectAgency01} onChange={(e) => handleChange("agency01", e.target.value)} disabled={data?.enabled} />
+        <div className="hidden">
+            <Input label="Entreprise *" name="enterprise" defaultValue={data?.enterprise} placeholder="Entreprise" className="border border-sky-950" onBlur={(event) => handleBlur("quantity", event.target.value)} ref={inputEnterprise} readOnly />
+            <Input label="Agence *" name="agency01" defaultValue={data?.agency} placeholder="Agence" className="border border-sky-950" onBlur={(event) => handleBlur("agency01", event.target.value)} ref={inputAgency01} readOnly />
         </div>
         <div className="flex justify-center gap-4">
             <Select label="Magasin *" id="store01" name="store01" selectedTitle="Sélectionner un magasin de départ" data={data?.store01} ref={selectStore01} onChange={(e) => handleChange("store01", e.target.value)} disabled={data?.enable} />

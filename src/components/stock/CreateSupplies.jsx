@@ -1,7 +1,7 @@
 import { useAnimate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { getAgencyBySlug, getAllAgencies, getAllLotById, getAllProducts, getAllStocks, getAllStorePrincipal, getAllStores, getEnterpriseById, getEnterpriseBySlug, getLotById, getLotBySlug, getProductBySlug, getStock, getStoreById, getStoreBySlug, getStorePrincipalById, getStorePrincipalBySlug, suppliesStock, transferStock } from "../../utils/http.js";
+import { getAgencyById, getAgencyBySlug, getAllAgencies, getAllLotById, getAllMvtStocks, getAllProducts, getAllStocks, getAllStorePrincipal, getAllStores, getEnterpriseById, getEnterpriseBySlug, getLotById, getLotBySlug, getProductBySlug, getStock, getStoreById, getStoreBySlug, getStorePrincipalById, getStorePrincipalBySlug, suppliesStock, transferStock } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import Select from "../../layout/Select.jsx";
@@ -11,23 +11,26 @@ import Modal from "../../layout/Modal.jsx";
 import Notification from "../../layout/Notification.jsx";
 import responseHttp from "../../utils/responseHttp.js";
 import { noteActions } from "../../store/noteSlice.js";
+import { useNavigate } from "react-router-dom";
+import { printActions } from "../../store/print.js";
 
 export default function CreateSupplies() {
 
     const user = JSON.parse(localStorage.getItem("user"));
     const dialog = useRef();
     const inputEnterprise = useRef();
-    const selectAgency01 = useRef();
+    const inputAgency01 = useRef();
     const selectStore01 = useRef();
     const selectProduct = useRef();
     const selectLot = useRef();
     const inputQuantity = useRef()
     const inputStock = useRef();
     const dispatch = useDispatch();
+    const navigate = useNavigate()
     const [animate] = useAnimate();
     const [data, setData] = useState({
         enterprise: "",
-        agency01: [],
+        agency: "",
         store01: [],
         products: [],
         productList: [],
@@ -41,36 +44,51 @@ export default function CreateSupplies() {
 
     useEffect(() => {
         if (user.enterprise > 0 && user.agency > 0) {
-
             let tbEl = {
-                tb1: [],
+                tb: [],
                 tb2: []
             }
             async function get(signal) {
-
                 const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
-                const allAgencies = await getAllAgencies()
+                const agency = await getAgencyById({ id: user.agency, signal })
+
+                if (enterprise.slug === agency.slug) {
+                    const store01 = await getAllStorePrincipal({ signal, enterprise: enterprise.id, agency: 0 })
+                    store01.forEach(s => {
+                        tbEl.tb.push({ key: s.id, name: s.name, value: s.slug })
+                    })
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            store01: tbEl.tb,
+                        }
+                    })
+
+                } else {
+                    const store01 = await getAllStores({ signal, enterprise: enterprise.id, agency: agency.id })
+                    store01.forEach(s => {
+                        tbEl.tb.push({ key: s.id, name: s.name, value: s.slug })
+                    })
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            store01: tbEl.tb,
+                        }
+                    })
+
+                }
                 const allProducts = await getAllProducts({ signal, enterprise: user.enterprise })
-                allAgencies.forEach(a => {
-                    if (a.enterprise == enterprise.id || a.slug == enterprise.slug) {
-                        tbEl.tb1.push({ key: a.id, name: a.name, value: a.slug })
-                    }
-                })
 
                 allProducts.forEach(p => {
                     if (p.category === "FOURNITURES") {
                         tbEl.tb2.push({ key: p.id, name: p.name, value: p.slug })
                     }
-
                 })
-
-
-
 
                 setData(prev => {
                     return {
                         ...prev,
-                        agency01: tbEl.tb1,
+                        agency: agency.slug,
                         enterprise: enterprise.slug,
                         productList: tbEl.tb2
                     }
@@ -81,14 +99,14 @@ export default function CreateSupplies() {
 
     }, [])
 
-    async function handleSave() {
+    async function handleSave(signal) {
 
         let products = []
         data.products.forEach(p => {
             products.push(p.product + ":" + p.store + ":" + p.quantity + ":" + p.lot)
         })
         const enterprise = inputEnterprise.current.value
-        const agency = selectAgency01.current.value
+        const agency = inputAgency01.current.value
         const suppliesDto = {
             enterprise,
             agency,
@@ -96,11 +114,34 @@ export default function CreateSupplies() {
         }
 
         const responseData = await suppliesStock(suppliesDto)
+        const enterprise_ = await getEnterpriseById({ id: user.enterprise, signal })
+        let products_ = []
+        for (let p of data.products) {
+            let product_ = await getProductBySlug({ signal, slug: p.product })
+            products_.push({ ref: product_.ref, name: product_.name, quantity: p.quantity, price: product_.price, totalPrice: p.quantity * product_.price })
+        }
+
+        const print = {
+            enterprise: enterprise_,
+            products_,
+            agency: agency.toUpperCase()
+        }
         const state = responseHttp(responseData);
         if (state) {
             dispatch(noteActions.error(true))
         } else {
+            setData(prev => {
+                return {
+                    ...prev,
+                    products: []
+                }
+
+            })
             dispatch(noteActions.error(false))
+            if (responseData[0].includes("Commande en fournitures effectuée avec succès.")) {
+                dispatch(printActions.getPrint(print))
+                navigate("/print-supplies")
+            }
         }
         dispatch(noteActions.show());
         dispatch(noteActions.relaunch());
@@ -126,61 +167,21 @@ export default function CreateSupplies() {
             }
         }
 
-
-
     }
 
 
     async function handleChange(identifier, value, signal) {
         let tb = []
-        if (identifier === "agency01") {
-            const agency02 = data.agency01
-            if (value == inputEnterprise.current.value) {
-                const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
-                const store01 = await getAllStorePrincipal({ signal, enterprise: enterprise.id, agency: 0 })
-                store01.forEach(s => {
-                    tb.push({ key: s.id, name: s.name, value: s.slug })
-                })
-                setData(prev => {
-                    return {
-                        ...prev,
-                        store01: tb,
-                    }
-                })
-
-            } else {
-                const agency = await getAgencyBySlug({ slug: value, signal })
-                const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
-                const store01 = await getAllStores({ signal, enterprise: enterprise.id, agency: agency.id })
-                store01.forEach(s => {
-                    tb.push({ key: s.id, name: s.name, value: s.slug })
-                })
-                setData(prev => {
-                    return {
-                        ...prev,
-                        store01: tb,
-                    }
-                })
-
-            }
-
-            setData(prev => {
-                return {
-                    ...prev,
-                    agency02,
-                }
-            })
-        }
 
 
 
         if (identifier === "product") {
             let tb1 = []
             const product = await getProductBySlug({ signal, slug: value })
-            const agency = await getAgencyBySlug({ slug: selectAgency01.current.value })
+            const agency = await getAgencyBySlug({ slug: inputAgency01.current.value })
             let storePrincipal = null
             let store = null
-            if (inputEnterprise.current.value === selectAgency01.current.value) {
+            if (inputEnterprise.current.value === inputAgency01.current.value) {
                 storePrincipal = await getStorePrincipalBySlug({ slug: selectStore01.current.value, signal })
             } else {
                 store = await getStoreBySlug({ slug: selectStore01.current.value, signal })
@@ -192,8 +193,7 @@ export default function CreateSupplies() {
 
             const allLots = await getAllLotById(tb1)
             allLots.forEach(l => {
-                tb.push({ key: 0, name: "Sélectionner un lot", value: "Sélectionner un lot" }),
-                    tb.push({ key: l.id, name: l.name, value: l.slug })
+                tb.push({ key: l.id, name: l.name, value: l.slug })
             })
 
             setData(prev => {
@@ -207,10 +207,10 @@ export default function CreateSupplies() {
         if (identifier === "lot") {
             const product = await getProductBySlug({ signal, slug: selectProduct.current.value })
             const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
-            const agency = await getAgencyBySlug({ slug: selectAgency01.current.value, signal })
+            const agency = await getAgencyBySlug({ slug: inputAgency01.current.value, signal })
             let storePrincipal = null
             let store = null
-            if (inputEnterprise.current.value === selectAgency01.current.value) {
+            if (inputEnterprise.current.value === inputAgency01.current.value) {
                 storePrincipal = await getStorePrincipalBySlug({ slug: selectStore01.current.value, signal })
             } else {
                 store = await getStoreBySlug({ slug: selectStore01.current.value, signal })
@@ -232,11 +232,6 @@ export default function CreateSupplies() {
     function handleAdd(identifier) {
         let errors = []
         if (identifier === "add") {
-            if (selectAgency01.current.value === "Sélectionner une agence de départ") {
-                errors.push("Veuillez sélectionner l'agence de départ")
-            }
-
-
 
             if (selectStore01.current.value === "Sélectionner un magasin de départ") {
                 errors.push("Veuillez sélectionner le magasin de départ")
@@ -313,9 +308,9 @@ export default function CreateSupplies() {
     return <>
 
         <div className="flex flex-col overflow-y-auto border border-sky-950 shadow-2xs shadow-sky-950 p-2 rounded mb-4">
-            <div className="flex justify-center gap-4">
-                <Input label="Entreprise *" name="quantity" defaultValue={data?.enterprise} placeholder="Entreprise" className="border border-sky-950" onBlur={(event) => handleBlur("quantity", event.target.value)} ref={inputQuantity} />
-                <Select label="Agence *" id="agency01" name="agency01" selectedTitle="Sélectionner une agence de départ" data={data?.agency01} ref={selectAgency01} onChange={(e) => handleChange("agency01", e.target.value)} disabled={data?.enabled} />
+            <div className="hidden">
+                <Input label="Entreprise *" name="enterprise" defaultValue={data?.enterprise} placeholder="Entreprise" className="border border-sky-950" onBlur={(event) => handleBlur("quantity", event.target.value)} ref={inputEnterprise} readOnly />
+                <Input label="Agence *" name="agency" defaultValue={data?.agency} placeholder="Agence" className="border border-sky-950" onBlur={(event) => handleBlur("agency01", event.target.value)} ref={inputAgency01} readOnly />
             </div>
             <div className="flex justify-center gap-4">
                 <Select label="Magasin *" id="store01" name="store01" selectedTitle="Sélectionner un magasin de départ" data={data?.store01} ref={selectStore01} onChange={(e) => handleChange("store01", e.target.value)} disabled={data?.enable} />

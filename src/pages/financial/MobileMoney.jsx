@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllMobileMoney } from "../../utils/http";
+import { getAllMobileMoney, getEnterpriseById, getOperatorById } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Submit from "../../layout/Submit.jsx"
 import Table from "../../layout/Table.jsx"
 import Modal from "../../layout/Modal.jsx";
@@ -10,6 +10,9 @@ import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { mobileMonies } from "../../data/dataTable.js";
 import CreateMobileMoney from "../../components/mobile_money/CreateMobileMoney.jsx";
 import Operator from "../../components/mobile_money/Operator.jsx";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -21,13 +24,11 @@ export default function MobileMoneyPage() {
     const dataItem = useSelector(state => state.note.dataItem)
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
-
-
-    const { data } = useQuery({
-        queryKey: ["mobilemoney", { agency: user.agency }],
-        queryFn: ({ signal }) => getAllMobileMoney({ signal, agency: user.agency }),
-        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")
+    const [data, setData] = useState({
+        mobileMoney: [],
+        isLoading: false
     })
+
 
 
     const dialog = useRef()
@@ -47,6 +48,36 @@ export default function MobileMoneyPage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "financial" }))
+        setData(prev => {
+            return {
+                ...prev,
+                isLoading: true
+            }
+        })
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")) {
+            async function get(signal) {
+                const allMobileMonies = await getAllMobileMoney({ signal, agency: user?.agency })
+                let tb = []
+                let enterprise = {}
+                let operator = {}
+                for (let m of allMobileMonies) {
+                    enterprise = await getEnterpriseById({ id: m.enterprise, signal })
+                    operator = await getOperatorById({ id: m.operator, signal })
+                    m.enterprise = enterprise.slug
+                    m.operator = operator.slug
+                    tb.push(m)
+                }
+                setData(prev => {
+                    return {
+                        ...prev,
+                        mobileMoney: tb,
+                        isLoading: false
+                    }
+                })
+
+            }
+            get()
+        }
     }, [menu, dispatch])
 
     return <>
@@ -54,7 +85,8 @@ export default function MobileMoneyPage() {
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("operator")}>Opérateurs</Submit> : undefined}
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("account")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={mobileMonies.header} emptyMessage="Aucun compte mobile money trouvé." globalFilterFields={mobileMonies.global} sheet="Compte mobile money" titleRef="Mise à jour informations d'un compte mobile money" size="lg:h-7/13 lg:w-4/15 xl:h-8/13" />
+        <Table data={data?.mobileMoney} headers={mobileMonies.header} emptyMessage="Aucun compte mobile money trouvé." globalFilterFields={mobileMonies.global} sheet="Compte mobile money" titleRef="Mise à jour informations d'un compte mobile money" size="lg:h-7/13 lg:w-4/15 xl:h-8/13" />
+        {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-6/12 lg:w-4/15" title="Créer une compte mobile money">
             <CreateMobileMoney />
         </Modal>

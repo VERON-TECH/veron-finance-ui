@@ -28,11 +28,11 @@ export default function CreateProduct() {
     useEffect(() => {
         let tb = []
         async function getAll(signal) {
-            const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
+            const enterprise = user.enterprise > 0 && await getEnterpriseById({ id: user.enterprise, signal })
             setData(prev => {
                 return {
                     ...prev,
-                    enterprise: enterprise.slug
+                    enterprise: user.enterprise > 0 ? enterprise.slug : ""
                 }
             })
 

@@ -1,22 +1,21 @@
 
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useDispatch } from "react-redux";
-import { createCustomer, createPersonal, getAllAgenciesByEnterprise, getAllCustomers, getAllEnterprises, getAllTitles, getEnterpriseById, getEnterpriseBySlug, queryClient } from "../../utils/http";
+import { createCustomer, getAllCustomers, getEnterpriseById, queryClient } from "../../utils/http";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
 import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
 import Select from "../../layout/Select.jsx";
-import { cities, genders } from "../../data/info.js";
+import { genders } from "../../data/info.js";
 import { identifierMenuActions } from "../../store/identifierSlice.js";
 
 export default function CreateCustomer() {
     const user = JSON.parse(localStorage.getItem("user"))
     const selectGender = useRef();
-
     const inputFirstName = useRef();
     const inputLastName = useRef();
     const inputEmail = useRef();

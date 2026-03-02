@@ -28,20 +28,23 @@ export default function UpdateAgency() {
 
 
     useEffect(() => {
-        async function get(signal) {
-            if (user.role.includes("ROLE_ADMIN") && id != "") {
-                const agency = await getAgencyById({ signal, id })
-                const enterprise = await getEnterpriseById({ signal, id: agency?.enterprise })
-                setData(prev => {
-                    return {
-                        ...prev,
-                        enterprise: enterprise.slug,
-                        agency: agency
-                    }
-                })
+        if (id !== "") {
+            async function get(signal) {
+                if (user.role.includes("ROLE_ADMIN") && id != "") {
+                    const agency = await getAgencyById({ signal, id })
+                    const enterprise = await getEnterpriseById({ signal, id: agency?.enterprise })
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            enterprise: enterprise.slug,
+                            agency: agency
+                        }
+                    })
+                }
             }
+            get()
         }
-        get()
+
     }, [id])
 
     async function handleSubmit(prevState, formData) {

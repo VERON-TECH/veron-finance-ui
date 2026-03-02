@@ -1,7 +1,7 @@
 import { useAnimate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createPackage, getAgencyBySlug, getAllAgencies, getAllLotById, getAllProducts, getAllStocks, getAllStorePrincipal, getAllStores, getEnterpriseById, getEnterpriseBySlug, getLotById, getLotBySlug, getProductBySlug, getStock, getStoreById, getStoreBySlug, getStorePrincipalById, getStorePrincipalBySlug, suppliesStock, transferStock } from "../../utils/http.js";
+import { createPackage, getAgencyById, getAgencyBySlug, getAllAgencies, getAllLotById, getAllProducts, getAllStocks, getAllStorePrincipal, getAllStores, getEnterpriseById, getEnterpriseBySlug, getLotById, getLotBySlug, getProductBySlug, getStock, getStoreById, getStoreBySlug, getStorePrincipalById, getStorePrincipalBySlug, suppliesStock, transferStock } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import Select from "../../layout/Select.jsx";
@@ -12,12 +12,16 @@ import Notification from "../../layout/Notification.jsx";
 import responseHttp from "../../utils/responseHttp.js";
 import { noteActions } from "../../store/noteSlice.js";
 import { isNotEmpty } from "../../utils/validation.jsx";
+import { modalActions } from "../../store/modalSlice.js";
 
 export default function CreatePackage() {
     const user = JSON.parse(localStorage.getItem("user"));
+    const errorNotification = useSelector(state => state.note.error);
+    const relaunch = useSelector(state => state.note.relaunch);
+    const dataItem = useSelector(state => state.note.dataItem)
     const dialog = useRef();
-    const selectEnterprise = useRef();
-    const selectAgency01 = useRef();
+    const inputEnterprise = useRef();
+    const inputAgency01 = useRef();
     const selectStore01 = useRef();
     const selectProduct = useRef();
     const selectLot = useRef();
@@ -28,8 +32,8 @@ export default function CreatePackage() {
     const dispatch = useDispatch();
     const [animate] = useAnimate();
     const [data, setData] = useState({
-        enterprises: [],
-        agency01: [],
+        enterprise: "",
+        agency: "",
         store01: [],
         products: [],
         productList: [],
@@ -48,21 +52,13 @@ export default function CreatePackage() {
 
             let tbEl = {
                 tb: [],
-                tb1: [],
                 tb2: []
             }
             async function get(signal) {
 
-                const allEnterprises = await getEnterpriseById({ id: user.enterprise, signal })
-                const allAgencies = await getAllAgencies()
+                const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
+                const agency = await getAgencyById({ id: user.agency, signal })
                 const allProducts = await getAllProducts({ signal, enterprise: user.enterprise })
-                tbEl.tb.push({ key: allEnterprises.id, name: allEnterprises.name, value: allEnterprises.slug })
-                allAgencies.forEach(a => {
-                    if (a.enterprise == allEnterprises.id && a.slug !== allEnterprises.slug) {
-                        tbEl.tb1.push({ key: a.id, name: a.name, value: a.slug })
-                    }
-                })
-
                 allProducts.forEach(p => {
                     if (p.category === "PRODUITS") {
                         tbEl.tb2.push({ key: p.id, name: p.name, value: p.slug })
@@ -71,13 +67,40 @@ export default function CreatePackage() {
                 })
 
 
+                if (enterprise.slug === agency.slug) {
+                    const store01 = await getAllStorePrincipal({ signal, enterprise: enterprise.id, agency: 0 })
+                    store01.forEach(s => {
+                        tbEl.tb.push({ key: s.id, name: s.name, value: s.slug })
+                    })
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            store01: tbEl.tb,
+                        }
+                    })
+
+                } else {
+                    const store01 = await getAllStores({ signal, enterprise: enterprise.id, agency: agency.id })
+                    store01.forEach(s => {
+                        tbEl.tb.push({ key: s.id, name: s.name, value: s.slug })
+                    })
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            store01: tbEl.tb,
+                        }
+                    })
+
+                }
+
+
 
 
                 setData(prev => {
                     return {
                         ...prev,
-                        agency01: tbEl.tb1,
-                        enterprises: tbEl.tb,
+                        agency: agency.slug,
+                        enterprise: enterprise.slug,
                         productList: tbEl.tb2
                     }
                 })
@@ -93,8 +116,8 @@ export default function CreatePackage() {
         data.products.forEach(p => {
             products.push(p.product + ":" + p.store + ":" + p.quantity + ":" + p.lot + ":" + p.price)
         })
-        const enterprise = selectEnterprise.current.value
-        const agency = selectAgency01.current.value
+        const enterprise = inputEnterprise.current.value
+        const agency = inputAgency01.current.value
         const store = selectStore01.current.value
         const name = inputName.current.value
         const packageKitDto = {
@@ -111,6 +134,7 @@ export default function CreatePackage() {
             dispatch(noteActions.error(true))
         } else {
             dispatch(noteActions.error(false))
+            dispatch(modalActions.updateClose())
         }
         dispatch(noteActions.show());
         dispatch(noteActions.relaunch());
@@ -155,54 +179,14 @@ export default function CreatePackage() {
 
     async function handleChange(identifier, value, signal) {
         let tb = []
-        if (identifier === "agency01") {
-            const agency02 = data.agency01
-            if (value == selectEnterprise.current.value) {
-                const enterprise = await getEnterpriseBySlug({ slug: value, signal })
-                const store01 = await getAllStorePrincipal({ signal, enterprise: enterprise.id, agency: 0 })
-                store01.forEach(s => {
-                    tb.push({ key: s.id, name: s.name, value: s.slug })
-                })
-                setData(prev => {
-                    return {
-                        ...prev,
-                        store01: tb,
-                    }
-                })
-
-            } else {
-                const agency = await getAgencyBySlug({ slug: value, signal })
-                const enterprise = await getEnterpriseBySlug({ slug: selectEnterprise.current.value, signal })
-                const store01 = await getAllStores({ signal, enterprise: enterprise.id, agency: agency.id })
-                store01.forEach(s => {
-                    tb.push({ key: s.id, name: s.name, value: s.slug })
-                })
-                setData(prev => {
-                    return {
-                        ...prev,
-                        store01: tb,
-                    }
-                })
-
-            }
-
-            setData(prev => {
-                return {
-                    ...prev,
-                    agency02,
-                }
-            })
-        }
-
-
 
         if (identifier === "product") {
             let tb1 = []
             const product = await getProductBySlug({ signal, slug: value })
-            const agency = await getAgencyBySlug({ slug: selectAgency01.current.value })
+            const agency = await getAgencyBySlug({ slug: inputAgency01.current.value })
             let storePrincipal = null
             let store = null
-            if (selectEnterprise.current.value === selectAgency01.current.value) {
+            if (inputEnterprise.current.value === inputAgency01.current.value) {
                 storePrincipal = await getStorePrincipalBySlug({ slug: selectStore01.current.value, signal })
             } else {
                 store = await getStoreBySlug({ slug: selectStore01.current.value, signal })
@@ -214,8 +198,7 @@ export default function CreatePackage() {
 
             const allLots = await getAllLotById(tb1)
             allLots.forEach(l => {
-                tb.push({ key: 0, name: "Sélectionner un lot", value: "Sélectionner un lot" }),
-                    tb.push({ key: l.id, name: l.name, value: l.slug })
+                tb.push({ key: l.id, name: l.name, value: l.slug })
             })
 
             inputPrice.current.value = product.price
@@ -229,11 +212,11 @@ export default function CreatePackage() {
 
         if (identifier === "lot") {
             const product = await getProductBySlug({ signal, slug: selectProduct.current.value })
-            const enterprise = await getEnterpriseBySlug({ slug: selectEnterprise.current.value, signal })
-            const agency = await getAgencyBySlug({ slug: selectAgency01.current.value, signal })
+            const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
+            const agency = await getAgencyBySlug({ slug: inputAgency01.current.value, signal })
             let storePrincipal = null
             let store = null
-            if (selectEnterprise.current.value === selectAgency01.current.value) {
+            if (inputEnterprise.current.value === inputAgency01.current.value) {
                 storePrincipal = await getStorePrincipalBySlug({ slug: selectStore01.current.value, signal })
             } else {
                 store = await getStoreBySlug({ slug: selectStore01.current.value, signal })
@@ -252,18 +235,9 @@ export default function CreatePackage() {
     }
 
 
-    function handleAdd(identifier) {
+    async function handleAdd(identifier, signal) {
         let errors = []
         if (identifier === "add") {
-            if (selectEnterprise.current.value === "Sélectionner une entreprise") {
-                errors.push("Veuillez sélectionner l'entreprise")
-            }
-
-            if (selectAgency01.current.value === "Sélectionner une agence de départ") {
-                errors.push("Veuillez sélectionner l'agence de départ")
-            }
-
-
 
             if (selectStore01.current.value === "Sélectionner un magasin de départ") {
                 errors.push("Veuillez sélectionner le magasin de départ")
@@ -287,7 +261,14 @@ export default function CreatePackage() {
                 errors.push("Veuillez renseigner le prix.")
             }
 
-            if (Number(inputQuantity.current.value) > Number(inputStock.current.value)) {
+            const enterprise = await getEnterpriseBySlug({ slug: inputEnterprise.current.value, signal })
+            const agency = await getAgencyBySlug({ slug: inputAgency01.current.value, signal })
+            const store = await getStoreBySlug({ slug: selectStore01.current.value, signal })
+            const lot = await getLotBySlug({ signal, slug: selectLot.current.value })
+            const product = await getProductBySlug({ signal, slug: selectProduct.current.value })
+            const stock = await getStock({ signal, enterprise: enterprise.id, agency: agency.id, storePrincipal: 0, store: store.id, product: product.id, lot: lot.id })
+
+            if (Number(inputQuantity.current.value) > Number(stock.stock)) {
                 errors.push("Le stock du produit " + selectProduct.current.value + " est insuffisant.")
             }
 
@@ -323,7 +304,7 @@ export default function CreatePackage() {
             })
 
 
-
+            inputQuantity.current.value = 0
             return { errors: null }
 
         }
@@ -348,9 +329,9 @@ export default function CreatePackage() {
             <div className="w-1/2 p-2 m-1 border-2 border-sky-950 shadow-lg shadow-sky-950 rounded">
                 <div className="flex justify-center gap-4">
                     <Input label="Nom du paquet*" type="text" name="name" placeholder="Nom du paquet" className="border border-sky-950" ref={inputName} /> </div>
-                <div className="flex justify-center gap-4">
-                    <Select label="Entreprise *" id="enterprise" name="enterprise" selectedTitle="Sélectionner une entreprise" data={data?.enterprises} ref={selectEnterprise} disabled={data?.enabled} />
-                    <Select label="Agence *" id="agency01" name="agency01" selectedTitle="Sélectionner une agence de départ" data={data?.agency01} ref={selectAgency01} onChange={(e) => handleChange("agency01", e.target.value)} disabled={data?.enabled} />
+                <div className="hidden">
+                    <Input label="Entreprise *" name="enterprise" defaultValue={data?.enterprise} placeholder="Entreprise" className="border border-sky-950" onBlur={(event) => handleBlur("quantity", event.target.value)} ref={inputEnterprise} readOnly />
+                    <Input label="Agence *" name="agency01" defaultValue={data?.agency} placeholder="Agence" className="border border-sky-950" onBlur={(event) => handleBlur("agency01", event.target.value)} ref={inputAgency01} readOnly />
                 </div>
                 <div className="flex justify-center gap-4">
                     <Select label="Magasin *" id="store01" name="store01" selectedTitle="Sélectionner un magasin de départ" data={data?.store01} ref={selectStore01} onChange={(e) => handleChange("store01", e.target.value)} disabled={data?.enable} />
@@ -434,6 +415,9 @@ export default function CreatePackage() {
             <p className="mb-4"><FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />Ce produit existe déjà dans le panier.</p>
             <Submit onClick={() => dialog.current.close()}>Fermer</Submit>
         </Modal>
+
+        {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
+
 
     </>
 }

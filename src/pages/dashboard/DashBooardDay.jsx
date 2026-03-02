@@ -28,7 +28,7 @@ export default function DashBoardDayPage() {
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "reporting" }))
         async function get(signal) {
-            const sales = await getAllSales({ signal, enterprise: user.enterprise, agency: user.agency, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
+            const sales = await getAllSales({ signal, enterprise: user.enterprise, agency: user.agency, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString(), cashes: [], customer: 0 })
             const profits = await getAllProfits({ signal, enterprise: user.enterprise, agency: user.agency })
             const mvtCash = await getAllMvtCash({ signal, enterprise: user.enterprise, agency: user.agency, cash: 0, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
             const bankAccounts = await getAllBankAccount({ signal, agency: user.agency })
@@ -149,7 +149,7 @@ export default function DashBoardDayPage() {
 
     return <>
 
-        <div className="flex gap-2 flex-wrap">
+        <div className="flex gap-8 flex-wrap">
             <CardDashboard title="Ventes" balance={data?.sales?.nb} account="Nombre" />
             <CardDashboard title="Montant" balance={data?.sales?.amount} account="Recettes" />
             <CardDashboard title="Montant" balance={data?.profits?.amount} account="Profits générés" />

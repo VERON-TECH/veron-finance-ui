@@ -19,7 +19,7 @@ export default function UpdateCategory() {
     const { data } = useQuery({
         queryKey: ["categories", { id }],
         queryFn: ({ signal }) => getCategoryServiceById({ id, signal }),
-        enabled: user?.role.includes("ROLE_COMPTABLE_MATIERE") && id != "" && id !== undefined || user?.role.includes("ROLE_COMPTABLE") && id != "" && id !== undefined
+        enabled: user?.role.includes("ROLE_GESTIONNAIRE_DE_STOCK") && id != "" && id !== undefined || user?.role.includes("ROLE_COMPTABLE") && id != "" && id !== undefined
     })
 
 

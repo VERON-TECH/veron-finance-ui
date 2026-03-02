@@ -1,14 +1,17 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllPurchaseOrders } from "../../utils/http";
+import { getAgencyById, getAllPurchaseOrders, getEnterpriseById, getSupplierById } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import Submit from "../../layout/Submit.jsx"
 import Table from "../../layout/Table.jsx"
 import Modal from "../../layout/Modal.jsx";
 import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { purchasOrders } from "../../data/dataTable.js";
 import CreatePurchaseOrder from "../../components/purchase/CreatePurchaseOrder.jsx";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -19,14 +22,10 @@ export default function PurchaseOrderPage() {
     const dataItem = useSelector(state => state.note.dataItem)
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
-
-
-    const { data } = useQuery({
-        queryKey: ["purchaserorders", { enterprise: user.enterprise, agency: user.agency }],
-        queryFn: ({ signal }) => getAllPurchaseOrders({ signal, enterprise: user.enterprise, agency: user.agency }),
-        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")
+    const [data, setData] = useState({
+        purchase: [],
+        isLoading: false
     })
-
 
     const dialog = useRef()
 
@@ -38,13 +37,47 @@ export default function PurchaseOrderPage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "stock" }))
+        setData(prev => {
+            return {
+                ...prev,
+                isLoading: true
+            }
+        })
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK")) {
+            async function get(signal) {
+                const allPurchaseOrders = await getAllPurchaseOrders({ signal, enterprise: user.enterprise, agency: user.agency })
+                let tb = []
+                let enterprise = {}
+                let agency = {}
+                let supplier = {}
+                for (let p of allPurchaseOrders) {
+                    enterprise = await getEnterpriseById({ id: p.enterprise, signal })
+                    agency = await getAgencyById({ id: p.agency, signal })
+                    supplier = await getSupplierById({ id: p.supplier, signal })
+                    p.enterprise = enterprise.slug
+                    p.agency = agency.slug
+                    p.supplier = supplier.slug
+                    tb.push(p)
+                }
+                setData(prev => {
+                    return {
+                        ...prev,
+                        purchase: tb,
+                        isLoading: false
+                    }
+                })
+
+            }
+            get()
+        }
     }, [menu, dispatch])
 
     return <>
         <div className="flex justify-center gap-2 mb-2">
-            {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit onClick={() => handleModal("store")}>Nouveau</Submit> : undefined}
+            {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK") ? <Submit onClick={() => handleModal("store")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={purchasOrders.header} emptyMessage="Aucun bon de commande trouvé." globalFilterFields={purchasOrders.global} sheet="Bon de commande" titleRef="Mise à jour informations d'un bon de commande" size="lg:h-9/12 lg:w-11/15 xl:w-13/15 xl:h-9/12" />
+        <Table data={data?.purchase} headers={purchasOrders.header} emptyMessage="Aucun bon de commande trouvé." globalFilterFields={purchasOrders.global} sheet="Bon de commande" titleRef="Mise à jour informations d'un bon de commande" size="lg:h-9/12 lg:w-11/15 xl:w-13/15 xl:h-9/12" />
+        {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-10/12 lg:w-15/15 xl:w-15/15 xl:h-10/12" title="Créer une commande">
             <CreatePurchaseOrder />
         </Modal>

@@ -30,7 +30,7 @@ export default function CreateService() {
         }
         async function get(signal) {
             const allCategories = await getCategoryService()
-            const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
+            const enterprise = user.enterprise != 0 && await getEnterpriseById({ id: user.enterprise, signal })
             allCategories.forEach(c => {
                 if (c.name !== "VENTES") {
                     tbEl.tb.push({ key: c.id, name: c.name, value: c.slug })
@@ -42,7 +42,7 @@ export default function CreateService() {
                 return {
                     ...prev,
                     categories: tbEl.tb,
-                    enterprise: enterprise.slug
+                    enterprise: user.enterprise != 0 ? enterprise.slug : ""
                 }
             })
         }

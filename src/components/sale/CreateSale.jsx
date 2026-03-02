@@ -1,7 +1,7 @@
 import { useAnimate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { convert, createSale, getAgencyById, getAgencyBySlug, getAllBankAccount, getAllCustomers, getAllLotById, getAllMobileMoney, getAllProducts, getAllSales, getAllServices, getAllStocks, getCategoryService, getCategoryServiceBySlug, getCustomerById, getCustomerBySlug, getEnterpriseById, getLotBySlug, getProductBySlug, getServiceById, getServiceBySlug, getStock, getStoreBySlug } from "../../utils/http.js";
+import { convert, createSale, createSalePayment, getAgencyById, getAllBankAccount, getAllCustomers, getAllLotById, getAllMobileMoney, getAllPrints, getAllProducts, getAllSalePaymentsByCustomer, getAllSales, getAllSales_, getAllServices, getAllStocks, getCashBySlug, getCategoryService, getCategoryServiceBySlug, getCustomerById, getCustomerBySlug, getEnterpriseById, getLotBySlug, getProductBySlug, getSaleById, getServiceById, getServiceBySlug, getStock, getStoreBySlug } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { noteActions } from "../../store/noteSlice.js";
@@ -9,12 +9,13 @@ import responseHttp from "../../utils/responseHttp.js"
 import Select from "../../layout/Select.jsx";
 import { paymentMethod } from "../../data/info.js";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faExclamationTriangle, faTrash, faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import { faExclamationTriangle, faPrint, faTrash, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import Modal from "../../layout/Modal.jsx";
 import Notification from "../../layout/Notification.jsx";
 import CreateCustomer from "../customer/CreateCustomer.jsx";
 import { printActions } from "../../store/print.js";
 import { useNavigate } from "react-router-dom";
+import { identifierMenuActions } from "../../store/identifierSlice.js";
 
 export default function CreateSale() {
     const errorNotification = useSelector(state => state.note.error);
@@ -24,6 +25,8 @@ export default function CreateSale() {
     const dialog = useRef();
     const dialog1 = useRef();
     const dialog2 = useRef();
+    const dialog3 = useRef();
+    const dialog4 = useRef();
     const selectCategory = useRef();
     const selectService = useRef();
     const selectPaymentReceiver = useRef();
@@ -37,6 +40,7 @@ export default function CreateSale() {
     const inputPayment_ = useRef()
     const inputDiscount = useRef();
     const inputPriceHT = useRef();
+    const inputPayment__ = useRef()
     const inputRest = useRef();
     const inputPriceTtc = useRef();
     const inputPayment = useRef();
@@ -51,7 +55,7 @@ export default function CreateSale() {
 
 
     const dispatch = useDispatch();
-    const [scope, animate] = useAnimate();
+    const [animate] = useAnimate();
     const [data, setData] = useState({
         category: [],
         services: [],
@@ -76,6 +80,11 @@ export default function CreateSale() {
         tax: 0,
         errors: [],
         disabled: false,
+        prints: [],
+        salePayments: [],
+        totalSalePayments: 0,
+        instantAmount: 0,
+        typePrint: "sale"
 
     })
 
@@ -86,20 +95,30 @@ export default function CreateSale() {
             let tbEl = {
                 tb: [],
                 tb1: [],
-                tb2: []
+                tb2: [],
+                tb3: []
             }
             inputCash.current.value = cash
             async function get(signal) {
                 const allCategories = await getCategoryService();
                 const allProducts = await getAllProducts({ signal, enterprise: user.enterprise })
                 const allCustomers = await getAllCustomers({ signal, enterprise: user.enterprise })
+                const allPrints = await getAllPrints({ signal, enterprise: user.enterprise, agency: user.agency })
+
                 allCategories.forEach(c => {
                     tbEl.tb.push({ key: c.id, name: c.name, value: c.slug })
                 })
 
                 allProducts.forEach(p => {
-                    if (p.category === "PRODUITS") {
+                    if (p.category === "PRODUITS" || p.category === "PACQUET") {
                         tbEl.tb1.push({ key: p.id, name: p.name, value: p.slug })
+                    }
+
+                })
+
+                allPrints.forEach(p => {
+                    if (p.status === "ACTIVE") {
+                        tbEl.tb3.push({ key: p.id, name: p.type, value: p.type })
                     }
 
                 })
@@ -114,7 +133,8 @@ export default function CreateSale() {
                         category: tbEl.tb,
                         productList: tbEl.tb1,
                         customers: tbEl.tb2,
-                        stores: user.stores
+                        stores: user.stores,
+                        prints: tbEl.tb3,
                     }
                 })
 
@@ -128,6 +148,7 @@ export default function CreateSale() {
 
     async function handleSave(signal) {
         let products = []
+        let errors = []
         if (Number(inputPayment.current.value) > 0 && Number(inputPayment.current.value) <= Number(inputPriceTtc.current.value) && selectPaymentMethod.current.value === "ESPECES" || Number(inputPayment.current.value) > 0 && Number(inputPayment.current.value) <= Number(inputPriceTtc.current.value) && selectPaymentMethod.current.value === "VIREMENT" || Number(inputPayment.current.value) > 0 && Number(inputPayment.current.value) <= Number(inputPriceTtc.current.value) && selectPaymentMethod.current.value === "MOBILE_MONEY" || selectPaymentMethod.current.value === "A_CREDIT" || selectPaymentMethod.current.value === "AVANCE_CLIENT") {
             data.products.forEach(p => {
                 products.push(p.category + ":" + p.service + ":" + p.product + ":" + p.store + ":" + p.lot + ":" + p.quantity + ":" + p.price + ":" + p.discount)
@@ -147,12 +168,27 @@ export default function CreateSale() {
             const priceTtc = inputPriceTtc.current.value
             const payment = inputPayment.current.value
 
+            if (customerData.lastName === "CLIENT INCONNU" && Number(inputRest.current.value) > 0) {
+                errors.push("Le client inconnu ne peut pas avoir de dette.")
+
+            }
+
+
+            if (errors.length > 0) {
+                dispatch(noteActions.error(true))
+                dispatch(noteActions.show());
+                dispatch(noteActions.relaunch());
+                dispatch(noteActions.sendData(errors))
+                return
+            }
+
+
             const saleDto = {
                 enterprise,
                 agency,
                 cash,
                 paymentMethod,
-                paymentReceiver,
+                paymentReceiver: selectPaymentMethod.current.value !== "A_CREDIT" ? paymentReceiver : "A_CREDIT",
                 products,
                 discount,
                 priceHt,
@@ -169,37 +205,41 @@ export default function CreateSale() {
             if (state) {
                 dispatch(noteActions.error(true))
             } else {
-
                 dispatch(noteActions.error(false))
-                const sales = await getAllSales({ signal, enterprise: 0, agency: 0, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
-                const sale = sales[sales.length - 1]
+                if (responseData[0].includes("avec succès")) {
+                    const sales = await getAllSales_()
+                    const sale = sales[sales.length - 1]
 
-                const printSale = {
-                    enterprise: enterprise.name,
-                    date: new Date().toLocaleDateString(),
-                    agency: agency_.name,
-                    ref: sale.ref,
-                    date: sale.date,
-                    time: sale.time,
-                    customer: customerData.lastName + " " + customerData.firstName,
-                    products: data.products,
-                    priceHT: priceHt,
-                    remise: discount,
-                    priceTTC: priceTtc,
-                    payment: payment,
-                    rest: priceTtc - Number(payment),
-                    cash: cash,
-                    amountLetter,
-                }
-                dispatch(printActions.getPrint(printSale))
-                setData(prev => {
-                    return {
-                        ...prev,
-                        products: []
+
+                    const printSale = {
+                        enterprise: enterprise_,
+                        agency: agency_,
+                        ref: sale.ref,
+                        date: new Date().toLocaleDateString(),
+                        time: sale.time,
+                        customer: customerData.lastName + " " + customerData.firstName,
+                        products: data.products,
+                        priceHT: priceHt,
+                        remise: discount,
+                        priceTTC: priceTtc,
+                        payment: payment,
+                        rest: priceTtc - Number(payment),
+                        cash: cash,
+                        amountLetter,
                     }
+                    dispatch(printActions.getPrint(printSale))
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            products: [],
+                            typePrint: "sale"
+                        }
 
-                })
-                navigate("/print-sale")
+                    })
+                    dialog4.current.open()
+                }
+
+
             }
             dispatch(noteActions.show());
             dispatch(noteActions.relaunch());
@@ -213,7 +253,98 @@ export default function CreateSale() {
 
 
 
+    async function handlePayment() {
+        const controller = new AbortController();
+        const signal = controller.signal;
+        let errors = []
+        if (selectPaymentMethod.current.value === "Sélectionner un moyen de paiement") {
+            errors.push("Veuillez sélectionner un moyen de paiement.")
+        }
 
+        if (selectPaymentReceiver.current.value === "Sélectionner un moyen de réception") {
+            errors.push("Veuillez sélectionner un moyen de réception.")
+        }
+
+        if (errors.length > 0) {
+            dispatch(noteActions.error(true))
+            dispatch(noteActions.show());
+            dispatch(noteActions.relaunch());
+            dispatch(noteActions.sendData(errors))
+            return
+        }
+
+        let salePaymentDto = {}
+        const salePaymentDtos = []
+        const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
+        const agency = await getAgencyById({ id: user.agency, signal })
+        const customer = await getCustomerBySlug({ signal, slug: selectCustomer.current.value })
+        const cash_ = await getCashBySlug({ slug: inputCash.current.value, signal })
+        let amount = Number(inputPayment__.current.value)
+        for (let s of data.salePayments) {
+            salePaymentDto = {}
+            if (s.status === "on") {
+                if (amount > s.balance) {
+                    salePaymentDto.amount = s.balance
+                    salePaymentDto.advance = s.advance + s.balance
+                    salePaymentDto.balance = 0
+                    amount -= s.balance
+
+                } else if (amount > 0 && amount <= s.balance) {
+                    salePaymentDto.amount = amount
+                    salePaymentDto.advance = s.advance + amount
+                    salePaymentDto.balance = s.balance - amount
+                    amount = 0
+                }
+                salePaymentDto.sale = s.sale
+                salePaymentDto.paymentMethod = selectPaymentMethod.current.value
+                salePaymentDto.paymentReceiver = selectPaymentReceiver.current.value
+                salePaymentDto.cash = inputCash.current.value
+                salePaymentDto.rest = s.rest
+                salePaymentDto.ref = s.ref
+                salePaymentDtos.push(salePaymentDto)
+
+            }
+        }
+
+        if (salePaymentDtos.length > 0) {
+            const responseData = await createSalePayment(salePaymentDtos)
+            const amountLetter = await convert(Number(inputPayment__.current.value))
+
+            const state = responseHttp(responseData);
+            if (state) {
+                dispatch(noteActions.error(true))
+            } else {
+
+                dispatch(noteActions.error(false))
+                const printSalePayment = {
+                    enterprise,
+                    agency,
+                    date: new Date().toLocaleDateString(),
+                    time: new Date().getTime().toLocaleString(),
+                    customer: customer.lastName + " " + customer.firstName,
+                    salePayments: salePaymentDtos,
+                    payment: inputPayment__.current.value,
+                    cash: cash_,
+                    amountLetter,
+                }
+                dispatch(printActions.getPrint(printSalePayment))
+                setData(prev => {
+                    return {
+                        ...prev,
+                        salePayments: [],
+                        typePrint: "salePayement"
+                    }
+
+                })
+                dialog4.current.open()
+
+            }
+            dispatch(noteActions.show());
+            dispatch(noteActions.relaunch());
+            dispatch(noteActions.sendData(responseData))
+        }
+
+    }
 
 
     function handleBlur(field, value) {
@@ -288,6 +419,29 @@ export default function CreateSale() {
         let tbEl = {
             tb: []
         }
+
+        if (identifier === "customer") {
+            const allSalePayments = await getAllSalePaymentsByCustomer({ signal, customer: value })
+            let tb = []
+            let totalSalePayments = 0
+            for (let s of allSalePayments) {
+                if (s.balance > 0) {
+                    totalSalePayments += s.balance
+                    const sale = await getSaleById({ signal, id: s.sale })
+                    tb.push({ id: s.id, sale: s.sale, ref: sale.ref, rest: sale.rest, advance: s.advance, balance: s.balance, status: "off" })
+                }
+            }
+            setData(prev => {
+                return {
+                    ...prev,
+                    salePayments: tb,
+                    totalSalePayments
+                }
+            })
+
+        }
+
+
         if (identifier === "category") {
             const category = await getCategoryServiceBySlug({ signal, slug: value })
             const services = await getAllServices({ signal, enterprise: user.enterprise, category: category.id })
@@ -324,7 +478,6 @@ export default function CreateSale() {
         }
 
         if (identifier === "paymentMethod") {
-
             if (value === "ESPECES") {
                 setData(prev => {
                     return {
@@ -332,6 +485,10 @@ export default function CreateSale() {
                         paymentReceiver: user.cashes
                     }
                 })
+            }
+
+            if (value === "A_CREDIT") {
+                inputPayment.current.readOnly = true
             }
 
             if (value === "VIREMENT") {
@@ -392,7 +549,7 @@ export default function CreateSale() {
                     lots: tbEl.tb,
                 }
             })
-            inputPrice.current.value = product.price || 0
+            inputPrice.current.value = product.sellingPrice || 0
         }
 
 
@@ -430,14 +587,10 @@ export default function CreateSale() {
             inputStock.current.value = stock.stock || 0
         }
 
-
-
-
-
     }
 
 
-    function handleAdd(identifier) {
+    async function handleAdd(identifier, signal) {
 
         let errors = []
         if (identifier === "add") {
@@ -458,30 +611,48 @@ export default function CreateSale() {
             }
 
 
-            if (selectService.current.value === "ventes" && selectProduct.current.value === "Sélectionner un produit") {
-                errors.push("Veuillez sélectionner un produit")
-            }
-
-            if (selectService.current.value === "ventes" && selectStore.current.value === "Sélectionner un magasin") {
-                errors.push("Veuillez sélectionner un magasin")
-            }
-
-            if (selectService.current.value === "ventes" && selectLot.current.value === "Sélectionner un lot") {
-                errors.push("Veuillez sélectionner un lot")
-            }
 
 
-            if (selectService.current.value === "ventes" && inputQuantity.current.value > inputStock.current.value) {
-                errors.push("Le stock de " + selectProduct.current.value + " est insuffisant dans le magasin " + selectStore.current.value)
+            if (selectService.current.value === "ventes") {
+                if (selectProduct.current.value === "Sélectionner un produit") {
+                    errors.push("Veuillez sélectionner un produit")
+                }
+
+                if (selectStore.current.value === "Sélectionner un magasin") {
+                    errors.push("Veuillez sélectionner un magasin")
+                }
+
+                if (selectLot.current.value === "Sélectionner un lot") {
+                    errors.push("Veuillez sélectionner un lot")
+                }
+
+                const enterprise = await getEnterpriseById({ id: user.enterprise, signal })
+                const agency = await getAgencyById({ id: user.agency, signal })
+                const store = await getStoreBySlug({ slug: selectStore.current.value, signal })
+                const lot = await getLotBySlug({ signal, slug: selectLot.current.value })
+                const product = await getProductBySlug({ signal, slug: selectProduct.current.value })
+                const stock = await getStock({ signal, enterprise: enterprise.id, agency: agency.id, storePrincipal: 0, store: store.id, product: product.id, lot: lot.id })
+
+                if (inputQuantity.current.value > Number(stock.stock)) {
+                    errors.push("Le stock de " + selectProduct.current.value + " est insuffisant dans le magasin " + selectStore.current.value)
+                }
+
+
+
+                if (inputQuantity.current.value === "" || inputQuantity.current.value <= 0) {
+                    errors.push("Veuillez renseigner une quantité valida")
+                }
+
+                if (inputPrice.current.value === "" || inputPrice.current.value <= 0) {
+                    errors.push("Veuillez renseigner le prix")
+                }
+
+                if ((Number(product.stock) - Number(inputQuantity.current.value)) <= product.securityStock) {
+                    dialog3.current.open()
+                }
             }
 
-            if (inputQuantity.current.value === "" || inputQuantity.current.value <= 0) {
-                errors.push("Veuillez renseigner la quantité")
-            }
 
-            if (inputPrice.current.value === "" || inputPrice.current.value <= 0) {
-                errors.push("Veuillez renseigner le prix")
-            }
         }
 
 
@@ -523,7 +694,7 @@ export default function CreateSale() {
         })
 
 
-        if (inputPriceHT.current !== undefined) {
+        if (data.products.length > 0) {
             inputPriceHT.current.value = priceHT || 0
             inputPriceTtc.current.value = priceTTC || 0
             inputRest.current.value = Number(inputPriceTtc.current.value) - Number(inputPayment.current.value)
@@ -572,11 +743,72 @@ export default function CreateSale() {
 
     }
 
-    function handleClick(identifier) {
+    function handleClick(identifier, value) {
         if (identifier == "customer") {
             dialog2.current.open()
         }
+
     }
+
+
+    function handleSelect(identifier, value, id) {
+        const salePayments = [...data.salePayments]
+        let totalSalePayments = 0
+        let instantAmount = data?.instantAmount
+        if (identifier == "all") {
+            if (value == true) {
+                for (let s of salePayments) {
+                    s.status = "on"
+                    totalSalePayments += s.balance
+                    instantAmount = totalSalePayments
+                }
+
+            } else if (value == false) {
+                for (let s of salePayments) {
+                    s.status = "off"
+                    totalSalePayments = 0
+                    instantAmount = 0
+
+                }
+
+            }
+
+        } else if (identifier == "one") {
+            totalSalePayments = data?.instantAmount
+            if (value == true) {
+                for (let s of salePayments) {
+                    if (s.id === id) {
+                        s.status = "on"
+                        totalSalePayments += s.balance
+                        instantAmount += s.balance
+                    }
+
+                }
+
+            } else if (value == false) {
+                for (let s of salePayments) {
+
+                    if (s.id === id) {
+                        s.status = "off"
+                        totalSalePayments -= s.balance
+                        instantAmount -= s.balance
+                    }
+                }
+
+            }
+
+        }
+        setData(prev => {
+            return {
+                ...prev,
+                salePayments,
+                instantAmount,
+            }
+        })
+        inputPayment__.current.value = totalSalePayments
+    }
+
+
 
     function handleUp(identifier, value) {
         if (identifier === "discount") {
@@ -591,6 +823,19 @@ export default function CreateSale() {
         }
     }
 
+    function handleSelectionPrint(value) {
+        dispatch(identifierMenuActions.updatePrint({ print: value }))
+        dispatch(identifierMenuActions.updateDuplicata({ duplicata: false }))
+        if (data?.typePrint === "sale") {
+            navigate("/print-sale")
+        } else if (data?.typePrint === "salePayement") {
+            navigate("/print-sale-payment")
+        }
+
+    }
+
+
+
 
 
     return <>
@@ -603,14 +848,13 @@ export default function CreateSale() {
                     <Input label="Caisse *" type="text" defaultValue={data?.cash} name="cash" placeholder="Caisse" className="border border-sky-950" ref={inputCash} readOnly />
                 </div>
                 <div className="flex justify-center gap-2 w-full">
-                    <Select label="Catégorie *" id="category" name="category" selectedTitle="Sélectionner une catégorie" data={data?.category} ref={selectCategory} onChange={(e) => handleChange("category", e.target.value)} />
-                    <Select label="Service *" id="service" name="service" selectedTitle="Sélectionner un service" data={data?.services} ref={selectService} onChange={(e) => handleChange("service", e.target.value)} />
-                </div>
-                <div className="flex justify-center gap-2 w-full">
                     <Select label="Moyen paiement *" id="paymentMethod" name="paymentMethod" selectedTitle="Sélectionner un moyen de paiement" data={paymentMethod} ref={selectPaymentMethod} onChange={(e) => handleChange("paymentMethod", e.target.value)} disabled={data?.disabled} />
                     <Select label="Moyen réception *" id="paymentReceiver" name="paymentReceiver" selectedTitle="Sélectionner un moyen de réception" data={data?.paymentReceiver} ref={selectPaymentReceiver} disabled={data?.paymentMethod === "A_CREDIT" || data?.paymentMethod === "AVANCE_CLIENT" || data?.disabled} />
                 </div>
-
+                <div className="flex justify-center gap-2 w-full">
+                    <Select label="Catégorie *" id="category" name="category" selectedTitle="Sélectionner une catégorie" data={data?.category} ref={selectCategory} onChange={(e) => handleChange("category", e.target.value)} />
+                    <Select label="Service *" id="service" name="service" selectedTitle="Sélectionner un service" data={data?.services} ref={selectService} onChange={(e) => handleChange("service", e.target.value)} />
+                </div>
                 {data?.categoryValue === "ventes" && data?.serviceValue === "ventes" ? <><div className="flex justify-center gap-2 w-full">
                     <Select label="Produit *" id="product" name="product" selectedTitle="Sélectionner un produit" data={data?.productList} ref={selectProduct} onChange={(e) => handleChange("product", e.target.value)} />
                     <Select label="Magasin *" id="store" name="store" selectedTitle="Sélectionner un magasin" data={data?.stores} ref={selectStore} onChange={(e) => handleChange("store", e.target.value)} />
@@ -727,6 +971,62 @@ export default function CreateSale() {
 
 
                 }
+                {data?.salePayments.length > 0 && <div className="flex gap-4 justify-center mt-4"><table className="w-2/3 mb-4">
+                    <thead>
+                        <tr className="bg-sky-950 text-sky-50">
+                            <th className="border">
+                                id
+                            </th>
+                            <th className="border hidden">
+                                sale
+                            </th>
+                            <th className="border">
+                                Réf.
+                            </th>
+                            <th className="border">
+                                Dettes
+                            </th>
+                            <th className="border">
+                                Avance
+                            </th>
+                            <th className="border">
+                                Solde
+                            </th>
+                            <th className="border py-1 flex items-center justify-center">
+                                Action <input type="checkbox" className="ms-2" onClick={(e) => handleSelect("all", e.target.checked)} />
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {data.salePayments.map(s => <tr key={s.id}>
+                            <td className="border border-sky-950 text-center p-1">{s.id}</td>
+                            <td className="border border-sky-950 text-center p-1 hidden">{s.sale}</td>
+                            <td className="border border-sky-950 text-center p-1">{s.ref}</td>
+                            <td className="border border-sky-950 text-center p-1">{Number(s.rest).toLocaleString()}</td>
+                            <td className="border border-sky-950 text-center p-1">{Number(s.advance).toLocaleString()}</td>
+                            <td className="border border-sky-950 text-center p-1">{Number(s.balance).toLocaleString()}</td>
+                            <td className="border border-sky-950 text-center p-1"><input type="checkbox" checked={s.status === "on"} onClick={(e) => handleSelect("one", e.target.checked, s.id)} /></td>
+                        </tr>)}
+                    </tbody>
+                    <tfoot>
+                        <tr className="bg-sky-950 text-sky-50">
+                            <td colSpan="3" className="border text-center p-1"></td>
+                            <td colSpan="2" className="border text-center p-1">Total</td>
+                            <td colSpan="2" className="border text-center p-1">{Number(data?.totalSalePayments).toLocaleString()}</td>
+                        </tr>
+                    </tfoot>
+                </table>
+                    <div className="flex flex-col gap-4 items-center">
+                        <div className="flex flex-col">
+                            <label htmlFor="payment_" className="font-medium">Montant versé</label>
+                            <input type="number" id="payment_" placeholder="Montant versé" className="border border-sky-950 rounded text-end shadow-md shadow-sky-950 p-1" ref={inputPayment__} />
+
+                        </div>
+                        <Submit onClick={handlePayment}>
+                            Enregistrer
+                        </Submit>
+                    </div>
+                </div>}
             </div>
 
         </div >
@@ -744,6 +1044,25 @@ export default function CreateSale() {
         <Modal ref={dialog2} title="Créer un nouveau client" size="lg:h-5/9 lg:w-8/15">
             <CreateCustomer />
         </Modal>
+
+
+        <Modal ref={dialog3} title="Alerte stock" size="h-1/5">
+            <p className="mb-4"><FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />Attention le stock de sécurité est atteint. Veuillez approvisionner votre stock</p>
+            <Submit onClick={() => dialog3.current.close()}>Fermer</Submit>
+        </Modal>
+
+        <Modal ref={dialog4} title="Sélection du format d'impression" size="h-2/5 ">
+            {data.prints.length > 0 ? <div className="flex flex-col items-center justify-center gap-4 mb-4">
+                {data.prints.map(p => <button key={p.id} className="text-sky-50 bg-sky-950 font-bold p-2 border rounded w-full cursor-pointer shadow-sky-950 shadow-md hover:bg-sky-50 hover:text-sky-950" onClick={(e) => handleSelectionPrint(e.target.textContent)}>
+                    <FontAwesomeIcon icon={faPrint} className="me-2"></FontAwesomeIcon>
+                    {p.name}
+                </button>)}
+            </div> : <button className="text-sky-50 bg-sky-950 font-bold p-2 border rounded w-full cursor-pointer shadow-sky-950 shadow-md hover:bg-sky-50 hover:text-sky-950 mb-4" onClick={(e) => handleSelectionPrint(e.target.textContent)}>
+                IMPRIMANTE_LASER
+            </button>}
+            <Submit onClick={() => dialog4.current.close()}>Fermer</Submit>
+        </Modal>
+
 
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>

@@ -1,8 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllBankAccount } from "../../utils/http";
+import { getAllBankAccount, getBankById, getEnterpriseById } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
-import { memo, useEffect, useRef } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import Submit from "../../layout/Submit.jsx"
 import Table from "../../layout/Table.jsx"
 import Modal from "../../layout/Modal.jsx";
@@ -10,6 +10,9 @@ import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { bankAccounts } from "../../data/dataTable.js";
 import CreateBankAccount from "../../components/bankAccount/CreateBankAccount.jsx";
 import Bank from "../../components/bankAccount/Bank.jsx";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Logo from "../../layout/LogoDark.jsx";
 
 
 
@@ -21,12 +24,9 @@ export default memo(function BankAccountPage() {
     const dataItem = useSelector(state => state.note.dataItem)
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
-
-
-    const { data } = useQuery({
-        queryKey: ["bankaccounts", { agency: user?.agency }],
-        queryFn: ({ signal }) => getAllBankAccount({ signal, agency: user?.agency }),
-        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")
+    const [data, setData] = useState({
+        bankAccount: [],
+        isLoading: false
     })
 
 
@@ -44,6 +44,36 @@ export default memo(function BankAccountPage() {
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "financial" }))
+        setData(prev => {
+            return {
+                ...prev,
+                isLoading: true
+            }
+        })
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")) {
+            async function get(signal) {
+                const allBankAccounts = await getAllBankAccount({ signal, agency: user?.agency })
+                let tb = []
+                let enterprise = {}
+                let bank = {}
+                for (let b of allBankAccounts) {
+                    enterprise = await getEnterpriseById({ id: b.enterprise, signal })
+                    bank = await getBankById({ id: b.bank, signal })
+                    b.enterprise = enterprise.slug
+                    b.bank = bank.slug
+                    tb.push(b)
+                }
+                setData(prev => {
+                    return {
+                        ...prev,
+                        bankAccount: tb,
+                        isLoading: false
+                    }
+                })
+
+            }
+            get()
+        }
     }, [menu, dispatch])
 
     return <>
@@ -51,7 +81,8 @@ export default memo(function BankAccountPage() {
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("bank")}>Banques</Submit> : undefined}
             {user.role.includes("ROLE_ADMIN") ? <Submit onClick={() => handleModal("account")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data} headers={bankAccounts.header} emptyMessage="Aucun compte bancaire trouvé." globalFilterFields={bankAccounts.global} sheet="Compte bancaire" titleRef="Mise à jour informations d'un compte bancaire" size="lg:h-5/11 lg:w-4/15" />
+        <Table data={data.bankAccount} headers={bankAccounts.header} emptyMessage="Aucun compte bancaire trouvé." globalFilterFields={bankAccounts.global} sheet="Compte bancaire" titleRef="Mise à jour informations d'un compte bancaire" size="lg:h-5/11 lg:w-4/15" />
+        {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-6/11 lg:w-12/15 overflow-auto" title="Informations sur les banques">
             <Bank />
         </Modal>

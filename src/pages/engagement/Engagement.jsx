@@ -1,12 +1,14 @@
 import { useQuery } from "@tanstack/react-query";
 import { useDispatch, useSelector } from "react-redux";
-import { getAllEngagements } from "../../utils/http";
+import { getAgencyById, getAllEngagements, getEnterpriseById } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Table from "../../layout/Table.jsx"
 import { identifierMenuActions } from "../../store/identifierSlice.js"
 import { engagements } from "../../data/dataTable.js";
-import Submit from "../../layout/Submit.jsx";
+import Logo from "../../layout/LogoDark.jsx";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faSpinner } from "@fortawesome/free-solid-svg-icons";
 
 
 
@@ -17,34 +19,51 @@ export default function EngagementPage() {
     const dataItem = useSelector(state => state.note.dataItem)
     const dispatch = useDispatch()
     const menu = useSelector(state => state.identifier.menu)
-
-
-    const { data } = useQuery({
-        queryKey: ["engagements", { enterprise: user.enterprise, agency: user.agency }],
-        queryFn: ({ signal }) => getAllEngagements({ signal, enterprise: user.enterprise, agency: user.agency }),
-        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")
+    const [data, setData] = useState({
+        engagement: [],
+        isLoading: false
     })
 
 
 
     useEffect(() => {
         dispatch(identifierMenuActions.updateMenu({ menu: "engagement" }))
+        setData(prev => {
+            return {
+                ...prev,
+                isLoading: true
+            }
+        })
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE")) {
+            async function get(signal) {
+                const allEngagements = await getAllEngagements({ signal, enterprise: user?.enterprise, agency: user?.agency })
+                let tb = []
+                let enterprise = {}
+                let agency = {}
+                for (let e of allEngagements) {
+                    enterprise = await getEnterpriseById({ id: e.enterprise, signal })
+                    agency = await getAgencyById({ id: e.agency, signal })
+                    e.enterprise = enterprise.slug
+                    e.agency = agency.slug
+                    tb.push(e)
+                }
+                setData(prev => {
+                    return {
+                        ...prev,
+                        engagement: tb,
+                        isLoading: false
+                    }
+                })
+
+            }
+            get()
+        }
     }, [menu, dispatch])
 
     return <>
-        <div className="flex justify-center gap-4">
-            <Submit onClick={() => handleClick("supplies")}>
-                Fournitures
-            </Submit>
-            <Submit onClick={() => handleClick("rebuts")}>
-                Rébuts
-            </Submit>
-            <Submit onClick={() => handleClick("packages")}>
-                Paquets
-            </Submit>
-        </div>
-        <Table data={data} headers={engagements.header} emptyMessage="Aucun engagement trouvé." globalFilterFields={engagements.global} sheet="Engagement" titleRef="Visualiser les engagements" size="lg:h-9/12 lg:w-11/15 xl:w-13/15 xl:h-9/12" />
 
+        <Table data={data?.engagement} headers={engagements.header} emptyMessage="Aucun engagement trouvé." globalFilterFields={engagements.global} sheet="Engagement" titleRef="Visualiser les engagements" size="lg:h-9/12 lg:w-11/15 xl:w-13/15 xl:h-9/12" />
+        {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>
 }

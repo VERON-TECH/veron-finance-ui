@@ -1,7 +1,7 @@
 import { useMutation } from "@tanstack/react-query";
 import { useAnimate } from "framer-motion";
 import { useActionState, useEffect, useRef, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { authorizeAgencyBank, authorizeAgencyMobile, authorizeAgencyStorePrincipal, authorizeCashSafe, authorizeEnterpriseSupplier, authorizeStorePrincipalStore, getAllAgenciesByEnterprise, getAllCashesByAgency, getAllEnterprises, getAllStores, getBankAccountById, getEnterpriseById, getMobileMoneyById, getSafeById, getStorePrincipalById, getSupplierById } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import { isNotEmpty } from "../../utils/validation.jsx"
@@ -329,7 +329,7 @@ export default function AuhtorizeAgency({ type, id }) {
             const supplierAuthorizeEnterpriseDto = {
                 enterprise,
             }
-            mutate({ slug: enterprise, supplierAuthorizeEnterpriseDto })
+            mutate({ slug: supplier.slug, supplierAuthorizeEnterpriseDto })
             return { errors: null }
         } else if (type === "store") {
             const store = formData.get("store")

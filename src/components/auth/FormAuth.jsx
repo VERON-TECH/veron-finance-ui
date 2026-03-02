@@ -37,6 +37,15 @@ export default function FormAuth() {
   const memo = localStorage.getItem("memo");
 
   async function handleSubmit(prevState, formData, signal) {
+    const userExist = localStorage.getItem("user")
+    const tokenExist = localStorage.getItem("token")
+    if (userExist != null) {
+      localStorage.removeItem('user')
+    }
+
+    if (tokenExist != null) {
+      localStorage.removeItem('token')
+    }
     const username = formData.get("username");
     USERNAME = username;
     const password = formData.get("password");
@@ -322,7 +331,7 @@ export default function FormAuth() {
     </AnimatePresence>
 
     <AnimatePresence>
-      <Modal ref={dialog} title="Déconnexion" size="lg:w-2/9 lg:h-3/12">
+      <Modal ref={dialog} title="Déconnexion" size="lg:w-2/9 lg:h-3/12 xl:w-2/9 xl:h-3/12">
         <p className="p-2 text-center mb-2">Souhaitez-vous vous déconnecter?</p>
         <form className="flex justify-center">
           <div className="flex gap-4">

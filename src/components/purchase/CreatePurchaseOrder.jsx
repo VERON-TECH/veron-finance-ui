@@ -1,7 +1,7 @@
 import { useAnimate } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { createPurchaseOrder, getAgencyById, getAllProducts, getAllPurchaseOrders, getAllSupplierAdvances, getAllSuppliers, getEnterpriseById, getProductById, getProductBySlug, getSupplierById, queryClient } from "../../utils/http.js";
+import { createPurchaseOrder, getAgencyById, getAllProducts, getAllPurchaseOrders, getAllSupplierAdvances, getAllSuppliers, getEnterpriseById, getProductBySlug, getSupplierAdvanceByRef, getSupplierById } from "../../utils/http.js";
 import Input from "../../layout/Input.jsx"
 import Submit from "../../layout/Submit.jsx"
 import { noteActions } from "../../store/noteSlice.js";
@@ -22,6 +22,7 @@ export default function CreatePurchaseOrder() {
     const user = JSON.parse(localStorage.getItem("user"));
     const dialog = useRef();
     const dialog1 = useRef();
+    const dialog2 = useRef();
     const selectSupplier = useRef();
     const selectProduct = useRef();
     const selectPaymentMethod = useRef();
@@ -69,7 +70,10 @@ export default function CreatePurchaseOrder() {
                 const allSupplierAdvances = await getAllSupplierAdvances({ signal, enterprise: user.enterprise, agency: user.agency })
 
                 allProducts.forEach(p => {
-                    tbEl.tb2.push({ key: p.id, name: p.name, value: p.slug })
+                    if (p.category !== "PACQUET") {
+                        tbEl.tb2.push({ key: p.id, name: p.name, value: p.slug })
+                    }
+
                 })
 
                 allSuppliers.forEach(s => {
@@ -77,7 +81,7 @@ export default function CreatePurchaseOrder() {
                 })
 
                 allSupplierAdvances.forEach(s => {
-                    tbEl.tb4.push({ key: s.id, name: s.ref, value: s.slug })
+                    tbEl.tb4.push({ key: s.id, name: s.ref, value: s.ref })
                 })
 
                 setData(prev => {
@@ -99,7 +103,9 @@ export default function CreatePurchaseOrder() {
 
     async function handleSave(signal) {
         let products = []
+        let totalPrice = 0
         data.products.forEach(p => {
+            totalPrice += (Number(p.quantity) * Number(p.price))
             products.push(p.product + ":" + p.quantity + ":" + p.price)
         })
         const enterprise = inputEnterprise.current.value
@@ -107,13 +113,31 @@ export default function CreatePurchaseOrder() {
         const supplier = selectSupplier.current.value
         const paymentMethod = selectPaymentMethod.current.value
         const supplierAdvances = data.supplierAdvances
+        let tb = []
+        let totalAdvance = 0
+        if (supplierAdvances.length > 0) {
+            for (let s of supplierAdvances) {
+                totalAdvance += s.amount
+                tb.push(s.ref)
+            }
+        }
+
+        if (totalPrice > totalAdvance && paymentMethod === "AVANCE_VERSEE") {
+            let errors = ["L'avance versée ne permet pas d'effectuer cette commande."]
+            dispatch(noteActions.error(true))
+            dispatch(noteActions.show());
+            dispatch(noteActions.relaunch());
+            dispatch(noteActions.sendData(errors))
+            return
+        }
+
         const discount = inputDiscount.current.value == "" ? 0 : inputDiscount.current.value
         const purchaseOrderDto = {
             enterprise,
             agency,
             supplier,
             paymentMethod,
-            supplierAdvances,
+            supplierAdvances: tb,
             products,
             discount,
         }
@@ -318,15 +342,36 @@ export default function CreatePurchaseOrder() {
 
     }
 
-    function handleAddAdvance(value) {
+    async function handleAddAdvance(signal) {
         let supplierAdvances = [...data.supplierAdvances]
-        supplierAdvances.push(value)
+        const supplierAdvance = await getSupplierAdvanceByRef({ signal, ref: selectSupplierAdvance.current.value })
+        let supplierAdvanceNames = supplierAdvances.map(s => s.ref);
+        if (supplierAdvanceNames.includes(selectSupplierAdvance.current.value)) {
+            dialog2.current.open();
+            return { errors: null }
+        }
+        supplierAdvances.push({ id: supplierAdvances.length + 1, ref: supplierAdvance.ref, amount: supplierAdvance.balance })
         setData(prev => {
             return {
                 ...prev,
                 supplierAdvances
             }
         })
+        return { errors: null }
+    }
+
+
+    function handleDeleteAdvance(value) {
+        let supplierAdvances = [...data.supplierAdvances]
+        supplierAdvances = supplierAdvances.filter(s => s.id !== value)
+
+        setData(prev => {
+            return {
+                ...prev,
+                supplierAdvances
+            }
+        })
+
     }
 
     return <>
@@ -344,11 +389,39 @@ export default function CreatePurchaseOrder() {
                 {data?.payment === "AVANCE_VERSEE" &&
                     <div className="flex gap-2">
                         <Select label="Avance versée *" id="supplierAdvance" name="supplierAdvance" selectedTitle="Sélectionner une avance versée" data={data.supplierAdvanceList} ref={selectSupplierAdvance} />
-                        <button className="cursor-pointer" onClick={(e) => handleAddAdvance(e.target.value)}>
+                        <button className="cursor-pointer" onClick={(e) => handleAddAdvance()}>
                             <FontAwesomeIcon icon={faPlusCircle} className="w-32" />
                         </button>
                     </div>
                 }
+
+                {data?.supplierAdvances.length > 0 && <table className="w-2/3">
+                    <thead>
+                        <tr className="bg-sky-950 text-sky-50">
+                            <th className="border px-4">
+                                id
+                            </th>
+                            <th className="border px-4">
+                                Ref.
+                            </th>
+                            <th className="border px-4">
+                                Montant
+                            </th>
+                            <th className="border px-4">
+                                Action
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {data?.supplierAdvances.length > 0 && data.supplierAdvances.map(s => <tr key={s.id}>
+                            <td className="border border-sky-950 text-center">{s.id}</td>
+                            <td className="border border-sky-950 text-center">{s.ref}</td>
+                            <td className="border border-sky-950 text-center">{Number(s.amount).toLocaleString()}</td>
+                            <td className="border border-sky-950 text-center"><FontAwesomeIcon icon={faTrash} className="cursor-pointer text-red-500" onClick={() => handleDeleteAdvance(s.id)} /></td>
+                        </tr>)}
+                    </tbody>
+
+                </table>}
                 <div className="flex gap-2 justify-between">
                     <Select label="Produit *" id="product" name="product" selectedTitle="Sélectionner un produit" data={data?.productList} ref={selectProduct} onChange={(e) => handleChange("product", e.target.value)} />
                     <Input label="Prix *" type="number" defaultValue={data?.price} name="price" placeholder="Prix" className="border border-sky-950" onBlur={(event) => handleBlur("price", event.target.value)} ref={inputPrice} />
@@ -390,17 +463,17 @@ export default function CreatePurchaseOrder() {
                         {data?.products.length > 0 && data.products.map(p => <tr key={p.product}>
                             <td className="border border-sky-950 text-center">{p.id}</td>
                             <td className="border border-sky-950 text-center">{p.product}</td>
-                            <td className="border border-sky-950 text-center">{p.quantity}</td>
-                            <td className="border border-sky-950 text-center">{p.price}</td>
+                            <td className="border border-sky-950 text-center">{Number(p.quantity).toLocaleString()}</td>
+                            <td className="border border-sky-950 text-center">{Number(p.price).toLocaleString()}</td>
                             <td className="border border-sky-950 text-center"><FontAwesomeIcon icon={faTrash} className="cursor-pointer text-red-500" onClick={() => handleDelete(p.id)} /></td>
                         </tr>)}
                     </tbody>
                     {data.products.length > 0 && <tfoot>
                         <tr className="bg-sky-950 text-sky-50">
                             <td className="border text-center" colSpan={2}>Prix H.T.</td>
-                            <td className="border text-center">{data?.priceHT}</td>
+                            <td className="border text-center">{Number(data?.priceHT).toLocaleString()}</td>
                             <td className="border text-center p-1"><input type="number" name="discount" id="discount" placeholder="Rémise" className="bg-sky-50 text-sky-950 text-center" ref={inputDiscount} onChange={(e) => handleChange("discount", e.target.value)} /></td>
-                            <td className="border text-center">{data.priceTTC}</td>
+                            <td className="border text-center">{Number(data.priceTTC).toLocaleString()}</td>
                         </tr>
                     </tfoot>}
                 </table>
@@ -409,25 +482,6 @@ export default function CreatePurchaseOrder() {
                         Enregistrer
                     </Submit>
 
-                    {data.supplierAdvances.length > 0 && <table className="w-full">
-                        <thead>
-                            <tr className="bg-sky-950 text-sky-50">
-                                <th className="border px-6">
-                                    ref
-                                </th>
-                                <th className="border px-6">
-                                    Action
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {data?.supplierAdvances.length > 0 && data.supplierAdvances.map(s => <tr key={s.id}>
-                                <td className="border border-sky-950 text-center">{s.ref}</td>
-                                <td className="border border-sky-950 text-center"><FontAwesomeIcon icon={faTrash} className="cursor-pointer text-red-500" onClick={() => handleDelete(p.id)} /></td>
-                            </tr>)}
-                        </tbody>
-
-                    </table>}
                 </div>}
             </div>
         </div>
@@ -435,6 +489,11 @@ export default function CreatePurchaseOrder() {
         <Modal ref={dialog} title="Produit existant" size="h-1/5">
             <p className="mb-4"><FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />Ce produit existe déjà dans le panier.</p>
             <Submit onClick={() => dialog.current.close()}>Fermer</Submit>
+        </Modal>
+
+        <Modal ref={dialog2} title="Avance existant" size="h-1/5">
+            <p className="mb-4"><FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />Cette avance existe déjà dans le panier.</p>
+            <Submit onClick={() => dialog2.current.close()}>Fermer</Submit>
         </Modal>
 
         <Modal ref={dialog1} title="Montant Rémise incorrect" size="h-1/5">

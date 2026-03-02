@@ -27,6 +27,7 @@ export default function Header() {
     await logout(user?.username);
     submit(null, { method: "post" }, { action: "/" })
     dispatch(authActions.logout())
+    localStorage.removeItem("user")
   }
 
   function handleExit() {
@@ -95,8 +96,7 @@ export default function Header() {
 
   return <>
 
-    <header className="flex gap-10 absolute right-0 top-0 h-2/25 p-4">
-      {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <span className="font-bold italic text-sky-50 bg-sky-950 shadow-md shadow-sky-950 rounded border text-center px-5"><FontAwesomeIcon icon={faMoneyBillWave} className="me-2" />Solde global: {user?.balance.toLocaleString()}</span> : undefined}
+    <header className="flex gap-4 absolute right-0 top-0 h-2/25 p-4">
       <span className="font-bold italic"><FontAwesomeIcon icon={faBuilding} className="me-2" />{user?.enterprise}</span>
       <span className="font-bold italic"><FontAwesomeIcon icon={faHome} className="me-2" />{user?.agency}</span>
       <span className="font-bold italic"> <span className="font-bold italic"><FontAwesomeIcon icon={faUser} className="me-2" /></span>{user.username}</span>
@@ -140,7 +140,7 @@ export default function Header() {
     </header>
 
     <AnimatePresence>
-      <Modal ref={dialog} title="Déconnexion" size="lg:w-1/5 lg:h-2/9">
+      <Modal ref={dialog} title="Déconnexion" size="lg:w-1/5 lg:h-2/9 xl:w-1/5 xl:h-3/12">
         <p className="p-2 text-center font-bold mb-2">Souhaitez-vous vous déconnecter?</p>
         <form className="flex justify-center">
           <div className="flex gap-4">

@@ -11,9 +11,12 @@ import Modal from "../../layout/Modal.jsx";
 import Notification from "../../layout/Notification.jsx";
 import responseHttp from "../../utils/responseHttp.js";
 import { noteActions } from "../../store/noteSlice.js";
+import { modalActions } from "../../store/modalSlice.js";
 
 export default function TransfertProductStock() {
-   
+    const errorNotification = useSelector(state => state.note.error);
+    const relaunch = useSelector(state => state.note.relaunch);
+    const dataItem = useSelector(state => state.note.dataItem)
     const user = JSON.parse(localStorage.getItem("user"));
     const dialog = useRef();
     const inputEnterprise = useRef();
@@ -108,8 +111,10 @@ export default function TransfertProductStock() {
         const state = responseHttp(responseData);
         if (state) {
             dispatch(noteActions.error(true))
+
         } else {
             dispatch(noteActions.error(false))
+            dispatch(modalActions.updateClose())
         }
         dispatch(noteActions.show());
         dispatch(noteActions.relaunch());
@@ -477,6 +482,6 @@ export default function TransfertProductStock() {
             <p className="mb-4"><FontAwesomeIcon icon={faExclamationTriangle} className="me-2" />Ce produit existe déjà dans le panier.</p>
             <Submit onClick={() => dialog.current.close()}>Fermer</Submit>
         </Modal>
-
+        {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>
 }

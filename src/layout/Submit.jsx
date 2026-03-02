@@ -1,7 +1,7 @@
 import { useFormStatus } from "react-dom"
 import { motion } from "framer-motion";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faAdd, faAngleDoubleDown, faArrowCircleRight, faBank, faBox, faCheckDouble, faCircleCheck, faCirclePlus, faCoins, faDeleteLeft, faDiagramPredecessor, faEraser, faFileCircleCheck, faFloppyDisk, faFolderOpen, faGroupArrowsRotate, faList, faListCheck, faPersonArrowDownToLine, faPrint, faSpinner, faSquarePhone, faTrashArrowUp, faUserGear, faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import { faAdd, faAngleDoubleDown, faArrowCircleRight, faBank, faBox, faCheckDouble, faCircleCheck, faCirclePlus, faCoins, faDeleteLeft, faDiagramNext, faDiagramPredecessor, faEraser, faFileCircleCheck, faFloppyDisk, faFolderOpen, faGroupArrowsRotate, faList, faListCheck, faPersonArrowDownToLine, faPrint, faSpinner, faSquarePhone, faStoreAlt, faStoreAltSlash, faTrashArrowUp, faUserGear, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { faCheckSquare, faWindowRestore } from "@fortawesome/free-regular-svg-icons";
 import { faCashApp } from "@fortawesome/free-brands-svg-icons";
 
@@ -27,6 +27,7 @@ export default function Submit({ children, disabled = false, className, ...props
       {children === "Ouvrir" ? <FontAwesomeIcon icon={faFolderOpen} className="me-2" /> : undefined}
       {children === "Réinitialiser" ? <FontAwesomeIcon icon={faWindowRestore} className="me-2" /> : undefined}
       {children === "Imprimer" ? <FontAwesomeIcon icon={faPrint} className="me-2" /> : undefined}
+      {children === "Inventaires" ? <FontAwesomeIcon icon={faStoreAlt} className="me-2" /> : undefined}
       {children === "Banques" && < FontAwesomeIcon icon={faBank} className="me-2" />}
       {children === "Opérateurs" && < FontAwesomeIcon icon={faSquarePhone} className="me-2" />}
       {children === "Fonctions" && < FontAwesomeIcon icon={faPersonArrowDownToLine} className="me-2" />}
@@ -45,6 +46,8 @@ export default function Submit({ children, disabled = false, className, ...props
       {children === "Appliquer" && < FontAwesomeIcon icon={faCheckSquare} className="me-2" />}
       {children === "Duplicata" && < FontAwesomeIcon icon={faPrint} className="me-2" />}
       {children === "Listing des opérations" && < FontAwesomeIcon icon={faList} className="me-2" />}
+      {children === "Rapport d'activité" && < FontAwesomeIcon icon={faDiagramNext} className="me-2" />}
+
 
 
       {pending ? <div className="flex gap-2">

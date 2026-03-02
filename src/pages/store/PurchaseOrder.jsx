@@ -43,7 +43,7 @@ export default function PurchaseOrderPage() {
                 isLoading: true
             }
         })
-        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")) {
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK")) {
             async function get(signal) {
                 const allPurchaseOrders = await getAllPurchaseOrders({ signal, enterprise: user.enterprise, agency: user.agency })
                 let tb = []
@@ -74,7 +74,7 @@ export default function PurchaseOrderPage() {
 
     return <>
         <div className="flex justify-center gap-2 mb-2">
-            {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit onClick={() => handleModal("store")}>Nouveau</Submit> : undefined}
+            {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK") ? <Submit onClick={() => handleModal("store")}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data?.purchase} headers={purchasOrders.header} emptyMessage="Aucun bon de commande trouvé." globalFilterFields={purchasOrders.global} sheet="Bon de commande" titleRef="Mise à jour informations d'un bon de commande" size="lg:h-9/12 lg:w-11/15 xl:w-13/15 xl:h-9/12" />
         {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}

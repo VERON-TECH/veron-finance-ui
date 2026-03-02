@@ -43,7 +43,7 @@ export default function ApproStockPage() {
                 isLoading: true
             }
         })
-        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")) {
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK")) {
             async function get(signal) {
                 const allMvtStocks = await getAllMvtStocks({ signal, enterprise: user.enterprise, agency: user.agency, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
                 let tb = []
@@ -83,7 +83,7 @@ export default function ApproStockPage() {
 
     return <>
         <div className="flex justify-center gap-2 mb-2">
-            {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit onClick={() => handleModal("stock")}>Nouveau</Submit> : undefined}
+            {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK") ? <Submit onClick={() => handleModal("stock")}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data?.mvtStock} headers={mvtStocks.header} emptyMessage="Aucun mouvement trouvé." globalFilterFields={mvtStocks.global} sheet="Mouvement de stock" titleRef="Informations sur un mouvement de stock" size="lg:h-4/12 lg:w-7/15 xl:w-7/15 xl:h-4/12" />
         {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}

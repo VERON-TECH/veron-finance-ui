@@ -14,6 +14,7 @@ import CreatePackage from "../../components/stock/CreatePackage.jsx";
 import Logo from "../../layout/LogoDark.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import CreateInventory from "../../components/store/CreateInventory.jsx";
 
 
 
@@ -32,6 +33,7 @@ export default function ProductStockPage() {
     const dialog = useRef()
     const dialog1 = useRef()
     const dialog2 = useRef()
+    const dialog3 = useRef()
 
 
     function handleClick(identifier) {
@@ -44,6 +46,10 @@ export default function ProductStockPage() {
         if (identifier === "packages") {
             dialog2.current.open()
         }
+
+        if (identifier === "inventory") {
+            dialog3.current.open()
+        }
     }
 
 
@@ -55,7 +61,7 @@ export default function ProductStockPage() {
                 isLoading: true
             }
         })
-        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")) {
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK")) {
             async function get(signal) {
                 const allStocks = await getAllStocks({ signal, enterprise: user.enterprise, agency: user.agency, storePrincipal: 0, store: 0, product: 0, lot: 0 })
                 let tb = []
@@ -94,19 +100,25 @@ export default function ProductStockPage() {
     }, [menu, dispatch])
 
     return <>
-        {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <div className="flex justify-center gap-4">
+        {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK") ? <div className="flex justify-center gap-4">
             <Submit onClick={() => handleClick("supplies")}>
                 Fournitures
             </Submit>
             <Submit onClick={() => handleClick("rebuts")}>
                 Rébuts
             </Submit>
-            <Submit onClick={() => handleClick("packages")}>
+            {user.role.includes(0) && <Submit onClick={() => handleClick("packages")}>
                 Paquets
-            </Submit>
+            </Submit>}
+            {user.role.includes("ROLE_COMPTABLE") ? <div className="flex justify-center gap-4">
+                <Submit onClick={() => handleClick("inventory")}>
+                    Inventaires
+                </Submit>
+            </div> : undefined}
         </div> : undefined}
 
-        <Table data={data?.stock} headers={productStocks.header} emptyMessage="Aucun stock trouvé." globalFilterFields={purchasOrders.global} sheet="Stock" titleRef="Informations sur le stock" size="lg:h-5/12 lg:w-8/15 xl:w-8/15 xl:h-5/12" />
+
+        <Table data={data?.stock} headers={productStocks.header} emptyMessage="Aucun stock trouvé." globalFilterFields={productStocks.global} sheet="Stock" titleRef="Informations sur le stock" size="lg:h-5/12 lg:w-8/15 xl:w-8/15 xl:h-5/12" />
         {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-9/12 lg:w-11/15 xl:w-9/15 xl:h-10/12" title="Créer un sortie de founiture">
             <CreateSupplies />
@@ -117,6 +129,10 @@ export default function ProductStockPage() {
 
         <Modal ref={dialog2} size="lg:h-9/12 lg:w-11/15 xl:w-15/15 xl:h-8/12" title="Créer un pacquet">
             <CreatePackage />
+        </Modal>
+
+        <Modal ref={dialog3} size="lg:h-3/12 lg:w-6/12 xl:w-6/15 xl:h-3/12" title="Créer un inventaire">
+            <CreateInventory />
         </Modal>
         {dataItem.length > 0 && <Notification key={relaunch} error={errorNotification} messages={dataItem} />}
     </>

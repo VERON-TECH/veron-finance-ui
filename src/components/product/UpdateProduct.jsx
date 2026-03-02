@@ -170,7 +170,7 @@ export default function UpdateProduct() {
 
             </div>
 
-            {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit>
+            {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK") ? <Submit>
                 Enregistrer
             </Submit> : undefined}
         </form>

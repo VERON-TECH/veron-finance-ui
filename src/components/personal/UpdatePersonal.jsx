@@ -350,9 +350,9 @@ export default function UpdatePersonal() {
             <Submit onClick={() => handleClick("affect")}>
                 Gestion des affectations
             </Submit>
-            {data?.authorities?.includes("ROLE_CAISSIER") && <Submit onClick={() => handleClick("attribute")}>
+            {data?.authorities?.includes("ROLE_CAISSIER") || data?.authorities?.includes("ROLE_CHEF_CAISSIER") ? <Submit onClick={() => handleClick("attribute")}>
                 Caisses & Magasins
-            </Submit>}
+            </Submit> : undefined}
         </div> : undefined}
 
         <Modal ref={dialog} size="lg:h-4/10 lg:w-5/15 xl:h-4/10" title="Gestion des affectations">

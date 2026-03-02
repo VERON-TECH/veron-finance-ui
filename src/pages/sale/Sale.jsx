@@ -49,7 +49,7 @@ export default function SalePage() {
                 for (let c of user.cashes) {
                     cashes.push(c.value)
                 }
-                const allSales = await getAllSales({ signal, enterprise: user.enterprise, agency: user.agency, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString(), cashes })
+                const allSales = await getAllSales({ signal, enterprise: user.enterprise, agency: user.agency, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString(), cashes, customer: 0 })
                 let tb = []
                 let enterprise = {}
                 let agency = {}

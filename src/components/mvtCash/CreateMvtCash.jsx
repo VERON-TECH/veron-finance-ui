@@ -10,10 +10,11 @@ import { noteActions } from "../../store/noteSlice.js";
 import responseHttp from "../../utils/responseHttp.js"
 import Select from "../../layout/Select.jsx";
 import { typeCash } from "../../data/info.js";
+import useTypeCash from "../../hooks/useTypeCash.jsx";
 
 export default function CreateMvtCash() {
 
-
+    const { typeC } = useTypeCash(typeCash)
     const selectCash = useRef();
     const selectTypeCash = useRef();
     const inputRefExt = useRef();
@@ -757,7 +758,7 @@ export default function CreateMvtCash() {
                 </div>
             </div>
             <div className="flex justify-between gap-2">
-                <Select label="Type *" id="typeCash" name="typeCash" selectedTitle="Sélectionner un type d'opération" data={typeCash} ref={selectTypeCash} onChange={(e) => handleChange("typeCash", e.target.value)} />
+                <Select label="Type *" id="typeCash" name="typeCash" selectedTitle="Sélectionner un type d'opération" data={typeC} ref={selectTypeCash} onChange={(e) => handleChange("typeCash", e.target.value)} />
                 {data?.isSelected ? <Select label="Motif *" id="motif" name="motif" selectedTitle="Sélectionner un motif" data={data?.motif || []} ref={selectMotif} onChange={(e) => handleChange("motif", e.target.value)} /> :
                     <Input label="Motif *" id="motif" type="text" name="motif" placeholder="Motif" className="border border-sky-950" />}
             </div>
@@ -774,7 +775,7 @@ export default function CreateMvtCash() {
 
 
 
-            {data?.cash !== "Sélectionner une caisse" ? <Submit>
+            {data?.cash !== "Sélectionner une caisse" && data?.cash !== "" ? <Submit>
                 Créer
             </Submit> : undefined}
         </form>

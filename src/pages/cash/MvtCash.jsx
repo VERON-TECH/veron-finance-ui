@@ -1,5 +1,5 @@
 import { useDispatch, useSelector } from "react-redux";
-import { getAgencyById, getAllMvtCash, getArchiveBalance, getCashBySlug, getEnterpriseById, getPersonalById } from "../../utils/http";
+import { getAgencyById, getAllCashes, getAllMvtCash, getArchiveBalance, getCashBySlug, getEnterpriseById, getPersonalById } from "../../utils/http";
 import Notification from "../../layout/Notification.jsx"
 import { useEffect, useRef, useState } from "react";
 import Submit from "../../layout/Submit.jsx"
@@ -15,6 +15,7 @@ import Input from "../../layout/Input.jsx";
 import Logo from "../../layout/LogoDark.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCoins, faSpinner } from "@fortawesome/free-solid-svg-icons";
+import { noteActions } from "../../store/noteSlice.js";
 
 
 
@@ -44,37 +45,71 @@ export default function MvtCashPage() {
             }
         })
         if (user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") || user.role.includes("ROLE_COMPTABLE")) {
+            let tb = []
+            let enterprise = {}
+            let agency = {}
+            let cashes = []
             async function get(signal) {
-                let cashes = []
-                for (let cash of user.cashes) {
-                    const allMvtCash = await getAllMvtCash({ signal, enterprise: user.enterprise, agency: user.agency, cash: cash.key, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
-                    const cash_ = await getCashBySlug({ slug: cash.value, signal })
-                    cashes.push({ key: cash_.id, name: cash_.name, value: cash_.slug, balance: cash_.balance })
-                    let tb = []
-                    let enterprise = {}
-                    let agency = {}
+                if (user.role.includes("ROLE_CAISSIER")) {
+                    for (let cash of user.cashes) {
+                        const allMvtCash = await getAllMvtCash({ signal, enterprise: user.enterprise, agency: user.agency, cash: cash.key, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
+                        const cash_ = await getCashBySlug({ slug: cash.value, signal })
+                        cashes.push({ key: cash_.id, name: cash_.name, value: cash_.slug, balance: cash_.balance })
+
+                        for (let m of allMvtCash) {
+                            enterprise = await getEnterpriseById({ id: m.enterprise, signal })
+                            agency = await getAgencyById({ id: m.agency, signal })
+                            m.enterprise = enterprise.slug
+                            m.agency = agency.slug
+                            tb.push(m)
+                        }
+                        setData(prev => {
+                            return {
+                                ...prev,
+                                mvtCash: tb,
+                                isLoading: false,
+
+                            }
+                        })
+                    }
+                    setData(prev => {
+                        return {
+                            ...prev,
+                            cashes,
+                            isLoading: false,
+                        }
+                    })
+                } else if (user.role.includes("ROLE_CHEF_CAISSIER") || user.role.includes("ROLE_COMPTABLE")) {
+                    const allMvtCash = await getAllMvtCash({ signal, enterprise: user.enterprise, agency: user.agency, cash: 0, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString() })
+                    const allCashes = await getAllCashes({ signal, enterprise: user.enterprise, agency: user.agency })
+                    for (let cash_ of allCashes) {
+                        cashes.push({ key: cash_.id, name: cash_.name, value: cash_.slug, balance: cash_.balance })
+                    }
                     for (let m of allMvtCash) {
                         enterprise = await getEnterpriseById({ id: m.enterprise, signal })
                         agency = await getAgencyById({ id: m.agency, signal })
                         m.enterprise = enterprise.slug
                         m.agency = agency.slug
                         tb.push(m)
+
+                        setData(prev => {
+                            return {
+                                ...prev,
+                                mvtCash: tb,
+                                isLoading: false,
+                            }
+                        })
                     }
                     setData(prev => {
                         return {
                             ...prev,
-                            mvtCash: tb,
+                            cashes,
                             isLoading: false,
-
                         }
                     })
+
                 }
-                setData(prev => {
-                    return {
-                        ...prev,
-                        cashes
-                    }
-                })
+
             }
             get()
         }
@@ -105,75 +140,107 @@ export default function MvtCashPage() {
         const enterprise = enterprise_.name
         const agency_ = await getAgencyById({ id: user.agency, signal })
         const agency = agency_.name
-        const selectCash = selectedCash?.current?.value;
-        const cash = await getCashBySlug({ slug: selectCash, signal })
         const startDate = inputStartDate.current.value;
         const endDate = inputEndDate.current.value;
-        const mvtCashData = await getAllMvtCash({ enterprise: user.enterprise, agency: user.agency, cash: cash.id, startDate, endDate })
-        const archiveBalance = await getArchiveBalance({ slug: selectCash, startDate, endDate: startDate })
-        const initial = archiveBalance.length > 0 ? archiveBalance[0].balance : 0
-        const personal_ = await getPersonalById({ id: user.personal, signal })
-        const personal = personal_.lastName + " " + personal_.firstName
         const date = new Date().toLocaleDateString()
         const period = { startDate, endDate }
         const data = []
         let incoming = 0
         let outgoing = 0
+        let initial = 0
+        let mvtCashData;
+        let cash = []
 
-        for (let m of mvtCashData) {
-            if (m.sens === "ENCAISSEMENT") {
-                incoming += m.amount
-            } else {
-                outgoing += m.amount
+        if (startDate !== "" && endDate !== "") {
+            if (user.role.includes("ROLE_CAISSIER")) {
+
+                const selectCash = selectedCash?.current?.value;
+                const cash_ = await getCashBySlug({ slug: selectCash, signal })
+                mvtCashData = await getAllMvtCash({ enterprise: user.enterprise, agency: user.agency, cash: cash_.id, startDate, endDate })
+                const archiveBalance = await getArchiveBalance({ slug: selectCash, startDate, endDate: startDate })
+                initial = archiveBalance.length > 0 ? archiveBalance[0].balance : 0
+                cash.push(cash_)
+            } else if (user.role.includes("ROLE_CHEF_CAISSIER") && selectedCash.current.value === "Sélectionner une caisse") {
+                const allCashes = await getAllCashes({ signal, enterprise: user.enterprise, agency: user.agency })
+                for (let c of allCashes) {
+                    const cash_ = await getCashBySlug({ slug: c.slug, signal })
+                    mvtCashData = await getAllMvtCash({ enterprise: user.enterprise, agency: user.agency, cash: cash_.id, startDate, endDate })
+                    const archiveBalance = await getArchiveBalance({ slug: c.slug, startDate, endDate: startDate })
+                    initial += archiveBalance.length > 0 ? archiveBalance[0].balance : 0
+
+                }
+
+            } else if (user.role.includes("ROLE_CHEF_CAISSIER") && selectedCash.current.value !== "Sélectionner une caisse") {
+                const selectCash = selectedCash?.current?.value;
+                const cash_ = await getCashBySlug({ slug: selectCash, signal })
+                mvtCashData = await getAllMvtCash({ enterprise: user.enterprise, agency: user.agency, cash: cash_.id, startDate, endDate })
+                const archiveBalance = await getArchiveBalance({ slug: selectCash, startDate, endDate: startDate })
+                initial = archiveBalance.length > 0 ? archiveBalance[0].balance : 0
+                cash.push(cash_)
+
             }
-            const exists = data.some(d => d.type === m.type);
-            if (!exists) {
-                data.push({
-                    ref: m.ref,
-                    type: m.type,
-                    sens: m.sens,
-                    amount: m.amount
-                });
+            for (let m of mvtCashData) {
+                if (m.sens === "ENCAISSEMENT") {
+                    incoming += m.amount
+                } else {
+                    outgoing += m.amount
+                }
+                const exists = data.some(d => d.type === m.type);
+                if (!exists) {
+                    data.push({
+                        ref: m.ref,
+                        type: m.type,
+                        sens: m.sens,
+                        amount: m.amount
+                    });
+                }
             }
+
+            const personal_ = await getPersonalById({ id: user.personal, signal })
+            const personal = personal_.lastName + " " + personal_.firstName
+
+            const printCash = {
+                enterprise,
+                agency,
+                period,
+                data,
+                date,
+                personal,
+                initial,
+                cash: user.role.includes("ROLE_CHEF_CAISSIER") && selectedCash === "Sélectionner une caisse" ? [] : cash,
+                incoming,
+                outgoing,
+                balance: initial + incoming - outgoing
+            }
+            dispatch(printActions.getPrint(printCash))
+            navigate("/print-cash")
+        } else {
+            dispatch(noteActions.show());
+            dispatch(noteActions.error(true));
+            dispatch(noteActions.relaunch());
+            dispatch(noteActions.sendData(errors))
+
         }
 
 
-        const printCash = {
-            enterprise,
-            agency,
-            period,
-            data,
-            date,
-            personal,
-            initial,
-            cash,
-            incoming,
-            outgoing,
-            balance: initial + incoming - outgoing
-        }
-        dispatch(printActions.getPrint(printCash))
-        navigate("/print-cash")
     }
 
 
 
     return <>
-        {user.cashes.length > 0 ? <>
-            <div className="flex gap-2 w-full shadow-xl shadow-sky-50 p-2">
-                <div className="w-2/3 h-26 bg-sky-950  flex flex-wrap p-2 gap-2 rounded shadow-2xs shadow-sky-950">
-                    {data?.cashes.map(c => <div className="flex flex-col bg-sky-50 text-sky-950 font-medium rounded p-2 w-35 gap-2" key={c.key}>
-                        <span className="bg-sky-950 text-sky-50 font-medium  border rounded px-1 shadow-sky-950 shadow-md text-center"><FontAwesomeIcon icon={faCoins} className="me-1" />{c.value.toUpperCase()}</span>
-                        <div className="flex flex-col bg-sky-950 rounded p-1 gap-1 shadow-sky-950 shadow-md">
-                            <span className="bg-sky-950 text-sky-50">Solde disponible:</span>
-                            <span className="bg-sky-950 text-sky-50 text-end">{Number(c.balance).toLocaleString()} FCFA</span>
-                        </div>
-                    </div>)}
-                </div>
-
-                <div className="flex justify-center mb-2">
-                    {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <Submit onClick={() => handleModal("new")}>Nouveau</Submit> : undefined}
-                    {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <Submit onClick={() => handleModal("report")}>Rapport</Submit> : undefined}
-                </div>
+        {user.cashes.length > 0 || user.role.includes("ROLE_CHEF_CAISSIER") ? <>
+            <div className="mb-2 w-full h-26 bg-sky-950  flex flex-wrap p-2 gap-2 rounded shadow-2xs shadow-sky-950">
+                {data?.cashes.map(c => <div className="flex flex-col bg-sky-50 text-sky-950 font-medium rounded p-2 w-35 gap-2" key={c.key}>
+                    <span className="bg-sky-950 text-sky-50 font-medium  border rounded px-1 shadow-sky-950 shadow-md text-center"><FontAwesomeIcon icon={faCoins} className="me-1" />{c.value.toUpperCase()}</span>
+                    <div className="flex flex-col bg-sky-950 rounded p-1 gap-1 shadow-sky-950 shadow-md">
+                        <span className="bg-sky-950 text-sky-50">Solde disponible:</span>
+                        <span className="bg-sky-950 text-sky-50 text-end">{Number(c.balance).toLocaleString()} FCFA</span>
+                    </div>
+                </div>)}
+            </div>
+            <div className="flex justify-center mb-2">
+                {user.role.includes("ROLE_CAISSIER") && user.cashes.length > 0 || user.role.includes("ROLE_CHEF_CAISSIER") && user.cashes.length > 0 ? <Submit onClick={() => handleModal("new")}>Nouveau</Submit> : undefined}
+                {user.role.includes("ROLE_CAISSIER") || user.role.includes("ROLE_CHEF_CAISSIER") ? <Submit onClick={() => handleModal("report")}>Rapport</Submit> : undefined}
             </div>
 
         </> : <p className="text-red-500 text-center font-medium">Aucune caisse rattachée</p>}

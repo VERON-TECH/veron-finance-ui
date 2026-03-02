@@ -27,7 +27,7 @@ export default function UpdateSupplier() {
     const { data } = useQuery({
         queryKey: ["suppliers", { id }],
         queryFn: ({ signal }) => getSupplierById({ id, signal }),
-        enabled: user.role.includes("ROLE_ADMIN") && id !== "" || user.role.includes("ROLE_COMPTABLE") && id !== "" || user.role.includes("ROLE_COMPTABLE_MATIERE") && id !== ""
+        enabled: user.role.includes("ROLE_ADMIN") && id !== "" || user.role.includes("ROLE_COMPTABLE") && id !== "" || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK") && id !== ""
     })
 
     async function handleSubmit(prevState, formData, signal) {
@@ -157,7 +157,7 @@ export default function UpdateSupplier() {
                 Enregistrer
             </Submit> : undefined}
         </form>
-        {user.role.includes("ROLE_ADMIN") && data?.name !== "FOURNISSEUR INCONNU" ? <Submit onClick={handleClick} className="absolute bottom-10 xl:bottom-5 left-1/2 transform -translate-x-1/2">
+        {user.role.includes("ROLE_ADMIN") && data?.name !== "FOURNISSEUR INCONNU" ? <Submit onClick={handleClick} className="absolute bottom-10 xl:bottom-5 left-1/2 transform -translate-x-1/2 w-full">
             Entreprises autorisées
         </Submit> : undefined}
 

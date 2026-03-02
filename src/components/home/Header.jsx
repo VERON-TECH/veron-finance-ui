@@ -140,7 +140,7 @@ export default function Header() {
     </header>
 
     <AnimatePresence>
-      <Modal ref={dialog} title="Déconnexion" size="lg:w-1/5 lg:h-2/9">
+      <Modal ref={dialog} title="Déconnexion" size="lg:w-1/5 lg:h-2/9 xl:w-1/5 xl:h-3/12">
         <p className="p-2 text-center font-bold mb-2">Souhaitez-vous vous déconnecter?</p>
         <form className="flex justify-center">
           <div className="flex gap-4">

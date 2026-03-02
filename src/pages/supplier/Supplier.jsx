@@ -27,7 +27,7 @@ export default function SupplierPage() {
     const { data, isLoading } = useQuery({
         queryKey: ["suppliers", { enterprise: user.enterprise }],
         queryFn: ({ signal }) => getAllSuppliers({ signal, enterprise: user.enterprise }),
-        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")
+        enabled: user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK")
     })
 
 

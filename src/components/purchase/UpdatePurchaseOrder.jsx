@@ -688,7 +688,7 @@ export default function UpdatePurchaseOrder() {
                     {data?.products.length > 0 && data.products.map(p => <tr key={p.product}>
                         <td className="border border-sky-950 text-center p-1">{p.id}</td>
                         <td className="border border-sky-950 text-center p-1">{p.product}</td>
-                        <td className="border border-sky-950 text-center p-1"><input type="number" className="w-full text-end" defaultValue={Number(p.quantity).toLocaleString()} onChange={(e) => handleChanges("quantity", e.value.target, p.id)} /></td>
+                        <td className="border border-sky-950 text-center p-1"><input type="number" className="w-full text-end" defaultValue={Number(p.quantity).toLocaleString()} onChange={(e) => handleChanges("quantity", e.target.value, p.id)} /></td>
                         <td className="border border-sky-950 text-center p-1"><input type="number" className="w-full text-end" defaultValue={Number(p.price).toLocaleString()} onChange={(e) => handleChanges("price", e.target.value, p.id)} /></td>
                         <td className="border border-sky-950 text-center p-1"><input type="text" placeholder="numéro du lot" onChange={(e) => handleChanges("lot", e.target.value, p.id)} /></td>
                         <td className="border border-sky-950 text-center p-1"><input type="date" onChange={(e) => handleChanges("date", e.target.value, p.id)} /></td>

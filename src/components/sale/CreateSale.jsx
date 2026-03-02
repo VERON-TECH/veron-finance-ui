@@ -478,7 +478,6 @@ export default function CreateSale() {
         }
 
         if (identifier === "paymentMethod") {
-            inputPayment.current.readOnly = false
             if (value === "ESPECES") {
                 setData(prev => {
                     return {

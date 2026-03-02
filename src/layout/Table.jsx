@@ -8,9 +8,8 @@ import 'primeicons/primeicons.css';
 import { AnimatePresence, motion } from 'framer-motion';
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
-import { Button } from 'primereact/button';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFolderOpen, faTrash } from '@fortawesome/free-solid-svg-icons';
+import { faFileCsv, faFileExcel, faFilePdf, faFolderOpen, faTrash } from '@fortawesome/free-solid-svg-icons';
 import Modal from './Modal';
 import { useDispatch, useSelector } from 'react-redux';
 import { modalActions } from '../store/modalSlice';
@@ -143,10 +142,10 @@ export default function Table({ data, headers, emptyMessage, sheet, titleRef, si
           />))}
 
     </DataTable>
-    <div className="flex items-center justify-end gap-2">
-      <Button type="button" icon="pi pi-file" rounded onClick={() => exportCSV(false)} data-pr-tooltip="CSV" />
-      <Button type="button" icon="pi pi-file-excel" severity="success" rounded onClick={exportExcel} data-pr-tooltip="XLS" />
-    </div>
+    {data?.length > 0 && <div className="flex items-center justify-end gap-2 mt-2">
+      <button onClick={exportExcel} data-pr-tooltip="XLS" className="cursor-pointer"><FontAwesomeIcon icon={faFileExcel} size="3x" className="text-green-950" /></button>
+      <button onClick={() => exportCSV(false)} data-pr-tooltip="CSV" className="cursor-pointer"><FontAwesomeIcon icon={faFileCsv} size="3x" className="text-green-950" /></button>
+    </div>}
 
     <AnimatePresence>
       <Modal ref={dialog1} title={titleRef} size={size}>

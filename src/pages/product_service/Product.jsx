@@ -45,7 +45,7 @@ export default function ProductPage() {
                 isLoading: true
             }
         })
-        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")) {
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK")) {
             async function get(signal) {
                 const allProducts = await getAllProducts({ signal, enterprise: user?.enterprise })
                 let tb = []
@@ -70,7 +70,7 @@ export default function ProductPage() {
 
     return <>
         <div className="flex justify-center mb-2">
-            {user.role.includes("ROLE_COMPTABL_MATIERE") || user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={handleModal}>Nouveau</Submit> : undefined}
+            {user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK") || user.role.includes("ROLE_COMPTABLE") ? <Submit onClick={handleModal}>Nouveau</Submit> : undefined}
         </div>
         <Table data={data?.product} headers={products.header} emptyMessage="Aucun produit trouvé." globalFilterFields={products.global} sheet="Produit" titleRef="Mise à jour informations d'un produit" size="lg:h-7/12 lg:w-4/15 xl:h-8/12" />
         {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}

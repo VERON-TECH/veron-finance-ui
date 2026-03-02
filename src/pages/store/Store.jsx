@@ -12,6 +12,7 @@ import CreateStore from "../../components/store/CreateStore.jsx";
 import Logo from "../../layout/LogoDark.jsx";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faSpinner } from "@fortawesome/free-solid-svg-icons";
+import CardStore from "../../components/store/CardStore.jsx";
 
 
 
@@ -43,7 +44,7 @@ export default function StorePage() {
                 isLoading: true
             }
         })
-        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")) {
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK")) {
             async function get(signal) {
                 const allStores = await getAllStores({ signal, enterprise: user?.enterprise, agency: user?.agency })
                 let tb = []
@@ -77,9 +78,12 @@ export default function StorePage() {
 
     return <>
         <div className="flex justify-center gap-2 mb-2">
-            {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit onClick={() => handleModal("store")}>Nouveau</Submit> : undefined}
+            {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK") ? <Submit onClick={() => handleModal("store")}>Nouveau</Submit> : undefined}
         </div>
-        <Table data={data?.store} headers={stores.header} emptyMessage="Aucun magasin trouvé." globalFilterFields={stores.global} sheet="Magasin" titleRef="Mise à jour informations d'un magasin" size="lg:h-4/12 lg:w-4/15 xl:h-5/12" />
+        {user.role.includes("ROLE_ADMIN") && <Table data={data?.store} headers={stores.header} emptyMessage="Aucun magasin trouvé." globalFilterFields={stores.global} sheet="Magasin" titleRef="Mise à jour informations d'un magasin" size="lg:h-4/12 lg:w-4/15 xl:h-5/12" />}
+        {user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK") || user.role.includes("ROLE_COMPTABLE") ? <div className="flex flex-wrap gap-8 border p-4 bg-sky-100 shadow-md shadow-sky-950 rounded-xl">
+            {data?.store.map(s => <CardStore key={s.id} name={s.name} storePrincipal={s.storePrincipal} id={s.id} />)}
+        </div> : undefined}
         {data?.isLoading && <div className="text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-32"><Logo /><FontAwesomeIcon icon={faSpinner} className="animate-spin" /></div>}
         <Modal ref={dialog} size="lg:h-3/12 lg:w-4/15 xl:h-3/12" title="Créer un magasin">
             <CreateStore />

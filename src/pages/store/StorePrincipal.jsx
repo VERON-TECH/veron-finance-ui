@@ -46,7 +46,7 @@ export default function StorePincipalPage() {
                 isLoading: true
             }
         })
-        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")) {
+        if (user.role.includes("ROLE_ADMIN") || user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK")) {
             async function get(signal) {
                 const allStorePrincipals = await getAllStorePrincipal({ signal, enterprise: user?.enterprise, agency: user?.agency })
                 let tb = []

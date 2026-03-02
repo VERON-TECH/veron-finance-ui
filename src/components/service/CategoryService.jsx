@@ -17,7 +17,7 @@ export default function CategoryService() {
     const { data } = useQuery({
         queryKey: ["categories"],
         queryFn: getCategoryService,
-        enabled: user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE")
+        enabled: user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK")
     })
 
 
@@ -32,7 +32,7 @@ export default function CategoryService() {
 
     return <>
         <div className="flex justify-center gap-2 mb-2">
-            {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_COMPTABLE_MATIERE") ? <Submit onClick={() => handleModal("category")}>Nouveau</Submit> : undefined}
+            {user.role.includes("ROLE_COMPTABLE") || user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK") ? <Submit onClick={() => handleModal("category")}>Nouveau</Submit> : undefined}
         </div>
 
         <Table data={data} headers={categoryServices.header} emptyMessage="Aucune catégorie trouvée." globalFilterFields={categoryServices.global} sheet="Banque" titleRef="Mise à jour informations d'une catégorie de service" size="lg:h-3/11 lg:w-4/15" />

@@ -23,12 +23,16 @@ export default function HomeIndexPage() {
       dispatch(identifierMenuActions.updateMenu({ menu: "financial" }))
     }
 
-    if (user.role.includes("ROLE_COMPTABLE_MATIERE")) {
+    if (user.role.includes("ROLE_GESTIONNAIRE_DE_STOCK")) {
       dispatch(identifierMenuActions.updateMenu({ menu: "store" }))
     }
 
     if (user.role.includes("ROLE_CAISSIER")) {
       dispatch(identifierMenuActions.updateMenu({ menu: "sale" }))
+    }
+
+    if (user.role.includes("ROLE_CHEF_CAISSIER")) {
+      dispatch(identifierMenuActions.updateMenu({ menu: "cash" }))
     }
 
 

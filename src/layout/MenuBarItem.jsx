@@ -2,9 +2,9 @@ import { useDispatch } from "react-redux";
 import { NavLink } from "react-router";
 import { modalActions } from "../store/modalSlice";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowCircleDown, faBank, faBuilding, faCalendarDay, faCalendarTimes, faCartPlus, faCashRegister, faCoins, faFileInvoice, faGlobe, faHome, faKey, faMinus, faMoneyBillTransfer, faPerson, faPersonArrowDownToLine, faPhoneAlt, faPrint, faSave, faShop, faShoppingBag, faShoppingCart, faSquarePlus, faStore, faStoreAlt, faUser, faUserGroup } from "@fortawesome/free-solid-svg-icons";
+import { faArrowCircleDown, faBank, faBuilding, faCalendarDay, faCalendarTimes, faCartPlus, faCashRegister, faCoins, faDatabase, faFileImport, faFileInvoice, faGlobe, faHome, faKey, faMinus, faMoneyBillTransfer, faNewspaper, faPerson, faPersonArrowDownToLine, faPhoneAlt, faPrint, faSave, faShop, faShoppingBag, faShoppingCart, faSquarePlus, faStore, faStoreAlt, faUser, faUserGroup } from "@fortawesome/free-solid-svg-icons";
 import { useEffect, useState } from "react";
-import { getAllBankAccount, getAllCashes, getAllCustomers, getAllEngagements, getAllInvoices, getAllMissing, getAllMobileMoney, getAllMvtCash, getAllPersonals, getAllPrints, getAllProducts, getAllProductStock, getAllPurchaseOrders, getAllSafes, getAllSales, getAllStorePrincipal, getAllStores, getAllSupplierAdvances, getAllSuppliers, getAllSurplus, getAllUsers } from "../utils/http";
+import { getAllAgencies, getAllBankAccount, getAllCashes, getAllCustomers, getAllEngagements, getAllEnterprises, getAllInvoices, getAllMissing, getAllMobileMoney, getAllMvtCash, getAllPersonals, getAllPrints, getAllProducts, getAllProductStock, getAllPurchaseOrders, getAllSafes, getAllSales, getAllStorePrincipal, getAllStores, getAllSupplierAdvances, getAllSuppliers, getAllSurplus, getAllUsers } from "../utils/http";
 
 
 
@@ -33,15 +33,16 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
       productStocks: 0,
       engagements: 0,
       prints: 0,
-      purchase: 0
-
+      purchase: 0,
+      agencies: 0,
+      enterprises: 0
     },
     balance: {
       bank: 0,
       mobileMoney: 0,
       advance: 0,
       safes: 0,
-      cashes: 0
+      cashes: 0,
     }
   })
   useEffect(() => {
@@ -67,7 +68,9 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
         productStocks: 0,
         engagements: 0,
         prints: 0,
-        purchase: 0
+        purchase: 0,
+        enterprises: 0,
+        agencies: 0
 
       }
 
@@ -76,12 +79,14 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
         mobileMoney: 0,
         advance: 0,
         safes: 0,
-        cashes: 0
+        cashes: 0,
       }
 
 
-      const allSales = await getAllSales({ signal, enterprise: user.enterprise, agency: user.agency, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString(), cashes })
+      const allSales = await getAllSales({ signal, enterprise: user.enterprise, agency: user.agency, startDate: new Date().toLocaleDateString(), endDate: new Date().toLocaleDateString(), cashes, customer: 0 })
       const allCustomers = await getAllCustomers({ signal, enterprise: user.enterprise })
+      const allEnterprises = await getAllEnterprises()
+      const allAgencies = await getAllAgencies()
       const allInvoices = await getAllInvoices({ signal, enterprise: user.enterprise, agency: user.agency, invoiceType: "EMISE" })
       const allMissing = await getAllMissing({ signal, personal: user.personal })
       const allSurplus = await getAllSurplus({ signal, personal: user.personal })
@@ -93,7 +98,7 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
       const allStores = await getAllStores({ signal, enterprise: user.enterprise, agency: user.agency })
       const allSuppliers = await getAllSuppliers({ signal, enterprise: user.enterprise })
       const allProducts = await getAllProducts({ signal, enterprise: user.enterprise })
-      const allProductStocks = await getAllProductStock()
+      const allProductStocks = await getAllProductStock(user.enterprise, user.agency)
       const allEngagements = await getAllEngagements({ signal, enterprise: user.enterprise, agency: user.agency })
       const allSupplierAdvances = await getAllSupplierAdvances({ signal, enterprise: user.enterprise, agency: user.agency })
       const allPrints = await getAllPrints({ signal, enterprise: user.enterprise, agency: user.agency })
@@ -117,6 +122,8 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
       nb.products = allProducts.length
       nb.productStocks = allProductStocks.length
       nb.prints = allPrints.length
+      nb.enterprises = allEnterprises.length
+      nb.agencies = allAgencies.length
 
       allInvoices.forEach(i => {
         if (i.statusInvoice === "EN_INSTANCE" && i.invoiceType === "EMISE") {
@@ -179,12 +186,14 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
   }, [])
   const className = `cursor-pointer flex justify-center items-center font-medium ${size} w-60 hover:border-b-4 focus:border-b-4 active:border-b-4 hover:pb-1`
   return <NavLink to={url} className={`({isActive})=>isActive ? ${className} : undefined`} onClick={handleClick}>
-    {title === "Entreprise" && < FontAwesomeIcon icon={faBuilding} className="me-4" />}
-    {title === "Agences" && < FontAwesomeIcon icon={faHome} className="me-4" />}
+    {title.includes("Entreprise") && < FontAwesomeIcon icon={faBuilding} className="me-4" />}
+    {title.includes("Agences") && < FontAwesomeIcon icon={faHome} className="me-4" />}
     {title.includes("Coffre-forts") && < FontAwesomeIcon icon={faCashRegister} className="me-4" />}
     {title.includes("Caisses") && < FontAwesomeIcon icon={faCoins} className="me-4" />}
     {title.includes("Banques") && < FontAwesomeIcon icon={faBank} className="me-4" />}
     {title === "Mobile Money" && < FontAwesomeIcon icon={faPhoneAlt} className="me-4" />}
+    {title === "Données" && < FontAwesomeIcon icon={faDatabase} className="me-4" />}
+    {title === "Intégration" && < FontAwesomeIcon icon={faFileImport} className="me-4" />}
     {title.includes("Magasins principaux") && < FontAwesomeIcon icon={faStoreAlt} className="me-4" />}
     {title.includes("Magasins sécondaires") && < FontAwesomeIcon icon={faStore} className="me-2" />}
     {title.includes("Bons de commande") && < FontAwesomeIcon icon={faShoppingCart} className="me-4" />}
@@ -206,31 +215,34 @@ export default function MenuBarItem({ url, title, size = "w-4/25" }) {
     {title.includes("Manquants") && < FontAwesomeIcon icon={faMinus} className="me-4" />}
     {title.includes("Excédents") && < FontAwesomeIcon icon={faSquarePlus} className="me-4" />}
     {title.includes("Imprimantes") && < FontAwesomeIcon icon={faPrint} className="me-4" />}
+    {title.includes("Opération de banque") && < FontAwesomeIcon icon={faBank} className="me-4" />}
+    {title.includes("Rapport activité") && < FontAwesomeIcon icon={faNewspaper} className="me-4" />}
     {title === "Journalier" || title === "Hebdomadaire" || title === "Mensuel" ? < FontAwesomeIcon icon={faCalendarDay} className="me-4" /> : undefined}
     {title === "Modifier le mot de passe" && < FontAwesomeIcon icon={faKey} className="me-4" />}
-    {title.includes("Ventes") ? <><span className="me-4">Ventes</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.sales).toLocaleString()}</span></> :
-      title.includes("Clients") ? <><span className="me-4">Clients</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.customers).toLocaleString()}</span></> :
-        title.includes("Factures") && title.includes("Factures") && !title.includes("clients") && !title.includes("fournisseurs") ? <><span className="me-4">Factures</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.invoices).toLocaleString()}</span></> :
-          title.includes("Opération de caisse") ? <><span className="me-4">Opération de caisse</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.mvtCashes).toLocaleString()}</span></> :
-            title.includes("Manquants") ? <><span className="me-4">Manquants</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.missing).toLocaleString()}</span></> :
-              title.includes("Excédents") ? <><span className="me-4">Excédents</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.surplus).toLocaleString()}</span></> :
-                title.includes("Banques") ? <><span className="me-4">Banques</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.balance.bank).toLocaleString()}</span></> :
-                  title.includes("Mobile Money") ? <><span className="me-4">Mobile Money</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.balance.mobileMoney).toLocaleString()}</span></> :
-                    title.includes("Personnels") ? <><span className="me-4">Personnels</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.personals).toLocaleString()}</span></> :
-                      title.includes("Utilisateurs") ? <><span className="me-4">Utilisateurs</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.users).toLocaleString()}</span></> :
-                        title.includes("Magasins principaux") ? <><span className="me-2">Magasins principaux</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.storePrincipal).toLocaleString()}</span></> :
-                          title.includes("Magasins sécondaires") ? <><span className="me-1">Magasins sécondaires</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.store).toLocaleString()}</span></> :
-                            title.includes("Fournisseurs") ? <><span className="me-4">Fournisseurs</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.suppliers).toLocaleString()}</span></> :
-                              title.includes("Produits & Services") ? <><span className="me-4">Produits & Services</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.products).toLocaleString()}</span></> :
-                                title.includes("Stock") ? <><span className="me-4">Stock</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.productStocks).toLocaleString()}</span></> :
-                                  title.includes("Factures clients") ? <><span className="me-4">Factures clients</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.invoices).toLocaleString()}</span></> :
-                                    title.includes("Factures fournisseurs") ? <><span className="me-4">Factures fournisseurs</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.invoices_).toLocaleString()}</span></> :
-                                      title.includes("Emprunts & prêts") ? <><span className="me-4">Emprunts & prêts</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.engagements).toLocaleString()}</span></> :
-                                        title.includes("Avances versées") ? <><span className="me-4">Avances versées</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.balance.advance).toLocaleString()}</span></> :
-                                          title.includes("Imprimantes") ? <><span className="me-4">Imprimante</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.prints).toLocaleString()}</span></> :
-                                            title.includes("Coffre-forts") ? <><span className="me-4">Coffre-forts</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.balance.safes).toLocaleString()}</span></> :
-                                              title.includes("Caisses") ? <><span className="me-4">Caisses</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.balance.cashes).toLocaleString()}</span></> :
-                                                title.includes("Bons de commande") ? <><span className="me-4">Bons de commande</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.purchase).toLocaleString()}</span></> :
+    {title.includes("Ventes") ? <><span className="me-4">Ventes</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.sales).toLocaleString() || 0}</span></> :
+      title.includes("Clients") ? <><span className="me-4">Clients</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.customers).toLocaleString() || 0}</span></> :
+        title.includes("Factures") && title.includes("Factures") && !title.includes("clients") && !title.includes("fournisseurs") ? <><span className="me-4">Factures</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.invoices).toLocaleString() || 0}</span></> :
+          title.includes("Opération de caisse") ? <><span className="me-4">Opération de caisse</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.mvtCashes).toLocaleString() || 0}</span></> :
+            title.includes("Manquants") ? <><span className="me-4">Manquants</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.missing).toLocaleString() || 0}</span></> :
+              title.includes("Excédents") ? <><span className="me-4">Excédents</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.surplus).toLocaleString() || 0}</span></> :
+                title.includes("Banques") ? <><span className="me-4">Banques</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.balance.bank).toLocaleString() || 0}</span></> :
+                  title.includes("Mobile Money") ? <><span className="me-4">Mobile Money</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.balance.mobileMoney).toLocaleString() || 0}</span></> :
+                    title.includes("Personnels") ? <><span className="me-4">Personnels</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.personals).toLocaleString() || 0}</span></> :
+                      title.includes("Utilisateurs") ? <><span className="me-4">Utilisateurs</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.users).toLocaleString() || 0}</span></> :
+                        title.includes("Magasins principaux") ? <><span className="me-2">Magasins principaux</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.storePrincipal).toLocaleString() || 0}</span></> :
+                          title.includes("Magasins sécondaires") ? <><span className="me-1">Magasins sécondaires</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.store).toLocaleString() || 0}</span></> :
+                            title.includes("Fournisseurs") ? <><span className="me-4">Fournisseurs</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.suppliers).toLocaleString() || 0}</span></> :
+                              title.includes("Produits & Services") ? <><span className="me-4">Produits & Services</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.products).toLocaleString() || 0}</span></> :
+                                title.includes("Stock") ? <><span className="me-4">Stock</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.productStocks).toLocaleString() || 0}</span></> :
+                                  title.includes("Factures clients") ? <><span className="me-4">Factures clients</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.invoices).toLocaleString() || 0}</span></> :
+                                    title.includes("Factures fournisseurs") ? <><span className="me-4">Factures fournisseurs</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.invoices_).toLocaleString() || 0}</span></> :
+                                      title.includes("Emprunts & prêts") ? <><span className="me-4">Emprunts & prêts</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.engagements).toLocaleString() || 0}</span></> :
+                                        title.includes("Avances versées") ? <><span className="me-4">Avances versées</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.balance.advance).toLocaleString() || 0}</span></> :
+                                          title.includes("Imprimantes") ? <><span className="me-4">Imprimante</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.prints).toLocaleString() || 0}</span></> :
+                                            title.includes("Coffre-forts") ? <><span className="me-4">Coffre-forts</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.balance.safes).toLocaleString() || 0}</span></> :
+                                              title.includes("Entreprise") ? <><span className="me-4">Entreprise</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.enterprises).toLocaleString() || 0}</span></> :
+                                                title.includes("Agences") ? <><span className="me-4">Agences</span><span className="border px-1 rounded bg-red-700 text-sky-50">{Number(item.nb.agencies).toLocaleString() || 0}</span></> :
+
                                                   title}
   </NavLink >
 }

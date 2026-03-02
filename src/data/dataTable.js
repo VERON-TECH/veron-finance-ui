@@ -84,6 +84,30 @@ export const agencies = {
 }
 
 
+export const archives = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Date", field: "savedDate" },
+        { key: 2, header: "Type", field: "type" },
+        { key: 3, header: "Entité", field: "identification" },
+        { key: 4, header: "Solde", field: "balance" },
+
+    ],
+
+
+
+    global: [
+        "Id",
+        "Date",
+        "Type",
+        "Entité",
+        "Solde",
+    ]
+
+}
+
+
+
 export const safes = {
     header: [
         { key: 0, header: "Id", field: "id" },
@@ -169,13 +193,10 @@ export const mvtCashes = {
         { key: 12, header: "Solde après", field: "balanceAfter" },
         { key: 13, header: "Caisse", field: "cash" },
         { key: 14, header: "Coffre-fort", field: "safe" },
-        { key: 15, header: "Validé", field: "isValidated" },
-        { key: 16, header: "Créée le", field: "dateCreated" },
-        { key: 17, header: "Par", field: "userCreated" },
-        { key: 18, header: "Mise à jour le", field: "dateUpdated" },
-        { key: 19, header: "Par", field: "userUpdated" },
+        { key: 15, header: "Validé", field: "validated" },
+        { key: 16, header: "Créé par", field: "userCreated" },
+        { key: 17, header: "Edité par", field: "userUpdated" },
     ],
-
 
 
     global: [
@@ -195,10 +216,224 @@ export const mvtCashes = {
         "Caisse",
         "Coffre-fort",
         "Validé",
+        "Créé par",
+        "Edité par"
+    ]
+
+}
+
+export const mvtBanks = {
+
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Date", field: "dateTransaction" },
+        { key: 4, header: "Réf", field: "ref" },
+        { key: 5, header: "Type", field: "type" },
+        { key: 6, header: "Réf. Ext", field: "refExt" },
+        { key: 7, header: "Motif", field: "motif" },
+        { key: 8, header: "Sens", field: "sens" },
+        { key: 9, header: "Solde avant", field: "balanceBefore" },
+        { key: 10, header: "Montant", field: "amount" },
+        { key: 11, header: "Frais", field: "fee" },
+        { key: 12, header: "Solde après", field: "balanceAfter" },
+        { key: 13, header: "Banque", field: "bankAccount" },
+        { key: 14, header: "Créé par", field: "userCreated" },
+        { key: 15, header: "Edité par", field: "userUpdated" },
+    ],
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Date",
+        "Réf",
+        "Type",
+        "Réf. Ext",
+        "Motif",
+        "Sens",
+        "Solde avant",
+        "Montant",
+        "Frais",
+        "Solde après",
+        "Banque",
+        "Créé par",
+        "Edité par"
+    ]
+
+}
+
+
+export const mvtSalePayments = {
+
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Vente", field: "sale" },
+        { key: 4, header: "Moyen de paiement", field: "paymentMethod" },
+        { key: 5, header: "Moyen de réception", field: "paymentReceiver" },
+        { key: 6, header: "Caisse", field: "cash" },
+        { key: 7, header: "Solde avant", field: "balanceBefore" },
+        { key: 8, header: "Avance", field: "advance" },
+        { key: 9, header: "Solde après", field: "balanceAfter" },
+        { key: 10, header: "Solde", field: "balance" },
+        { key: 11, header: "Client", field: "customer" },
+        { key: 12, header: "Créée le", field: "dateCreated" },
+        { key: 13, header: "Créé par", field: "userCreated" },
+        { key: 14, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 15, header: "Edité par", field: "userUpdated" },
+
+    ],
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Vente",
+        "Moyen de paiement",
+        "Moyen de réception",
+        "Caisse",
+        "Solde avant",
+        "Avance",
+        "Solde après",
+        "Solde",
+        "Client",
         "Créée le",
-        "Par",
+        "Créé par",
         "Mise à jour le",
-        "Par"
+        "Edité par",
+    ]
+
+}
+
+
+export const payments = {
+
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Client", field: "customer" },
+        { key: 4, header: "Caisse", field: "cash" },
+        { key: 5, header: "Moyen de paiement", field: "paymentMethod" },
+        { key: 6, header: "Moyen de réception", field: "paymentReceiver" },
+        { key: 7, header: "Facture", field: "invoice" },
+        { key: 8, header: "Montant de la facture", field: "amountInvoice" },
+        { key: 9, header: "Montant", field: "amount" },
+        { key: 10, header: "Solde", field: "balance" },
+        { key: 11, header: "Créée le", field: "dateCreated" },
+        { key: 12, header: "Créé par", field: "userCreated" },
+        { key: 13, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 14, header: "Edité par", field: "userUpdated" },
+
+    ],
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Client",
+        "Caisse",
+        "Moyen de paiement",
+        "Moyen de réception",
+        "Facture",
+        "Montant de la facture",
+        "Montant",
+        "Solde",
+        "Créée le",
+        "Créé par",
+        "Mise à jour le",
+        "Edité par",
+    ]
+
+}
+
+export const salePayments = {
+
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Vente", field: "sale" },
+        { key: 2, header: "Reste", field: "rest" },
+        { key: 3, header: "Avance", field: "advance" },
+        { key: 4, header: "Solde", field: "balance" },
+        { key: 5, header: "Créée le", field: "dateCreated" },
+        { key: 6, header: "Créé par", field: "userCreated" },
+        { key: 7, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 8, header: "Edité par", field: "userUpdated" },
+
+    ],
+
+
+    global: [
+        "Id",
+        "Vente",
+        "Reste",
+        "Avance",
+        "Solde",
+        "Créée le",
+        "Créé par",
+        "Mise à jour le",
+        "Edité par",
+    ]
+
+}
+
+
+export const mvtSales = {
+
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Vente", field: "sale" },
+        { key: 4, header: "Client", field: "customer" },
+        { key: 5, header: "Service", field: "service" },
+        { key: 6, header: "Produit", field: "product" },
+        { key: 7, header: "Moyen de paiement", field: "paymentMethod" },
+        { key: 8, header: "Quantité", field: "quantity" },
+        { key: 9, header: "Profit", field: "profit" },
+        { key: 10, header: "Prix H.T.", field: "price" },
+        { key: 11, header: "Rémise", field: "discount" },
+        { key: 12, header: "Taxe", field: "tax" },
+        { key: 13, header: "Prix T.T.C.", field: "priceTTC" },
+        { key: 14, header: "Magasin", field: "store" },
+        { key: 15, header: "Lot", field: "lot" },
+        { key: 16, header: "Caisse", field: "cash" },
+        { key: 17, header: "Créée le", field: "dateCreated" },
+        { key: 18, header: "Créé par", field: "userCreated" },
+        { key: 19, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 20, header: "Edité par", field: "userUpdated" },
+
+    ],
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Vente",
+        "Client",
+        "Service",
+        "Produit",
+        "Moyen de paiement",
+        "Quantité",
+        "Profit",
+        "Prix H.T.",
+        "Rémise",
+        "Taxe",
+        "Prix T.T.C.",
+        "Magasin",
+        "Lot",
+        "Caisse",
+        "Créée le",
+        "Créé par",
+        "Mise à jour le",
+        "Edité par",
     ]
 
 }
@@ -619,7 +854,7 @@ export const products = {
         { key: 0, header: "Id", field: "id" },
         { key: 1, header: "Entreprise", field: "enterprise" },
         { key: 2, header: "Réf.", field: "ref" },
-        { key: 3, header: "Catégorie", field: "catégorie" },
+        { key: 3, header: "Catégorie", field: "category" },
         { key: 4, header: "Nom", field: "name" },
         { key: 5, header: "Prix d'achat", field: "price" },
         { key: 6, header: "Prix de vente", field: "sellingPrice" },
@@ -647,6 +882,35 @@ export const products = {
         "Quantité",
         "Valeur",
         "Stock de sécurité",
+        "Créée le",
+        "Par",
+        "Mise à jour le",
+        "Par"
+    ]
+
+}
+
+export const profits = {
+    header: [
+        { key: 0, header: "Id", field: "id" },
+        { key: 1, header: "Entreprise", field: "enterprise" },
+        { key: 2, header: "Agence", field: "agency" },
+        { key: 3, header: "Vente", field: "sale" },
+        { key: 4, header: "Montant", field: "amount" },
+        { key: 5, header: "Créée le", field: "dateCreated" },
+        { key: 6, header: "Par", field: "userCreated" },
+        { key: 7, header: "Mise à jour le", field: "dateUpdated" },
+        { key: 8, header: "Par", field: "userUpdated" },
+    ],
+
+
+
+    global: [
+        "Id",
+        "Entreprise",
+        "Agence",
+        "Vente",
+        "Montant",
         "Créée le",
         "Par",
         "Mise à jour le",
@@ -740,6 +1004,10 @@ export const families = {
     ]
 
 }
+
+
+
+
 
 
 export const budgets = {

@@ -329,7 +329,7 @@ export default function AuhtorizeAgency({ type, id }) {
             const supplierAuthorizeEnterpriseDto = {
                 enterprise,
             }
-            mutate({ slug: enterprise, supplierAuthorizeEnterpriseDto })
+            mutate({ slug: supplier.slug, supplierAuthorizeEnterpriseDto })
             return { errors: null }
         } else if (type === "store") {
             const store = formData.get("store")
